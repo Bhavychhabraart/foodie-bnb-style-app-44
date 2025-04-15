@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu as MenuIcon, ChevronUp, X } from 'lucide-react';
+import { Menu as MenuIcon, ChevronUp, X, Share, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Drawer,
@@ -86,87 +86,115 @@ const Menu: React.FC = () => {
     : menuItems.filter(item => item.category === activeTab);
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white py-4 px-4">
-      <div className="text-center mb-4">
-        <h2 className="text-3xl font-bold">Fine Dine Menu</h2>
+    <div className="container-padding section-padding">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="font-semibold text-2xl">Our Menu</h2>
       </div>
       
-      <Card className="w-full max-w-2xl mx-auto shadow-lg bg-gray-50 bg-opacity-20 rounded-xl">
-        <CardContent className="p-6 text-center">
-          <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>
-              <Button className="bg-airbnb-red hover:bg-airbnb-red/90 text-white font-medium px-8 py-6 rounded-full flex items-center gap-2">
-                <MenuIcon className="w-5 h-5" />
-                <span>Open Menu</span>
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="h-[90vh] rounded-t-[20px] border-t-4 border-airbnb-red">
-              <div className="flex justify-between items-center px-6 pt-4 pb-2">
-                <h2 className="text-2xl font-semibold">Fine Dine Menu</h2>
-                <DrawerClose asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <X className="h-5 w-5" />
-                  </Button>
-                </DrawerClose>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="airbnb-card overflow-hidden">
+          <div className="h-48 overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
+              alt="Restaurant menu" 
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+            />
+            <button className="share-button">
+              <Share className="h-5 w-5 text-gray-700" />
+            </button>
+          </div>
+          
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-medium">Fine Dining Menu</h3>
+              <div className="flex items-center">
+                <Star className="h-4 w-4 fill-current text-airbnb-dark" />
+                <span className="ml-1 text-sm">4.9</span>
               </div>
-              <ScrollArea className="h-[calc(90vh-70px)] w-full px-4">
-                <div className="pb-8 px-2">
-                  <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="bg-white border border-gray-200 p-1 mb-6 w-full grid grid-cols-4">
-                      <TabsTrigger value="all" className="text-sm">All Items</TabsTrigger>
-                      <TabsTrigger value="starters" className="text-sm">Starters</TabsTrigger>
-                      <TabsTrigger value="mains" className="text-sm">Mains</TabsTrigger>
-                      <TabsTrigger value="desserts" className="text-sm">Desserts</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value={activeTab} className="mt-0">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {filteredItems.map((item) => (
-                          <Card key={item.id} className="overflow-hidden border-none shadow-md">
-                            <div className="h-48 overflow-hidden">
-                              <img 
-                                src={item.image} 
-                                alt={item.name} 
-                                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                              />
-                            </div>
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-medium">{item.name}</h3>
-                                <span className="font-medium text-airbnb-red">{item.price}</span>
-                              </div>
-                              <p className="text-airbnb-light text-sm mb-3">{item.description}</p>
-                              {item.dietary && (
-                                <div className="flex flex-wrap gap-2">
-                                  {item.dietary.map((diet) => (
-                                    <Badge key={diet} variant="outline" className="text-xs capitalize">
-                                      {diet}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </ScrollArea>
-              <div className="flex justify-center pb-6">
-                <Button 
-                  variant="ghost" 
-                  className="rounded-full flex items-center gap-1 text-airbnb-red"
-                  onClick={() => setOpen(false)}
-                >
-                  <ChevronUp className="h-5 w-5" />
-                  <span>Close</span>
+            </div>
+            
+            <p className="text-airbnb-light text-sm mb-3">
+              Explore our curated selection of dishes prepared with the finest ingredients
+            </p>
+            
+            <Drawer open={open} onOpenChange={setOpen}>
+              <DrawerTrigger asChild>
+                <Button className="w-full bg-airbnb-red hover:bg-airbnb-red/90 text-white">
+                  <MenuIcon className="mr-2 h-4 w-4" />
+                  Open Menu
                 </Button>
-              </div>
-            </DrawerContent>
-          </Drawer>
-        </CardContent>
-      </Card>
+              </DrawerTrigger>
+              
+              <DrawerContent className="h-[90vh] rounded-t-[20px] border-t-4 border-airbnb-red">
+                <div className="flex justify-between items-center px-6 pt-4 pb-2">
+                  <h2 className="text-2xl font-semibold">Fine Dining Menu</h2>
+                  <DrawerClose asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </DrawerClose>
+                </div>
+                
+                <ScrollArea className="h-[calc(90vh-70px)] w-full px-4">
+                  <div className="pb-8 px-2">
+                    <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                      <TabsList className="bg-white border border-gray-200 p-1 mb-6 w-full grid grid-cols-4">
+                        <TabsTrigger value="all" className="text-sm">All Items</TabsTrigger>
+                        <TabsTrigger value="starters" className="text-sm">Starters</TabsTrigger>
+                        <TabsTrigger value="mains" className="text-sm">Mains</TabsTrigger>
+                        <TabsTrigger value="desserts" className="text-sm">Desserts</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value={activeTab} className="mt-0">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                          {filteredItems.map((item) => (
+                            <Card key={item.id} className="overflow-hidden border-none shadow-md">
+                              <div className="h-48 overflow-hidden">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name} 
+                                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                                />
+                              </div>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                  <h3 className="font-medium">{item.name}</h3>
+                                  <span className="font-medium text-airbnb-red">{item.price}</span>
+                                </div>
+                                <p className="text-airbnb-light text-sm mb-3">{item.description}</p>
+                                {item.dietary && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {item.dietary.map((diet) => (
+                                      <Badge key={diet} variant="outline" className="text-xs capitalize">
+                                        {diet}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                </ScrollArea>
+                
+                <div className="flex justify-center pb-6">
+                  <Button 
+                    variant="ghost" 
+                    className="rounded-full flex items-center gap-1 text-airbnb-red"
+                    onClick={() => setOpen(false)}
+                  >
+                    <ChevronUp className="h-5 w-5" />
+                    <span>Close</span>
+                  </Button>
+                </div>
+              </DrawerContent>
+            </Drawer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
