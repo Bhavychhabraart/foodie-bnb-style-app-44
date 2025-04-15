@@ -43,8 +43,8 @@ const Index = () => {
           <ChefsSpecials />
           <OngoingOffers />
           <PhotoGallery />
-          <Testimonials />
           <Highlights />
+          <Testimonials />
         </div>
       ) : activeCategory === 'experiences' ? (
         <Experiences category="experiences" />
