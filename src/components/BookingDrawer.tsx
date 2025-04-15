@@ -31,52 +31,54 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
   const renderBookingOptions = () => {
     return (
-      <div className="grid grid-cols-1 gap-4 px-4 pb-6">
-        <DrawerHeader>
-          <DrawerTitle className="text-center text-xl">How would you like to book?</DrawerTitle>
-          <DrawerDescription className="text-center">
+      <div className="flex flex-col h-full">
+        <DrawerHeader className="pb-6 pt-6">
+          <DrawerTitle className="text-center text-2xl font-bold">How would you like to book?</DrawerTitle>
+          <DrawerDescription className="text-center text-base mt-2">
             Choose an option below to get started
           </DrawerDescription>
         </DrawerHeader>
 
-        <Button
-          variant="outline"
-          className="flex items-center justify-start border-2 h-24 relative p-4"
-          onClick={() => handleBookingOptionSelect('standard')}
-        >
-          <Utensils className="h-6 w-6 text-airbnb-red mr-3" />
-          <div className="text-left">
-            <h3 className="font-medium">Standard Table</h3>
-            <p className="text-xs text-gray-500">Reserve a table for your group</p>
-          </div>
-          <div className="absolute right-4">→</div>
-        </Button>
+        <div className="flex-1 px-6 pb-8 space-y-6">
+          <Button
+            variant="outline"
+            className="flex items-center justify-start border-2 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-red/50 hover:bg-airbnb-red/5 transition-all"
+            onClick={() => handleBookingOptionSelect('standard')}
+          >
+            <Utensils className="h-8 w-8 text-airbnb-red mr-4" />
+            <div className="text-left flex-1">
+              <h3 className="font-medium text-lg">Standard Table</h3>
+              <p className="text-sm text-gray-500 mt-1">Reserve a table for your group</p>
+            </div>
+            <div className="text-airbnb-red text-xl">→</div>
+          </Button>
 
-        <Button
-          variant="outline"
-          className="flex items-center justify-start border-2 h-24 relative p-4"
-          onClick={() => handleBookingOptionSelect('corporate')}
-        >
-          <Briefcase className="h-6 w-6 text-airbnb-red mr-3" />
-          <div className="text-left">
-            <h3 className="font-medium">Corporate Event</h3>
-            <p className="text-xs text-gray-500">Organize a business lunch or meeting</p>
-          </div>
-          <div className="absolute right-4">→</div>
-        </Button>
+          <Button
+            variant="outline"
+            className="flex items-center justify-start border-2 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-red/50 hover:bg-airbnb-red/5 transition-all"
+            onClick={() => handleBookingOptionSelect('corporate')}
+          >
+            <Briefcase className="h-8 w-8 text-airbnb-red mr-4" />
+            <div className="text-left flex-1">
+              <h3 className="font-medium text-lg">Corporate Event</h3>
+              <p className="text-sm text-gray-500 mt-1">Organize a business lunch or meeting</p>
+            </div>
+            <div className="text-airbnb-red text-xl">→</div>
+          </Button>
 
-        <Button
-          variant="outline"
-          className="flex items-center justify-start border-2 h-24 relative p-4"
-          onClick={() => handleBookingOptionSelect('party')}
-        >
-          <PartyPopper className="h-6 w-6 text-airbnb-red mr-3" />
-          <div className="text-left">
-            <h3 className="font-medium">Private Party</h3>
-            <p className="text-xs text-gray-500">Host a celebration or kitty party</p>
-          </div>
-          <div className="absolute right-4">→</div>
-        </Button>
+          <Button
+            variant="outline"
+            className="flex items-center justify-start border-2 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-red/50 hover:bg-airbnb-red/5 transition-all"
+            onClick={() => handleBookingOptionSelect('party')}
+          >
+            <PartyPopper className="h-8 w-8 text-airbnb-red mr-4" />
+            <div className="text-left flex-1">
+              <h3 className="font-medium text-lg">Private Party</h3>
+              <p className="text-sm text-gray-500 mt-1">Host a celebration or kitty party</p>
+            </div>
+            <div className="text-airbnb-red text-xl">→</div>
+          </Button>
+        </div>
       </div>
     );
   };
@@ -96,8 +98,10 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={`${isMobile ? 'max-h-[135dvh]' : 'max-h-[135vh]'} overflow-y-auto pb-safe`}>
-        {renderSelectedForm()}
+      <DrawerContent className="max-h-[90vh] bg-white">
+        <div className="h-full overflow-y-auto pb-safe">
+          {renderSelectedForm()}
+        </div>
       </DrawerContent>
     </Drawer>
   );
