@@ -250,6 +250,55 @@ const CarouselNext = React.forwardRef<
 })
 CarouselNext.displayName = "CarouselNext"
 
+const CarouselDots = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const { api } = useCarousel()
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!api) {
+      return
+    }
+
+    const onSelect = () => {
+      setSelectedIndex(api.selectedScrollSnap())
+    }
+
+    api.on("select", onSelect)
+    return () => {
+      api.off("select", onSelect)
+    }
+  }, [api])
+
+  if (!api || api.scrollSnapList().length <= 1) {
+    return null
+  }
+
+  return (
+    <div 
+      ref={ref}
+      className={cn("flex justify-center items-center space-x-2", className)}
+      {...props}
+    >
+      {api.scrollSnapList().map((_, index) => (
+        <button
+          key={index}
+          onClick={() => api.scrollTo(index)}
+          className={cn(
+            "w-2 h-2 rounded-full transition-all duration-300",
+            index === selectedIndex 
+              ? "bg-airbnb-red w-4" 
+              : "bg-gray-300 hover:bg-gray-400"
+          )}
+        />
+      ))}
+    </div>
+  )
+})
+CarouselDots.displayName = "CarouselDots"
+
 export {
   type CarouselApi,
   Carousel,
@@ -257,4 +306,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselDots,
 }

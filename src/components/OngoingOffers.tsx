@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
 import { ChevronRight, Tag } from 'lucide-react';
 import { 
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  CarouselDots,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -99,8 +97,7 @@ const OngoingOffers: React.FC = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-0 -translate-x-1/2" />
-          <CarouselNext className="right-0 translate-x-1/2" />
+          <CarouselDots className="mt-4" />
         </Carousel>
       </div>
 
