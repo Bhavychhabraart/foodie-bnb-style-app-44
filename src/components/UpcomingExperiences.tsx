@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, Calendar, ArrowRight } from 'lucide-react';
+import { ChevronRight, Calendar, ArrowRight, ArrowLeft, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import { 
   Carousel,
   CarouselContent,
@@ -32,6 +32,18 @@ import {
 } from "@/components/ui/select";
 import { format } from 'date-fns';
 import { useToast } from "@/components/ui/use-toast";
+import BookingConfirmation from './BookingConfirmation';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface Experience {
   id: number;
@@ -71,44 +83,307 @@ const timeSlots = [
   "10:00 PM"
 ];
 
+// Define the form schema with Zod
+const formSchema = z.object({
+  time: z.string().min(1, { message: "Please select a time" }),
+  guests: z.string().min(1, { message: "Please select number of guests" }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  specialRequests: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 const UpcomingExperiences: React.FC = () => {
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
-  const [guests, setGuests] = useState("2");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [specialRequests, setSpecialRequests] = useState("");
-  const [selectedTime, setSelectedTime] = useState<string | undefined>();
+  const [bookingStep, setBookingStep] = useState(1);
+  const [bookingComplete, setBookingComplete] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { toast } = useToast();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      time: "",
+      guests: "2",
+      name: "",
+      email: "",
+      phone: "",
+      specialRequests: "",
+    },
+  });
 
   const handleBookNow = (experience: Experience) => {
     setSelectedExperience(experience);
+    setBookingStep(1);
+    setBookingComplete(false);
+    form.reset({
+      time: "",
+      guests: "2",
+      name: "",
+      email: "",
+      phone: "",
+      specialRequests: "",
+    });
+    setDrawerOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedExperience || !selectedTime || !name || !email || !phone) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
-      return;
+  const handleSubmit = (values: FormValues) => {
+    if (bookingStep < 3) {
+      setBookingStep(bookingStep + 1);
+    } else {
+      setBookingComplete(true);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (bookingStep > 1) {
+      setBookingStep(bookingStep - 1);
+    }
+  };
+
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+    setTimeout(() => {
+      setBookingStep(1);
+      setBookingComplete(false);
+    }, 300);
+  };
+
+  const renderStepIndicator = () => {
+    return (
+      <div className="flex items-center justify-center space-x-2 mb-6">
+        {[1, 2, 3].map((step) => (
+          <div 
+            key={step} 
+            className={`w-2.5 h-2.5 rounded-full ${
+              step === bookingStep 
+                ? 'bg-airbnb-red' 
+                : step < bookingStep 
+                  ? 'bg-gray-400' 
+                  : 'bg-gray-200'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const renderBookingStepContent = () => {
+    if (bookingComplete) {
+      return (
+        <BookingConfirmation 
+          experienceTitle={selectedExperience?.title || ""}
+          date={selectedExperience?.date || ""}
+          time={form.getValues("time")}
+          guests={form.getValues("guests")}
+          onClose={handleCloseDrawer}
+        />
+      );
     }
 
-    toast({
-      title: "Booking confirmed!",
-      description: `Your booking for ${selectedExperience.title} on ${selectedExperience.date} at ${selectedTime} has been confirmed.`,
-    });
-
-    // Reset form
-    setSelectedTime(undefined);
-    setGuests("2");
-    setName("");
-    setEmail("");
-    setPhone("");
-    setSpecialRequests("");
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 px-6">
+          {renderStepIndicator()}
+          
+          {bookingStep === 1 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium mb-3">Choose your preferences</h3>
+              
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Time</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a time" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {timeSlots.map((slot) => (
+                          <SelectItem key={slot} value={slot}>
+                            {slot}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="guests"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number of Guests</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                          <SelectItem key={num} value={num.toString()}>
+                            {num} {num === 1 ? 'guest' : 'guests'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+          
+          {bookingStep === 2 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium mb-3">Personal Details</h3>
+              
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input 
+                          {...field} 
+                          placeholder="Your full name" 
+                          className="pl-10" 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input 
+                          {...field} 
+                          type="email" 
+                          placeholder="your@email.com" 
+                          className="pl-10" 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input 
+                          {...field} 
+                          type="tel" 
+                          placeholder="Your phone number" 
+                          className="pl-10" 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+          
+          {bookingStep === 3 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium mb-3">Additional Information</h3>
+              
+              <FormField
+                control={form.control}
+                name="specialRequests"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Special Requests</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Any dietary restrictions or special requests?" 
+                        className="min-h-[100px]" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start">
+                <AlertCircle className="h-5 w-5 text-amber-500 mr-3 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-amber-800">Please note:</p>
+                  <p className="text-amber-700">Your experience is not confirmed until you complete this process. No payment will be taken at this time.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DrawerFooter className="px-0 pt-2">
+            <div className="flex justify-between w-full">
+              {bookingStep > 1 ? (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handlePrevious}
+                  className="flex items-center"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+              ) : (
+                <div />
+              )}
+              
+              <Button 
+                type="submit" 
+                className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+              >
+                {bookingStep === 3 ? 'Confirm Booking' : 'Continue'} 
+                {bookingStep < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+              </Button>
+            </div>
+            
+            <DrawerClose asChild>
+              <Button variant="outline" onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </form>
+      </Form>
+    );
   };
 
   return (
@@ -143,7 +418,7 @@ const UpcomingExperiences: React.FC = () => {
                       <h3 className="font-medium text-lg mb-1">{experience.title}</h3>
                       <p className="text-airbnb-light mb-3">{experience.price}</p>
                       
-                      <Drawer>
+                      <Drawer open={drawerOpen && selectedExperience?.id === experience.id} onOpenChange={setDrawerOpen}>
                         <DrawerTrigger asChild>
                           <Button 
                             className="w-full bg-airbnb-red hover:bg-airbnb-red/90 text-white"
@@ -152,106 +427,16 @@ const UpcomingExperiences: React.FC = () => {
                             Book Now <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
                         </DrawerTrigger>
-                        <DrawerContent>
-                          <div className="mx-auto w-full max-w-md">
-                            <DrawerHeader>
-                              <DrawerTitle>Book {selectedExperience?.title}</DrawerTitle>
+                        <DrawerContent className="max-h-[90vh] overflow-auto">
+                          <DrawerHeader>
+                            <DrawerTitle>{bookingComplete ? 'Booking Confirmed' : selectedExperience?.title}</DrawerTitle>
+                            {!bookingComplete && (
                               <DrawerDescription>
                                 {selectedExperience?.date} | {selectedExperience?.price}
                               </DrawerDescription>
-                            </DrawerHeader>
-                            
-                            <form onSubmit={handleSubmit} className="px-6">
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="time">Time</Label>
-                                  <Select value={selectedTime} onValueChange={setSelectedTime}>
-                                    <SelectTrigger className="w-full mt-1.5">
-                                      <SelectValue placeholder="Select time" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {timeSlots.map((slot) => (
-                                        <SelectItem key={slot} value={slot}>
-                                          {slot}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="guests">Number of guests</Label>
-                                  <Select value={guests} onValueChange={setGuests}>
-                                    <SelectTrigger className="w-full mt-1.5">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                                        <SelectItem key={num} value={num.toString()}>
-                                          {num} {num === 1 ? 'guest' : 'guests'}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="name">Name</Label>
-                                  <Input 
-                                    id="name" 
-                                    value={name} 
-                                    onChange={(e) => setName(e.target.value)} 
-                                    placeholder="Your full name"
-                                    className="mt-1.5"
-                                  />
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="email">Email</Label>
-                                  <Input 
-                                    id="email" 
-                                    type="email" 
-                                    value={email} 
-                                    onChange={(e) => setEmail(e.target.value)} 
-                                    placeholder="your@email.com"
-                                    className="mt-1.5"
-                                  />
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="phone">Phone</Label>
-                                  <Input 
-                                    id="phone" 
-                                    type="tel" 
-                                    value={phone} 
-                                    onChange={(e) => setPhone(e.target.value)} 
-                                    placeholder="Your phone number"
-                                    className="mt-1.5"
-                                  />
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="special-requests">Special Requests</Label>
-                                  <Textarea 
-                                    id="special-requests"
-                                    value={specialRequests}
-                                    onChange={(e) => setSpecialRequests(e.target.value)}
-                                    placeholder="Any dietary restrictions or special requests?"
-                                    className="mt-1.5"
-                                  />
-                                </div>
-                              </div>
-                            </form>
-                            
-                            <DrawerFooter>
-                              <Button onClick={handleSubmit} className="bg-airbnb-red hover:bg-airbnb-red/90 text-white">
-                                Confirm Booking
-                              </Button>
-                              <DrawerClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                              </DrawerClose>
-                            </DrawerFooter>
-                          </div>
+                            )}
+                          </DrawerHeader>
+                          {renderBookingStepContent()}
                         </DrawerContent>
                       </Drawer>
                     </div>
