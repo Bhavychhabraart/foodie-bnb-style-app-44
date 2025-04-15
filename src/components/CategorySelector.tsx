@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Menu, Ticket, Tag, Home } from 'lucide-react';
+import { Menu, Calendar, Tag, Home } from 'lucide-react';
 
 interface CategoryProps {
   activeCategory: string;
@@ -19,8 +19,8 @@ const CategorySelector: React.FC<CategoryProps> = ({
     }, 
     {
       id: 'experiences',
-      label: 'Experiences',
-      icon: Ticket
+      label: 'Events',
+      icon: Calendar
     }, 
     {
       id: 'menu',

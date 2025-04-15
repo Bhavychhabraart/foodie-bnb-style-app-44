@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
-import Experiences from '@/components/Experiences';
+import Events from '@/components/Events';
 import BottomNav from '@/components/BottomNav';
 import ChefsSpecials from '@/components/ChefsSpecials';
 import OngoingOffers from '@/components/OngoingOffers';
@@ -33,7 +33,7 @@ const Index = () => {
       
       {activeCategory === 'home' ? (
         <div className="space-y-2 bg-zinc-900">
-          <Experiences category="home" />
+          <Events category="home" />
           <Spotlight />
           <ChefsSpecials />
           <OngoingOffers />
@@ -43,7 +43,7 @@ const Index = () => {
           <Testimonials />
         </div>
       ) : activeCategory === 'experiences' ? (
-        <Experiences category="experiences" />
+        <Events category="experiences" />
       ) : activeCategory === 'menu' ? (
         <FlipBook />
       ) : activeCategory === 'offers' ? (
