@@ -122,14 +122,17 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         </motion.div>
         
         <motion.div variants={itemVariants}>
-          <Button 
-            onClick={onClose} 
-            className="mt-4 bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Done
-          </Button>
+            <Button 
+              onClick={onClose} 
+              className="mt-4 bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+            >
+              Done
+            </Button>
+          </motion.div>
         </motion.div>
       </motion.div>
       
