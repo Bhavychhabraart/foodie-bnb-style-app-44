@@ -51,7 +51,7 @@ const FlipBook: React.FC = () => {
                       <iframe 
                         src="https://heyzine.com/flip-book/44253fcd19.html" 
                         title="Restaurant Digital Menu"
-                        className="w-full h-[75vh] border-0 rounded-lg shadow-sm"
+                        className="w-full h-[calc(90vh-100px)] border-0 rounded-lg shadow-sm"
                         allow="fullscreen"
                       />
                     </div>
