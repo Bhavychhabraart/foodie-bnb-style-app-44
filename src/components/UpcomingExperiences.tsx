@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { ChevronRight, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, Calendar, ArrowRight } from 'lucide-react';
 import { 
   Carousel,
   CarouselContent,
@@ -9,6 +9,37 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { format } from 'date-fns';
+import { useToast } from "@/components/ui/use-toast";
+
+interface Experience {
+  id: number;
+  title: string;
+  date: string;
+  imageUrl: string;
+  price: string;
+}
 
 const upcomingExperiences = [
   {
@@ -34,7 +65,52 @@ const upcomingExperiences = [
   }
 ];
 
+const timeSlots = [
+  "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", 
+  "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM",
+  "10:00 PM"
+];
+
 const UpcomingExperiences: React.FC = () => {
+  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
+  const [guests, setGuests] = useState("2");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [specialRequests, setSpecialRequests] = useState("");
+  const [selectedTime, setSelectedTime] = useState<string | undefined>();
+  const { toast } = useToast();
+
+  const handleBookNow = (experience: Experience) => {
+    setSelectedExperience(experience);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedExperience || !selectedTime || !name || !email || !phone) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Booking confirmed!",
+      description: `Your booking for ${selectedExperience.title} on ${selectedExperience.date} at ${selectedTime} has been confirmed.`,
+    });
+
+    // Reset form
+    setSelectedTime(undefined);
+    setGuests("2");
+    setName("");
+    setEmail("");
+    setPhone("");
+    setSpecialRequests("");
+  };
+
   return (
     <div className="section-padding">
       <div className="container-padding mx-auto">
@@ -64,8 +140,120 @@ const UpcomingExperiences: React.FC = () => {
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="font-medium text-lg">{experience.title}</h3>
-                      <p className="text-airbnb-light mt-1">{experience.price}</p>
+                      <h3 className="font-medium text-lg mb-1">{experience.title}</h3>
+                      <p className="text-airbnb-light mb-3">{experience.price}</p>
+                      
+                      <Drawer>
+                        <DrawerTrigger asChild>
+                          <Button 
+                            className="w-full bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+                            onClick={() => handleBookNow(experience)}
+                          >
+                            Book Now <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                          <div className="mx-auto w-full max-w-md">
+                            <DrawerHeader>
+                              <DrawerTitle>Book {selectedExperience?.title}</DrawerTitle>
+                              <DrawerDescription>
+                                {selectedExperience?.date} | {selectedExperience?.price}
+                              </DrawerDescription>
+                            </DrawerHeader>
+                            
+                            <form onSubmit={handleSubmit} className="px-6">
+                              <div className="space-y-4">
+                                <div>
+                                  <Label htmlFor="time">Time</Label>
+                                  <Select value={selectedTime} onValueChange={setSelectedTime}>
+                                    <SelectTrigger className="w-full mt-1.5">
+                                      <SelectValue placeholder="Select time" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {timeSlots.map((slot) => (
+                                        <SelectItem key={slot} value={slot}>
+                                          {slot}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="guests">Number of guests</Label>
+                                  <Select value={guests} onValueChange={setGuests}>
+                                    <SelectTrigger className="w-full mt-1.5">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                                        <SelectItem key={num} value={num.toString()}>
+                                          {num} {num === 1 ? 'guest' : 'guests'}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="name">Name</Label>
+                                  <Input 
+                                    id="name" 
+                                    value={name} 
+                                    onChange={(e) => setName(e.target.value)} 
+                                    placeholder="Your full name"
+                                    className="mt-1.5"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="email">Email</Label>
+                                  <Input 
+                                    id="email" 
+                                    type="email" 
+                                    value={email} 
+                                    onChange={(e) => setEmail(e.target.value)} 
+                                    placeholder="your@email.com"
+                                    className="mt-1.5"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="phone">Phone</Label>
+                                  <Input 
+                                    id="phone" 
+                                    type="tel" 
+                                    value={phone} 
+                                    onChange={(e) => setPhone(e.target.value)} 
+                                    placeholder="Your phone number"
+                                    className="mt-1.5"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="special-requests">Special Requests</Label>
+                                  <Textarea 
+                                    id="special-requests"
+                                    value={specialRequests}
+                                    onChange={(e) => setSpecialRequests(e.target.value)}
+                                    placeholder="Any dietary restrictions or special requests?"
+                                    className="mt-1.5"
+                                  />
+                                </div>
+                              </div>
+                            </form>
+                            
+                            <DrawerFooter>
+                              <Button onClick={handleSubmit} className="bg-airbnb-red hover:bg-airbnb-red/90 text-white">
+                                Confirm Booking
+                              </Button>
+                              <DrawerClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                              </DrawerClose>
+                            </DrawerFooter>
+                          </div>
+                        </DrawerContent>
+                      </Drawer>
                     </div>
                   </CardContent>
                 </Card>
