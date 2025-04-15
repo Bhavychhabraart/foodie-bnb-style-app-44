@@ -10,14 +10,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const chefsSpecials = [
   {
-    id: 1,
-    title: "Truffle Risotto",
-    chef: "Chef Marcus",
-    imageUrl: "https://images.unsplash.com/photo-1634140801787-bfc0aedc2fe8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    price: "₹1,200",
-    rating: 4.9
-  },
-  {
     id: 2,
     title: "Beef Wellington",
     chef: "Chef Alessandro",
