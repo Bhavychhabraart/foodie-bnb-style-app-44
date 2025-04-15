@@ -60,12 +60,12 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           </p>}
 
         <div className="flex gap-2 mt-3">
-          <Button variant="outline" className="flex-1 border-airbnb-red text-airbnb-red hover:bg-airbnb-red hover:text-white transition-colors" onClick={() => setIsDrawerOpen(true)}>
+          <Button variant="outline" onClick={() => setIsDrawerOpen(true)} className="flex-1 border-airbnb-red transition-colors text-orange-50 bg-orange-700 hover:bg-orange-600">
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Button>
           
-          <Button className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90 text-white" onClick={handleBookNow} disabled={isSoldOut}>
+          <Button onClick={handleBookNow} disabled={isSoldOut} className="flex-1 text-white bg-amber-500 hover:bg-amber-400">
             <CalendarCheck className="mr-2 h-4 w-4" />
             Book Now
           </Button>
