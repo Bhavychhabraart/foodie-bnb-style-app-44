@@ -14,7 +14,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   
   return (
     <motion.div 
-      className="fixed inset-0 z-50 bg-airbnb-dark flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 bg-airbnb-red flex flex-col items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -25,19 +25,19 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="flex flex-col items-center"
       >
-        <div className="w-24 h-24 rounded-full bg-airbnb-light flex items-center justify-center mb-4 shadow-lg">
-          <Utensils className="w-12 h-12 text-airbnb-dark" />
+        <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 shadow-lg">
+          <Utensils className="w-12 h-12 text-airbnb-red" />
         </div>
         <motion.h1 
-          className="text-airbnb-light text-4xl font-bold mb-2"
+          className="text-white text-4xl font-bold mb-2"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Makhna
+          Fine Dine
         </motion.h1>
         <motion.p 
-          className="text-airbnb-gray text-lg"
+          className="text-white text-lg"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
@@ -50,4 +50,3 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
 };
 
 export default SplashScreen;
-
