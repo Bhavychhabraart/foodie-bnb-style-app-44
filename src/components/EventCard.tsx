@@ -40,7 +40,7 @@ const EventCard: React.FC<EventCardProps> = ({
   return (
     <div className="mb-8 bg-zinc-900">
       <div className="relative rounded-xl overflow-hidden mb-2">
-        <AspectRatio ratio={9/16} className="bg-zinc-800">
+        <AspectRatio ratio={4/5} className="bg-zinc-800">
           <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
         </AspectRatio>
         
