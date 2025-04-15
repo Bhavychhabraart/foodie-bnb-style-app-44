@@ -13,6 +13,7 @@ import MenuCard from '@/components/MenuCard';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
+import { ChevronRight } from 'lucide-react';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
