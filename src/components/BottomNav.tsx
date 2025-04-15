@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { CalendarPlus, User, Users, LifeBuoy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import BookingDrawer from './BookingDrawer';
 
 interface BottomNavProps {
@@ -10,12 +11,20 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const navigate = useNavigate();
   
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'members', label: 'Members', icon: Users },
     { id: 'support', label: 'Support', icon: LifeBuoy },
   ];
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'support') {
+      navigate('/support');
+    }
+  };
 
   return (
     <>
@@ -27,7 +36,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
               <button
                 key={tab.id}
                 className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
                 <span>{tab.label}</span>
@@ -49,7 +58,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
               <button
                 key={tab.id}
                 className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
                 <span>{tab.label}</span>

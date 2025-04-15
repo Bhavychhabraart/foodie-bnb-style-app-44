@@ -2,6 +2,7 @@
 import React from 'react';
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
+  const navigate = useNavigate();
+  
   const navItems = [
     { id: 'about', label: 'About' },
     { id: 'menu', label: 'Menu' },
@@ -23,11 +26,18 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'location', label: 'Location' },
   ];
 
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'support') {
+      navigate('/support');
+    }
+  };
+
   return (
     <div className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
       <div className="container-padding mx-auto flex items-center justify-between py-4">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold text-airbnb-red">Fine Dine</h1>
+          <h1 className="text-xl font-bold text-airbnb-red cursor-pointer" onClick={() => navigate('/')}>Fine Dine</h1>
         </div>
 
         <div className="hidden md:flex items-center space-x-8">
@@ -57,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             <DropdownMenuContent align="end" className="w-56 bg-white">
               <DropdownMenuItem className="cursor-pointer text-sm">Sign in</DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer text-sm">Sign up</DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-sm">Contact us</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('support')}>Support</DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer text-sm md:hidden">
                 <Button 
                   variant="ghost" 
