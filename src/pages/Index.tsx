@@ -9,6 +9,7 @@ import PhotoGallery from '@/components/PhotoGallery';
 import Testimonials from '@/components/Testimonials';
 import Highlights from '@/components/Highlights';
 import FlipBook from '@/components/FlipBook';
+import MenuCard from '@/components/MenuCard';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
@@ -53,7 +54,16 @@ const Index = () => {
       ) : activeCategory === 'experiences' ? (
         <Experiences category="experiences" />
       ) : activeCategory === 'menu' ? (
-        <FlipBook />
+        <div className="container-padding section-padding">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl">Our Menu</h2>
+            <button className="flex items-center text-airbnb-red hover:underline text-xs text-left">
+              <span className="mr-1">View all</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <MenuCard />
+        </div>
       ) : activeCategory === 'offers' ? (
         <OngoingOffers />
       ) : null}
