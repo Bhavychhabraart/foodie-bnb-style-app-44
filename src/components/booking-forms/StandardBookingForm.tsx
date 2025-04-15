@@ -1,8 +1,12 @@
-
 import React, { useState } from 'react';
-import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
+import { 
+  DrawerHeader, 
+  DrawerTitle, 
+  DrawerDescription, 
+  DrawerFooter 
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Coupon, Tag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
