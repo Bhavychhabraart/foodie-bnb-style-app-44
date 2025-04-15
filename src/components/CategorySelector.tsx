@@ -9,10 +9,10 @@ interface CategoryProps {
 
 const CategorySelector: React.FC<CategoryProps> = ({ activeCategory, setActiveCategory }) => {
   const categories = [
-    { id: 'menu', label: 'Menu', icon: Menu },
-    { id: 'experiences', label: 'Experiences', icon: Ticket },
-    { id: 'offers', label: 'Offers', icon: Tag },
     { id: 'home', label: 'Home', icon: Home },
+    { id: 'experiences', label: 'Experiences', icon: Ticket },
+    { id: 'menu', label: 'Menu', icon: Menu },
+    { id: 'offers', label: 'Offers', icon: Tag },
   ];
 
   return (
