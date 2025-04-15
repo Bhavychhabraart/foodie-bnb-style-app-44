@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CalendarPlus, User, Users, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BookingDrawer from './BookingDrawer';
+import SupportDrawer from './SupportDrawer';
 
 interface BottomNavProps {
   activeTab: string;
@@ -11,6 +12,7 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
   const navigate = useNavigate();
   
   const tabs = [
@@ -22,7 +24,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
-      navigate('/support');
+      setIsSupportDrawerOpen(true);
     }
   };
 
@@ -71,6 +73,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       <BookingDrawer 
         open={isBookingDrawerOpen} 
         onOpenChange={setIsBookingDrawerOpen} 
+      />
+
+      <SupportDrawer
+        open={isSupportDrawerOpen}
+        onOpenChange={setIsSupportDrawerOpen}
       />
     </>
   );

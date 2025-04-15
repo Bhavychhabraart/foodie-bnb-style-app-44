@@ -9,7 +9,6 @@ import SplashScreen from "./components/SplashScreen";
 import Index from "./pages/Index";
 import Detail from "./pages/Detail";
 import BookingRequest from "./pages/BookingRequest"; 
-import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient outside of the component
@@ -37,7 +36,6 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/detail" element={<Detail />} />
               <Route path="/booking" element={<BookingRequest />} />
-              <Route path="/support" element={<Support />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
