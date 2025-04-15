@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
-import { Star, Share, Eye } from 'lucide-react';
+import { Star, Share, Eye, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ExperienceDetailsDrawer from './ExperienceDetailsDrawer';
+import BookingDrawer from './BookingDrawer';
 
 interface ExperienceCardProps {
   imageUrl: string;
@@ -23,6 +25,12 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
   isSoldOut = false
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+
+  const handleReserveNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsBookingDrawerOpen(true);
+  };
 
   return (
     <div className="mb-8">
@@ -63,14 +71,25 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           </p>
         )}
 
-        <Button 
-          variant="outline" 
-          className="w-full mt-3 border-airbnb-red text-airbnb-red hover:bg-airbnb-red hover:text-white transition-colors"
-          onClick={() => setIsDrawerOpen(true)}
-        >
-          <Eye className="mr-2 h-4 w-4" />
-          View Experience
-        </Button>
+        <div className="flex gap-2 mt-3">
+          <Button 
+            variant="outline" 
+            className="flex-1 border-airbnb-red text-airbnb-red hover:bg-airbnb-red hover:text-white transition-colors"
+            onClick={() => setIsDrawerOpen(true)}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            View Details
+          </Button>
+          
+          <Button 
+            className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+            onClick={handleReserveNow}
+            disabled={isSoldOut}
+          >
+            <CalendarPlus className="mr-2 h-4 w-4" />
+            Reserve Now
+          </Button>
+        </div>
       </div>
 
       <ExperienceDetailsDrawer
@@ -85,6 +104,11 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           reviews,
           isSoldOut
         }}
+      />
+
+      <BookingDrawer
+        open={isBookingDrawerOpen}
+        onOpenChange={setIsBookingDrawerOpen}
       />
     </div>
   );

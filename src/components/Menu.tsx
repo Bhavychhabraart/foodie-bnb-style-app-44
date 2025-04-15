@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu as MenuIcon, ChevronUp, X, Share, ChevronRight } from 'lucide-react';
+import { Menu as MenuIcon, ChevronUp, X, Share, ChevronRight, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Drawer,
@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
 import ExperienceCard from './ExperienceCard';
+import BookingDrawer from './BookingDrawer';
 
 interface MenuItem {
   id: number;
@@ -81,10 +82,17 @@ const menuItems: MenuItem[] = [
 const Menu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const filteredItems = activeTab === "all" 
     ? menuItems 
     : menuItems.filter(item => item.category === activeTab);
+
+  const handleReserve = (item: MenuItem) => {
+    setSelectedItem(item);
+    setIsBookingDrawerOpen(true);
+  };
 
   return (
     <div className="container-padding section-padding">
@@ -151,15 +159,25 @@ const Menu: React.FC = () => {
                               <span className="font-medium text-airbnb-red">{item.price}</span>
                             </div>
                             <p className="text-airbnb-light text-sm mb-3">{item.description}</p>
-                            {item.dietary && (
-                              <div className="flex flex-wrap gap-2">
-                                {item.dietary.map((diet) => (
-                                  <Badge key={diet} variant="outline" className="text-xs capitalize">
-                                    {diet}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
+                            <div className="flex justify-between items-center">
+                              {item.dietary && (
+                                <div className="flex flex-wrap gap-2">
+                                  {item.dietary.map((diet) => (
+                                    <Badge key={diet} variant="outline" className="text-xs capitalize">
+                                      {diet}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                              <Button 
+                                className="ml-auto bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+                                size="sm"
+                                onClick={() => handleReserve(item)}
+                              >
+                                <CalendarPlus className="h-4 w-4 mr-1" />
+                                Reserve Now
+                              </Button>
+                            </div>
                           </CardContent>
                         </Card>
                       ))}
@@ -182,6 +200,11 @@ const Menu: React.FC = () => {
           </DrawerContent>
         </Drawer>
       </div>
+
+      <BookingDrawer 
+        open={isBookingDrawerOpen} 
+        onOpenChange={setIsBookingDrawerOpen} 
+      />
     </div>
   );
 };
