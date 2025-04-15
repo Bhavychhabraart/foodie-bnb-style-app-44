@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Award, Clock, Utensils, Wine } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
 
 const highlights = [
   {
@@ -31,19 +32,23 @@ const highlights = [
 
 const Highlights: React.FC = () => {
   return (
-    <div className="section-padding bg-gray-50">
+    <div className="py-8 bg-white">
       <div className="container-padding mx-auto">
-        <h2 className="text-2xl font-semibold mb-8 text-center">Highlights</h2>
+        <h2 className="text-2xl font-semibold mb-5 text-center">Highlights</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-4">
           {highlights.map((highlight) => (
-            <div key={highlight.id} className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
-                <highlight.icon className="w-6 h-6 text-airbnb-red" />
-              </div>
-              <h3 className="font-medium text-lg mb-2">{highlight.title}</h3>
-              <p className="text-airbnb-light text-sm">{highlight.description}</p>
-            </div>
+            <Card key={highlight.id} className="border-none shadow-sm hover:shadow-md transition-shadow duration-300">
+              <CardContent className="p-4 flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <highlight.icon className="w-5 h-5 text-airbnb-red" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-base mb-1">{highlight.title}</h3>
+                  <p className="text-airbnb-light text-xs leading-tight">{highlight.description}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

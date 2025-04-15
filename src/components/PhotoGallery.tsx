@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const photos = [
   {
@@ -52,11 +53,14 @@ const PhotoGallery: React.FC = () => {
   };
 
   return (
-    <div id="photos" className="section-padding">
+    <div id="photos" className="section-padding bg-gray-50">
       <div className="container-padding mx-auto">
-        <h2 className="text-2xl font-semibold mb-6">Photo Gallery</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">Photo Gallery</h2>
+          <LayoutGrid className="text-airbnb-dark" size={20} />
+        </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {photos.map((photo, index) => (
             <Dialog key={photo.id} open={open && currentPhotoIndex === index} onOpenChange={(value) => {
               setOpen(value);
@@ -65,13 +69,15 @@ const PhotoGallery: React.FC = () => {
               }
             }}>
               <DialogTrigger asChild>
-                <div className="airbnb-card cursor-pointer h-64">
-                  <img 
-                    src={photo.url} 
-                    alt={photo.alt} 
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  />
-                </div>
+                <Card className="overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg">
+                  <div className="h-40 sm:h-48 md:h-56 lg:h-64 relative">
+                    <img 
+                      src={photo.url} 
+                      alt={photo.alt} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                  </div>
+                </Card>
               </DialogTrigger>
               <DialogContent className="sm:max-w-3xl p-0 bg-transparent border-none">
                 <div className="relative bg-black h-[80vh] flex items-center justify-center">

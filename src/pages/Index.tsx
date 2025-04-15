@@ -15,23 +15,27 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('explore');
 
   return (
-    <div className="pb-16">
-      <SearchBar />
-      <CategorySelector 
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
+    <div className="pb-16 bg-white">
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <SearchBar />
+        <CategorySelector 
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
+      </div>
+      
       {activeCategory === 'home' ? (
-        <>
+        <div className="space-y-2">
           <UpcomingExperiences />
           <ChefsSpecials />
           <PhotoGallery />
           <Testimonials />
           <Highlights />
-        </>
+        </div>
       ) : (
         <Experiences category={activeCategory} />
       )}
+      
       <BottomNav 
         activeTab={activeTab}
         setActiveTab={setActiveTab}
