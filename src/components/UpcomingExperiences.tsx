@@ -12,7 +12,7 @@ interface Experience {
   price: string;
 }
 
-const upcomingExperiences = [
+const experiences = [
   {
     id: 1,
     title: "Farm to Table Dinner",
@@ -36,12 +36,12 @@ const upcomingExperiences = [
   }
 ];
 
-const UpcomingExperiences: React.FC = () => {
+const Experiences: React.FC = () => {
   return (
     <div className="section-padding">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-2xl">Upcoming Experiences</h2>
+          <h2 className="font-semibold text-2xl">Experiences</h2>
           <button className="flex items-center text-airbnb-red hover:underline text-xs text-left">
             <span className="mr-1">View all</span>
             <ChevronRight className="w-4 h-4" />
@@ -50,7 +50,7 @@ const UpcomingExperiences: React.FC = () => {
         
         <Carousel className="w-full">
           <CarouselContent className="-ml-2 md:-ml-4">
-            {upcomingExperiences.map(experience => (
+            {experiences.map(experience => (
               <CarouselItem key={experience.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <ExperienceCard
                   imageUrl={experience.imageUrl}
@@ -70,4 +70,4 @@ const UpcomingExperiences: React.FC = () => {
   );
 };
 
-export default UpcomingExperiences;
+export default Experiences;

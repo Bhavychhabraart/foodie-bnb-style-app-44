@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
 import BottomNav from '@/components/BottomNav';
-import UpcomingExperiences from '@/components/UpcomingExperiences';
+import Experiences from '@/components/Experiences';
 import ChefsSpecials from '@/components/ChefsSpecials';
 import OngoingOffers from '@/components/OngoingOffers';
 import PhotoGallery from '@/components/PhotoGallery';
@@ -42,7 +42,7 @@ const Index = () => {
       
       {activeCategory === 'home' ? (
         <div className="space-y-2">
-          <UpcomingExperiences />
+          <Experiences />
           <Spotlight />
           <ChefsSpecials />
           <OngoingOffers />
