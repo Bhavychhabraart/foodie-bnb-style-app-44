@@ -16,7 +16,7 @@ interface BookingDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange }) => {
+export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange }) => {
   const [selectedOption, setSelectedOption] = useState<BookingOption>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();

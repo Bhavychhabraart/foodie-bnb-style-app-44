@@ -1,6 +1,8 @@
 
-import React from 'react';
-import { Star, Share } from 'lucide-react';
+import React, { useState } from 'react';
+import { Star, Share, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import ExperienceDetailsDrawer from './ExperienceDetailsDrawer';
 
 interface ExperienceCardProps {
   imageUrl: string;
@@ -21,6 +23,8 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
   reviews = 0,
   isSoldOut = false
 }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   return (
     <div className="mb-8">
       <div className="relative rounded-xl overflow-hidden mb-2">
@@ -59,7 +63,30 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
             <span className="font-medium">{price}</span>
           </p>
         )}
+
+        <Button 
+          variant="outline" 
+          className="w-full mt-3 border-airbnb-red text-airbnb-red hover:bg-airbnb-red hover:text-white transition-colors"
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <Eye className="mr-2 h-4 w-4" />
+          View Experience
+        </Button>
       </div>
+
+      <ExperienceDetailsDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        experience={{
+          imageUrl,
+          title,
+          host,
+          price,
+          rating,
+          reviews,
+          isSoldOut
+        }}
+      />
     </div>
   );
 };
