@@ -17,7 +17,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
-  const summerDesserts = ["Mango Passion Sorbet", "Berry Pavlova", "Coconut Lime Panna Cotta", "Watermelon Granita", "Lavender Honey Ice Cream"];
+  const upcomingEvents = ["Soulful Sufi Night - 16th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
   
   return (
     <div className="pb-16 bg-zinc-900">
@@ -25,9 +25,9 @@ const Index = () => {
         <ThemeToggle />
       </div>
       
-      <MarqueeAnnouncement title="New Summer Desserts!" items={summerDesserts} />
+      <MarqueeAnnouncement title="Upcoming Events!" items={upcomingEvents} />
       
-      <div className="sticky top-0 z-10 bg-background shadow-sm dark:shadow-gray-800/20">
+      <div className="sticky top-0 z-10 bg-zinc-900 shadow-md shadow-black/30">
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
@@ -45,9 +45,15 @@ const Index = () => {
       ) : activeCategory === 'experiences' ? (
         <Events category="experiences" />
       ) : activeCategory === 'menu' ? (
-        <FlipBook />
+        <div>
+          <Events category="menu" />
+          <FlipBook />
+        </div>
       ) : activeCategory === 'offers' ? (
-        <OngoingOffers />
+        <div>
+          <Events category="offers" />
+          <OngoingOffers />
+        </div>
       ) : null}
       
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />

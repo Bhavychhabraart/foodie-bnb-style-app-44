@@ -35,16 +35,22 @@ const CategorySelector: React.FC<CategoryProps> = ({
   ];
   
   return (
-    <div className="container-padding mx-auto mt-4 border-b border-gray-800 pb-3 bg-zinc-900">
+    <div className="container-padding mx-auto mt-4 border-b border-zinc-800 pb-3 bg-zinc-900">
       <div className="flex justify-between overflow-x-auto scrollbar-none">
         {categories.map(category => (
           <button 
             key={category.id} 
-            className={`category-pill px-4 ${activeCategory === category.id ? 'active text-amber-500 border-amber-500' : 'text-gray-400'}`} 
+            className={`flex flex-col items-center px-6 py-2 transition-all duration-300 ${
+              activeCategory === category.id 
+                ? 'text-amber-500 border-b-2 border-amber-500 -mb-[13px]' 
+                : 'text-gray-400 hover:text-gray-300'
+            }`} 
             onClick={() => setActiveCategory(category.id)}
           >
-            <category.icon className="category-icon" />
-            <span>{category.label}</span>
+            <category.icon className={`h-5 w-5 mb-1 ${
+              activeCategory === category.id ? 'text-amber-500' : 'text-gray-500'
+            }`} />
+            <span className="text-xs font-medium">{category.label}</span>
           </button>
         ))}
       </div>

@@ -18,88 +18,104 @@ interface Event {
   rating?: number;
   reviews?: number;
   isSoldOut?: boolean;
+  venue?: string;
+  time?: string;
 }
 
 const eventsByCategory: Record<string, Event[]> = {
   menu: [{
     id: 1,
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Fine Dine Restaurant Event",
-    host: "Chef Marcus",
-    price: "₹2,500 per person",
+    imageUrl: "/lovable-uploads/caafafc9-9a89-4fff-9df5-dc55abecc5f5.png",
+    title: "Soulful Sufi Night",
+    host: "16th April",
+    price: "Complimentary Dessert for Couples",
     rating: 4.92,
     reviews: 286,
-    isSoldOut: false
+    isSoldOut: false,
+    venue: "Sector 52, Gurgaon",
+    time: "05 PM Wed"
   }, {
     id: 2,
-    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Farm to Table Dinner",
-    host: "May 25, 2025",
-    price: "₹3,200 per person",
+    imageUrl: "/lovable-uploads/929e6452-100b-4173-9f21-062e3e25d238.png",
+    title: "Thursday Gin & Groove",
+    host: "17th April",
+    price: "Free drinks for the ladies",
     rating: 4.78,
     reviews: 124,
-    isSoldOut: false
+    isSoldOut: false,
+    venue: "Sector 52, Gurgaon",
+    time: "05 PM"
   }],
   experiences: [{
     id: 3,
-    imageUrl: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Business Conference",
-    host: "June 15, 2025",
-    price: "₹7,039 per ticket",
-    isSoldOut: true
+    imageUrl: "/lovable-uploads/63b7aa0e-bd60-4379-aee7-3936cc89fff5.png",
+    title: "Back to 90s Night",
+    host: "18th April, Friday",
+    price: "7:30 PM onwards",
+    isSoldOut: false,
+    venue: "Sector 49, Gurgaon",
+    time: "7:30 PM"
   }, {
     id: 4,
-    imageUrl: "https://images.unsplash.com/photo-1500673922987-e212871fec22?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Outdoor Festival",
-    host: "July 10, 2025",
-    price: "₹35,198 for 5 days",
+    imageUrl: "/lovable-uploads/1b747850-74bd-4752-93b7-eeeab113b43a.png",
+    title: "Corporate Night",
+    host: "14th April, Monday",
+    price: "7:30 PM - 4:00 AM",
     rating: 4.86,
     reviews: 468,
-    isSoldOut: false
+    isSoldOut: false,
+    venue: "Sector 49, Gurgaon"
   }],
   offers: [{
     id: 5,
-    imageUrl: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "25% Off Weekend Brunch",
-    host: "May 31, 2025",
-    price: "Valid until May 31",
+    imageUrl: "/lovable-uploads/1f8b3900-b741-4507-9b2f-47953f00f3bd.png",
+    title: "Bollywood Night",
+    host: "20th April, Sunday",
+    price: "7:30 PM",
     rating: 4.96,
     reviews: 352,
-    isSoldOut: false
+    isSoldOut: false,
+    venue: "Sector 49, Gurgaon"
   }, {
     id: 6,
-    imageUrl: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Chef's Special Tasting Menu",
-    host: "June 20, 2025",
-    price: "₹6,000 per person",
+    imageUrl: "/lovable-uploads/2876d9eb-45d5-4fb9-bac5-14a5d8624765.png",
+    title: "Back to 90s",
+    host: "18th April, Friday",
+    price: "7:30 PM onwards",
     rating: 4.91,
     reviews: 208,
-    isSoldOut: false
+    isSoldOut: false,
+    venue: "Sector 49, Gurgaon"
   }],
   home: [{
     id: 7,
-    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Farm to Table Dinner",
-    host: "May 25, 2025",
-    price: "₹3,200 per person",
+    imageUrl: "/lovable-uploads/caafafc9-9a89-4fff-9df5-dc55abecc5f5.png",
+    title: "Soulful Sufi Night",
+    host: "16th April",
+    price: "Complimentary Dessert for Couples",
     rating: 4.92,
-    reviews: 48
+    reviews: 48,
+    time: "05 PM Wed",
+    venue: "Sector 52, Gurgaon"
   }, {
     id: 8,
-    imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Wine Tasting Evening",
-    host: "June 3, 2025",
-    price: "₹1,800 per person",
+    imageUrl: "/lovable-uploads/929e6452-100b-4173-9f21-062e3e25d238.png",
+    title: "Thursday Gin & Groove",
+    host: "17th April",
+    price: "Free drinks for the ladies",
     rating: 4.85,
-    reviews: 32
+    reviews: 32,
+    time: "05 PM",
+    venue: "Sector 52, Gurgaon"
   }, {
     id: 9,
-    imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1165&q=80",
-    title: "Garden Party",
-    host: "June 12, 2025",
-    price: "₹2,500 per person",
+    imageUrl: "/lovable-uploads/1f8b3900-b741-4507-9b2f-47953f00f3bd.png",
+    title: "Bollywood Night",
+    host: "20th April, Sunday",
+    price: "7:30 PM",
     rating: 4.78,
-    reviews: 28
+    reviews: 28,
+    venue: "Sector 49, Gurgaon"
   }]
 };
 
@@ -115,7 +131,7 @@ const Events: React.FC<EventsProps> = ({
           <h2 className="font-semibold text-2xl">
             {category === 'experiences' ? 'Past Events' : 'Events'}
           </h2>
-          <button className="flex items-center text-airbnb-red hover:underline text-xs text-left">
+          <button className="flex items-center text-amber-500 hover:underline text-xs text-left">
             <span className="mr-1">View all</span>
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -132,7 +148,9 @@ const Events: React.FC<EventsProps> = ({
                   price={event.price} 
                   rating={event.rating} 
                   reviews={event.reviews} 
-                  isSoldOut={event.isSoldOut} 
+                  isSoldOut={event.isSoldOut}
+                  venue={event.venue}
+                  time={event.time} 
                 />
               </CarouselItem>
             ))}
