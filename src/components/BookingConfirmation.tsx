@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Check, PartyPopper } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -56,18 +56,18 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       </motion.div>
       
       <motion.div 
-        className="absolute top-1/4 left-0 w-full"
+        className="fixed inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
-        {Array.from({ length: 15 }).map((_, i) => (
+        {Array.from({ length: 50 }).map((_, i) => (
           <motion.div
             key={i}
-            className="confetti"
+            className="absolute"
             initial={{
               position: "absolute",
-              top: 0,
+              top: "40%",
               left: `${Math.random() * 100}%`,
               width: `${Math.random() * 10 + 5}px`,
               height: `${Math.random() * 10 + 5}px`,
@@ -78,14 +78,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
               opacity: 1,
             }}
             animate={{
-              top: `${Math.random() * 100 + 100}%`,
+              top: `${Math.random() * 50 + 100}%`,
               rotate: `${Math.random() * 360}deg`,
               opacity: 0,
             }}
             transition={{
               duration: Math.random() * 3 + 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
+              ease: "easeOut",
+              delay: Math.random() * 0.5,
             }}
           />
         ))}
