@@ -3,13 +3,18 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Share, Heart, Star, Medal, House, Map } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const Detail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [activeTab, setActiveTab] = useState('about');
   const navigate = useNavigate();
   
   return (
-    <div className="pb-16">
+    <div className="pb-24">
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      
       <div className="relative h-[50vh]">
         <img 
           src="public/lovable-uploads/895f39d4-3d63-4455-8bf4-cbc017f47516.png" 
@@ -52,7 +57,7 @@ const Detail = () => {
       </div>
       
       <div className="container-padding">
-        <h1 className="text-2xl font-semibold mt-4">Connect with your heart in this magical place</h1>
+        <h1 className="text-2xl font-semibold mt-6">Connect with your heart in this magical place</h1>
         <p className="text-airbnb-dark mt-1">Room in Santa Cruz de Tenerife, Spain</p>
         <p className="text-airbnb-dark mt-1">2 queen beds · Shared bathroom</p>
         
@@ -63,7 +68,7 @@ const Detail = () => {
           <span className="underline">468 reviews</span>
         </div>
         
-        <div className="detail-section">
+        <div className="detail-section mt-4">
           <div className="detail-host">
             <img 
               src="https://randomuser.me/api/portraits/men/32.jpg" 
@@ -102,7 +107,7 @@ const Detail = () => {
           </div>
         </div>
         
-        <div className="mt-6">
+        <div className="mt-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-xl font-semibold">₹35,198</span>
@@ -114,7 +119,10 @@ const Detail = () => {
             </div>
           </div>
           
-          <Button className="w-full airbnb-button mt-4">
+          <Button 
+            className="w-full airbnb-button mt-4"
+            onClick={() => navigate('/booking')}
+          >
             Reserve
           </Button>
           
@@ -133,8 +141,13 @@ const Detail = () => {
         </div>
       </div>
       
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <Button className="w-full airbnb-button">
+      <Footer />
+      
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
+        <Button 
+          className="w-full airbnb-button"
+          onClick={() => navigate('/booking')}
+        >
           Reserve
         </Button>
       </div>

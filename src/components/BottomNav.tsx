@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { CalendarPlus, User, Users, LifeBuoy } from 'lucide-react';
+import { Search, Home, Map, Heart, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface BottomNavProps {
   activeTab: string;
@@ -8,27 +9,33 @@ interface BottomNavProps {
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
-  const tabs = [
-    { id: 'reserve', label: 'Reserve', icon: CalendarPlus },
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'members', label: 'Members', icon: Users },
-    { id: 'support', label: 'Support', icon: LifeBuoy },
+  const navigate = useNavigate();
+  
+  const navItems = [
+    { id: 'explore', label: 'Explore', icon: Search, path: '/' },
+    { id: 'home', label: 'Home', icon: Home, path: '/' },
+    { id: 'locations', label: 'Locations', icon: Map, path: '/' },
+    { id: 'saved', label: 'Saved', icon: Heart, path: '/' },
+    { id: 'profile', label: 'Profile', icon: User, path: '/' },
   ];
 
+  const handleTabClick = (tab: string, path: string) => {
+    setActiveTab(tab);
+    navigate(path);
+  };
+
   return (
-    <div className="bottom-nav">
-      <div className="flex justify-between">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+    <div className="bottom-nav grid grid-cols-5 gap-2 z-40">
+      {navItems.map((item) => (
+        <button
+          key={item.id}
+          className={`bottom-nav-item ${activeTab === item.id ? 'active' : ''}`}
+          onClick={() => handleTabClick(item.id, item.path)}
+        >
+          <item.icon className="bottom-nav-icon" />
+          <span>{item.label}</span>
+        </button>
+      ))}
     </div>
   );
 };

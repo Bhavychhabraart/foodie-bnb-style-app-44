@@ -12,13 +12,17 @@ import Highlights from '@/components/Highlights';
 import OngoingOffers from '@/components/OngoingOffers';
 import FlipBook from '@/components/FlipBook';
 import Menu from '@/components/Menu';
+import About from '@/components/About';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 
 const Index = () => {
-  const [activeCategory, setActiveCategory] = useState('menu');
+  const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
 
   return (
-    <div className="pb-16 bg-white">
+    <div className="min-h-screen bg-white">
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="sticky top-0 z-10 bg-white shadow-sm">
         <SearchBar />
         <CategorySelector 
@@ -35,12 +39,17 @@ const Index = () => {
           <PhotoGallery />
           <Testimonials />
           <Highlights />
+          <About />
         </div>
       ) : activeCategory === 'menu' ? (
         <FlipBook />
-      ) : (
+      ) : activeCategory === 'experiences' ? (
         <Experiences category={activeCategory} />
+      ) : (
+        <Menu />
       )}
+      
+      <Footer />
       
       <BottomNav 
         activeTab={activeTab}
