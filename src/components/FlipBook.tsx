@@ -37,7 +37,7 @@ const FlipBook: React.FC = () => {
                     <span>Open Menu</span>
                   </Button>
                 </DrawerTrigger>
-                <DrawerContent className="h-[95vh] rounded-t-[20px] border-t-4 border-airbnb-red">
+                <DrawerContent className="h-screen rounded-t-[20px] border-t-4 border-airbnb-red">
                   <div className="flex justify-between items-center px-6 pt-4 pb-2">
                     <h2 className="text-2xl font-semibold">Fine Dining Menu</h2>
                     <DrawerClose asChild>
@@ -46,12 +46,12 @@ const FlipBook: React.FC = () => {
                       </Button>
                     </DrawerClose>
                   </div>
-                  <ScrollArea className="h-[calc(95vh-70px)] w-full px-4">
+                  <ScrollArea className="h-[calc(100vh-70px)] w-full px-4">
                     <div className="pb-4 h-full w-full">
                       <iframe 
                         src="https://heyzine.com/flip-book/44253fcd19.html" 
                         title="Restaurant Digital Menu"
-                        className="w-full h-[calc(95vh-100px)] border-0 rounded-lg shadow-sm"
+                        className="w-full h-[calc(100vh-100px)] border-0 rounded-lg shadow-sm"
                         allow="fullscreen"
                       />
                     </div>
