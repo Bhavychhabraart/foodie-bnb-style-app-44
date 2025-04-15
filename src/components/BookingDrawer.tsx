@@ -41,7 +41,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
         <Button
           variant="outline"
-          className="flex items-center justify-start border-2 h-16 relative p-4"
+          className="flex items-center justify-start border-2 h-24 relative p-4"
           onClick={() => handleBookingOptionSelect('standard')}
         >
           <Utensils className="h-6 w-6 text-airbnb-red mr-3" />
@@ -54,7 +54,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
         <Button
           variant="outline"
-          className="flex items-center justify-start border-2 h-16 relative p-4"
+          className="flex items-center justify-start border-2 h-24 relative p-4"
           onClick={() => handleBookingOptionSelect('corporate')}
         >
           <Briefcase className="h-6 w-6 text-airbnb-red mr-3" />
@@ -67,7 +67,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
         <Button
           variant="outline"
-          className="flex items-center justify-start border-2 h-16 relative p-4"
+          className="flex items-center justify-start border-2 h-24 relative p-4"
           onClick={() => handleBookingOptionSelect('party')}
         >
           <PartyPopper className="h-6 w-6 text-airbnb-red mr-3" />
@@ -96,7 +96,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={`${isMobile ? 'max-h-[90dvh]' : 'max-h-[90vh]'} overflow-y-auto pb-safe`}>
+      <DrawerContent className={`${isMobile ? 'max-h-[135dvh]' : 'max-h-[135vh]'} overflow-y-auto pb-safe`}>
         {renderSelectedForm()}
       </DrawerContent>
     </Drawer>
