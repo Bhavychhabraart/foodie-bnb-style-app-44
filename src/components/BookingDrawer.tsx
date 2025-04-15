@@ -94,7 +94,7 @@ const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange }) => 
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] overflow-y-auto">
+      <DrawerContent className="h-screen overflow-y-auto">
         {renderSelectedForm()}
       </DrawerContent>
     </Drawer>
