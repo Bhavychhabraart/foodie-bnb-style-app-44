@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import StandardBookingForm from './booking-forms/StandardBookingForm';
 import CorporateEventForm from './booking-forms/CorporateEventForm';
 import PrivatePartyForm from './booking-forms/PrivatePartyForm';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type BookingOption = 'standard' | 'corporate' | 'party' | null;
 
@@ -18,6 +19,7 @@ interface BookingDrawerProps {
 const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange }) => {
   const [selectedOption, setSelectedOption] = useState<BookingOption>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleBookingOptionSelect = (option: BookingOption) => {
     setSelectedOption(option);
@@ -94,7 +96,7 @@ const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange }) => 
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-screen overflow-y-auto">
+      <DrawerContent className={`${isMobile ? 'max-h-[90dvh]' : 'max-h-[90vh]'} overflow-y-auto pb-safe`}>
         {renderSelectedForm()}
       </DrawerContent>
     </Drawer>
