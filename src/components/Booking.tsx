@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Users } from 'lucide-react';
+import { Calendar as CalendarIcon, Users, Tag } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const timeSlots = [
@@ -24,7 +24,25 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
   const { toast } = useToast();
+
+  const handleApplyCoupon = () => {
+    if (couponCode) {
+      setDiscountApplied(true);
+      toast({
+        title: "Coupon applied!",
+        description: "Your discount has been applied to your reservation.",
+      });
+    } else {
+      toast({
+        title: "No coupon entered",
+        description: "Please enter a valid coupon code.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +58,7 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
 
     toast({
       title: "Reservation confirmed!",
-      description: `Your table for ${guests} is reserved for ${format(date, 'MMMM dd, yyyy')} at ${time}.`,
+      description: `Your table for ${guests} is reserved for ${format(date, 'MMMM dd, yyyy')} at ${time}.${discountApplied ? ' Discount applied!' : ''}`,
     });
 
     // Reset form
@@ -49,6 +67,8 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
     setName("");
     setEmail("");
     setPhone("");
+    setCouponCode("");
+    setDiscountApplied(false);
   };
 
   return (
@@ -151,6 +171,30 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
                     placeholder="Your phone number"
                     className="mt-1.5"
                   />
+                </div>
+                
+                <div>
+                  <Label htmlFor="coupon">Coupon Code (Optional)</Label>
+                  <div className="flex mt-1.5">
+                    <div className="relative flex-grow">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <Input 
+                        id="coupon" 
+                        value={couponCode} 
+                        onChange={(e) => setCouponCode(e.target.value)} 
+                        placeholder="Enter coupon code"
+                        className="pl-10"
+                      />
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleApplyCoupon}
+                      className="ml-2"
+                    >
+                      Apply
+                    </Button>
+                  </div>
                 </div>
                 
                 <Button type="submit" className="airbnb-button w-full mt-4">

@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, Users, Star, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Users, Star, ArrowRight, Tag } from 'lucide-react';
 import { BookingDrawer } from './BookingDrawer';
 import FomoNotification from './FomoNotification';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Experience {
   imageUrl: string;
@@ -28,9 +30,28 @@ const ExperienceDetailsDrawer: React.FC<ExperienceDetailsDrawerProps> = ({
   experience
 }) => {
   const [bookingDrawerOpen, setBookingDrawerOpen] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const { toast } = useToast();
 
   const handleBookNow = () => {
     setBookingDrawerOpen(true);
+  };
+
+  const handleApplyCoupon = () => {
+    if (couponCode) {
+      setDiscountApplied(true);
+      toast({
+        title: "Coupon applied!",
+        description: "Your discount has been applied.",
+      });
+    } else {
+      toast({
+        title: "No coupon entered",
+        description: "Please enter a valid coupon code.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -94,6 +115,33 @@ const ExperienceDetailsDrawer: React.FC<ExperienceDetailsDrawerProps> = ({
                   This experience offers a unique opportunity to taste exquisite flavors while 
                   learning about local cuisine and culture. Perfect for food enthusiasts of all levels.
                 </p>
+              </div>
+
+              <div className="border rounded-md p-4">
+                <label className="block text-sm font-medium mb-2">Have a coupon code?</label>
+                <div className="flex">
+                  <div className="relative flex-grow">
+                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input 
+                      placeholder="Enter coupon code" 
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="pl-10" 
+                    />
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleApplyCoupon}
+                    className="ml-2"
+                  >
+                    Apply
+                  </Button>
+                </div>
+                {discountApplied && (
+                  <p className="text-green-600 text-sm mt-2">
+                    Discount applied! You'll see it on checkout.
+                  </p>
+                )}
               </div>
 
               <div className="pt-4 border-t">

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Coupon, Tag } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,6 +32,7 @@ const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   phone: z.string().min(10, "Please enter a valid phone number"),
   specialRequests: z.string().optional(),
+  couponCode: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -46,6 +47,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
   const { toast } = useToast();
+  const [discountApplied, setDiscountApplied] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,6 +58,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       email: "",
       phone: "",
       specialRequests: "",
+      couponCode: "",
     },
     mode: "onChange",
   });
@@ -102,6 +105,23 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       setStep(step - 1);
     } else {
       onBack();
+    }
+  };
+
+  const handleApplyCoupon = () => {
+    const couponCode = form.getValues('couponCode');
+    if (couponCode) {
+      setDiscountApplied(true);
+      toast({
+        title: "Coupon applied!",
+        description: "Your discount has been applied to your reservation.",
+      });
+    } else {
+      toast({
+        title: "No coupon entered",
+        description: "Please enter a valid coupon code.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -347,7 +367,48 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                     <span className="text-gray-600">Phone:</span>
                     <span className="font-medium">{form.getValues('phone')}</span>
                   </div>
+                  {discountApplied && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount:</span>
+                      <span className="font-medium">Applied</span>
+                    </div>
+                  )}
                 </div>
+              </div>
+
+              <div className="border rounded-md p-4">
+                <FormField
+                  control={form.control}
+                  name="couponCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Have a coupon code?</FormLabel>
+                      <div className="flex">
+                        <FormControl>
+                          <div className="flex w-full">
+                            <div className="relative flex-grow">
+                              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                              <Input 
+                                placeholder="Enter coupon code" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={handleApplyCoupon}
+                              className="ml-2"
+                            >
+                              Apply
+                            </Button>
+                          </div>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
