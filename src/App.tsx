@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +23,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* TooltipProvider needs to wrap React elements */}
       <TooltipProvider>
         <Toaster />
         <Sonner />
