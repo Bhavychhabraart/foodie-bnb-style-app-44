@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import SupportDrawer from './SupportDrawer';
+import InfluencerDrawer from './InfluencerDrawer';
 
 interface NavbarProps {
   activeTab: string;
@@ -19,6 +20,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
+  const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
   
   const navItems = [
     { id: 'about', label: 'About' },
@@ -32,6 +34,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
+    } else if (tabId === 'influencers') {
+      setIsInfluencerDrawerOpen(true);
     }
   };
 
@@ -70,7 +74,12 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               <DropdownMenuContent align="end" className="w-56 bg-white">
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign in</DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign up</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('support')}>Support</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('influencers')}>
+                  Influencers
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('support')}>
+                  Support
+                </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm md:hidden">
                   <Button 
                     variant="ghost" 
@@ -89,6 +98,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       <SupportDrawer
         open={isSupportDrawerOpen}
         onOpenChange={setIsSupportDrawerOpen}
+      />
+
+      <InfluencerDrawer
+        open={isInfluencerDrawerOpen}
+        onOpenChange={setIsInfluencerDrawerOpen}
       />
     </>
   );

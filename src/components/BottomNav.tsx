@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { CalendarPlus, User, Users, LifeBuoy } from 'lucide-react';
+import { CalendarPlus, User, Instagram, LifeBuoy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BookingDrawer from './BookingDrawer';
 import SupportDrawer from './SupportDrawer';
+import InfluencerDrawer from './InfluencerDrawer';
 
 interface BottomNavProps {
   activeTab: string;
@@ -13,11 +14,12 @@ interface BottomNavProps {
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
+  const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
   const navigate = useNavigate();
   
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'members', label: 'Members', icon: Users },
+    { id: 'influencers', label: 'Influencers', icon: Instagram },
     { id: 'support', label: 'Support', icon: LifeBuoy },
   ];
 
@@ -25,6 +27,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
+    } else if (tabId === 'influencers') {
+      setIsInfluencerDrawerOpen(true);
     }
   };
 
@@ -78,6 +82,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       <SupportDrawer
         open={isSupportDrawerOpen}
         onOpenChange={setIsSupportDrawerOpen}
+      />
+
+      <InfluencerDrawer
+        open={isInfluencerDrawerOpen}
+        onOpenChange={setIsInfluencerDrawerOpen}
       />
     </>
   );
