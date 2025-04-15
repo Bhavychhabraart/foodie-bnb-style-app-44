@@ -2,8 +2,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from 'framer-motion';
 
 interface MenuItem {
   id: number;
@@ -71,38 +69,18 @@ const menuItems: MenuItem[] = [
 
 const Menu: React.FC = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const filteredItems = activeTab === "all" 
     ? menuItems 
     : menuItems.filter(item => item.category === activeTab);
 
-  const handleItemClick = (item: MenuItem) => {
-    setSelectedItem(item);
-  };
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <div id="menu" className="section-padding bg-white">
+    <div id="menu" className="section-padding bg-airbnb-gray">
       <div className="container-padding mx-auto">
         <h2 className="text-2xl font-semibold mb-6">Our Menu</h2>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white border border-gray-200 p-1 mb-6 w-full">
+          <TabsList className="bg-white border border-gray-200 p-1 mb-6">
             <TabsTrigger value="all" className="text-sm">All Items</TabsTrigger>
             <TabsTrigger value="starters" className="text-sm">Starters</TabsTrigger>
             <TabsTrigger value="mains" className="text-sm">Mains</TabsTrigger>
@@ -110,45 +88,35 @@ const Menu: React.FC = () => {
           </TabsList>
           
           <TabsContent value={activeTab} className="mt-0">
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              variants={container}
-              initial="hidden"
-              animate="show"
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredItems.map((item) => (
-                <motion.div key={item.id} variants={item}>
-                  <Card 
-                    className="airbnb-card bg-white h-full hover:shadow-md cursor-pointer transition-all duration-300"
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <div className="h-48 overflow-hidden">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
+                <div key={item.id} className="airbnb-card bg-white h-full">
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium">{item.name}</h3>
+                      <span className="font-medium text-airbnb-dark">{item.price}</span>
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{item.name}</h3>
-                        <span className="font-medium text-airbnb-dark">{item.price}</span>
+                    <p className="text-airbnb-light text-sm mb-3">{item.description}</p>
+                    {item.dietary && (
+                      <div className="flex flex-wrap gap-2">
+                        {item.dietary.map((diet) => (
+                          <Badge key={diet} variant="outline" className="text-xs capitalize">
+                            {diet}
+                          </Badge>
+                        ))}
                       </div>
-                      <p className="text-airbnb-light text-sm mb-3">{item.description}</p>
-                      {item.dietary && (
-                        <div className="flex flex-wrap gap-2">
-                          {item.dietary.map((diet) => (
-                            <Badge key={diet} variant="outline" className="text-xs capitalize">
-                              {diet}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

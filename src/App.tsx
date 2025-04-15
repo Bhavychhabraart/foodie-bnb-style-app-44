@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,17 +29,13 @@ const App = () => {
           <SplashScreen onFinish={handleSplashFinish} />
         ) : (
           <BrowserRouter>
-            <div className="flex flex-col min-h-screen">
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/detail" element={<Detail />} />
-                  <Route path="/booking" element={<BookingRequest />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-            </div>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/detail" element={<Detail />} />
+              <Route path="/booking" element={<BookingRequest />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
         )}
       </TooltipProvider>

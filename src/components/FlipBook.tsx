@@ -15,9 +15,9 @@ const FlipBook: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center bg-white py-6 px-4">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center bg-white py-4 px-4">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold">Fine Dine Menu</h2>
+        <h2 className="text-3xl font-bold">Fine Dine Menu</h2>
       </div>
       
       <Card className="w-full max-w-2xl mx-auto shadow-lg bg-soft-orange bg-opacity-20 rounded-xl">
