@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Star, Share } from 'lucide-react';
+import { Share } from 'lucide-react';
 
 interface ExperienceCardProps {
   imageUrl: string;
@@ -26,31 +26,23 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
       <div className="relative rounded-xl overflow-hidden mb-2">
         <img src={imageUrl} alt={title} className="w-full h-[300px] object-cover" />
         
-        <button className="share-button">
+        <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center">
           <Share className="h-5 w-5 text-gray-700" />
         </button>
         
-        <div className="image-dots">
-          <div className="image-dot active"></div>
-          <div className="image-dot"></div>
-          <div className="image-dot"></div>
-          <div className="image-dot"></div>
-          <div className="image-dot"></div>
+        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
+          {[...Array(5)].map((_, i) => (
+            <div 
+              key={i} 
+              className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/70'}`}
+            />
+          ))}
         </div>
       </div>
       
-      <div>
-        <div className="flex justify-between items-start">
-          <h3 className="text-lg font-medium">{title}</h3>
-          {rating > 0 && (
-            <div className="flex items-center">
-              <Star className="h-4 w-4 fill-current text-airbnb-dark" />
-              <span className="ml-1 text-sm">{rating.toFixed(2)}</span>
-            </div>
-          )}
-        </div>
-        
-        <p className="text-airbnb-light text-sm">Hosted by {host}</p>
+      <div className="px-1">
+        <h3 className="text-lg font-medium">{title}</h3>
+        <p className="text-gray-500 text-sm">Hosted by {host}</p>
         
         {isSoldOut ? (
           <p className="font-medium mt-1">Sold out</p>

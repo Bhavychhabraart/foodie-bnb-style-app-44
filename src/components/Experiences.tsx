@@ -97,9 +97,9 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
     Object.values(experiencesByCategory).flat();
 
   return (
-    <div className="container-padding mx-auto pb-20">
+    <div className="px-4 pt-6 pb-20">
       {category === 'experiences' && (
-        <h2 className="text-2xl font-semibold mb-4">Past experiences</h2>
+        <h2 className="text-2xl font-semibold mb-6">Past experiences</h2>
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

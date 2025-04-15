@@ -84,17 +84,17 @@ const Menu: React.FC<MenuProps> = ({ category }) => {
         <h2 className="text-2xl font-semibold mb-6">Our Menu</h2>
         
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white border border-gray-200 p-1 mb-6">
-            <TabsTrigger value="all" className="text-sm">All Items</TabsTrigger>
-            <TabsTrigger value="starters" className="text-sm">Starters</TabsTrigger>
-            <TabsTrigger value="mains" className="text-sm">Mains</TabsTrigger>
-            <TabsTrigger value="desserts" className="text-sm">Desserts</TabsTrigger>
+          <TabsList className="bg-white border border-gray-200 p-1 mb-6 rounded-full overflow-x-auto">
+            <TabsTrigger value="all" className="text-sm rounded-full">All Items</TabsTrigger>
+            <TabsTrigger value="starters" className="text-sm rounded-full">Starters</TabsTrigger>
+            <TabsTrigger value="mains" className="text-sm rounded-full">Mains</TabsTrigger>
+            <TabsTrigger value="desserts" className="text-sm rounded-full">Desserts</TabsTrigger>
           </TabsList>
           
           <TabsContent value={activeTab} className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredItems.map((item) => (
-                <div key={item.id} className="airbnb-card bg-white h-full">
+                <div key={item.id} className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm">
                   <div className="h-48 overflow-hidden">
                     <img 
                       src={item.image} 

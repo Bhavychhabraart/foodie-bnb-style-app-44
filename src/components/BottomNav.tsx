@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Heart, Home, Utensils, User } from 'lucide-react';
+import { Search, Heart, Home, Building, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface BottomNavProps {
@@ -12,10 +12,10 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   
   const tabs = [
-    { id: 'explore', label: 'Home', icon: Home, route: '/' },
-    { id: 'menu', label: 'Menu', icon: Utensils, route: '/menu' },
-    { id: 'reservation', label: 'Reserve', icon: Search, route: '/reservation' },
-    { id: 'saved', label: 'Saved', icon: Heart, route: '/venue-services' },
+    { id: 'explore', label: 'Explore', icon: Search, route: '/' },
+    { id: 'wishlists', label: 'Wishlists', icon: Heart, route: '/venue-services' },
+    { id: 'trips', label: 'Trips', icon: Building, route: '/reservation' },
+    { id: 'messages', label: 'Messages', icon: Building, route: '/menu' },
     { id: 'profile', label: 'Profile', icon: User, route: '/admin' },
   ];
 
@@ -25,15 +25,19 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   };
 
   return (
-    <div className="bottom-nav">
-      <div className="flex justify-between">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
+      <div className="flex justify-between px-6">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+            className={`flex flex-col items-center justify-center text-xs ${
+              activeTab === tab.id ? 'text-red-500' : 'text-gray-500'
+            }`}
             onClick={() => handleTabClick(tab.id, tab.route)}
           >
-            <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
+            <tab.icon className={`w-6 h-6 mb-1 ${
+              activeTab === tab.id ? 'text-red-500' : 'text-gray-500'
+            }`} />
             <span>{tab.label}</span>
           </button>
         ))}
