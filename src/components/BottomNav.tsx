@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Heart, Home, MessageSquare, User } from 'lucide-react';
+import { CalendarPlus, User, Users, LifeBuoy } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: string;
@@ -9,11 +9,10 @@ interface BottomNavProps {
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const tabs = [
-    { id: 'explore', label: 'Explore', icon: Search },
-    { id: 'wishlists', label: 'Wishlists', icon: Heart },
-    { id: 'trips', label: 'Experiences', icon: Home },
-    { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'reserve', label: 'Reserve', icon: CalendarPlus },
     { id: 'profile', label: 'Profile', icon: User },
+    { id: 'members', label: 'Members', icon: Users },
+    { id: 'support', label: 'Support', icon: LifeBuoy },
   ];
 
   return (
