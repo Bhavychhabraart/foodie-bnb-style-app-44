@@ -13,6 +13,10 @@ interface MenuItem {
   dietary?: string[];
 }
 
+interface MenuProps {
+  category?: string;
+}
+
 const menuItems: MenuItem[] = [
   {
     id: 1,
@@ -67,7 +71,7 @@ const menuItems: MenuItem[] = [
   }
 ];
 
-const Menu: React.FC = () => {
+const Menu: React.FC<MenuProps> = ({ category }) => {
   const [activeTab, setActiveTab] = useState("all");
 
   const filteredItems = activeTab === "all" 
