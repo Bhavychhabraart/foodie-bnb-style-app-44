@@ -29,10 +29,7 @@ const FlipBook: React.FC = () => {
               alt="Restaurant menu"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 text-white">
-              <h3 className="text-2xl font-bold mb-2">Fine Dining Experience</h3>
-              <p className="text-white/90 mb-4">Discover our carefully crafted dishes</p>
-              
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6">
               <Drawer open={open} onOpenChange={setOpen}>
                 <DrawerTrigger asChild>
                   <Button className="bg-white text-airbnb-dark hover:bg-white/90 font-medium px-8 py-6 rounded-full flex items-center gap-2 max-w-xs mx-auto">
