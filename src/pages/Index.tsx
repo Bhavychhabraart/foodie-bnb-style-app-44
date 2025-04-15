@@ -6,7 +6,7 @@ import Experiences from '@/components/Experiences';
 import BottomNav from '@/components/BottomNav';
 
 const Index = () => {
-  const [activeCategory, setActiveCategory] = useState('experiences');
+  const [activeCategory, setActiveCategory] = useState('menu');
   const [activeTab, setActiveTab] = useState('explore');
 
   return (

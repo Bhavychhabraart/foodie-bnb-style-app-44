@@ -19,25 +19,7 @@ interface Experience {
 
 const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
   const experiencesByCategory: Record<string, Experience[]> = {
-    experiences: [
-      {
-        imageUrl: "public/lovable-uploads/caaabcab-eb0c-419c-a0a9-c2ed1af62a64.png",
-        title: "Train for Gladiator II glory",
-        host: "Lucius",
-        price: "₹7,039 per night",
-        isSoldOut: true
-      },
-      {
-        imageUrl: "public/lovable-uploads/895f39d4-3d63-4455-8bf4-cbc017f47516.png",
-        title: "Connect with your heart in this magical place",
-        host: "Joel",
-        price: "₹35,198 for 5 nights",
-        rating: 4.86,
-        reviews: 468,
-        isSoldOut: false
-      }
-    ],
-    'fine-dining': [
+    menu: [
       {
         imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
         title: "Fine Dine Restaurant Experience",
@@ -57,29 +39,34 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         isSoldOut: false
       }
     ],
-    homestyle: [
+    experiences: [
+      {
+        imageUrl: "public/lovable-uploads/caaabcab-eb0c-419c-a0a9-c2ed1af62a64.png",
+        title: "Train for Gladiator II glory",
+        host: "Lucius",
+        price: "₹7,039 per night",
+        isSoldOut: true
+      },
+      {
+        imageUrl: "public/lovable-uploads/895f39d4-3d63-4455-8bf4-cbc017f47516.png",
+        title: "Connect with your heart in this magical place",
+        host: "Joel",
+        price: "₹35,198 for 5 nights",
+        rating: 4.86,
+        reviews: 468,
+        isSoldOut: false
+      }
+    ],
+    offers: [
       {
         imageUrl: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-        title: "Traditional Home Cooking",
-        host: "Grandma Lucy",
-        price: "₹1,800 per person",
+        title: "25% Off Weekend Brunch",
+        host: "Fine Dine",
+        price: "Valid until May 31",
         rating: 4.96,
         reviews: 352,
         isSoldOut: false
-      }
-    ],
-    outdoor: [
-      {
-        imageUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-        title: "Sunset Rooftop Dining",
-        host: "Sky Team",
-        price: "₹4,500 per person",
-        rating: 4.88,
-        reviews: 176,
-        isSoldOut: false
-      }
-    ],
-    specials: [
+      },
       {
         imageUrl: "public/lovable-uploads/fc1a91f1-8f05-417b-a507-4b846a1f2ca2.png",
         title: "Chef's Special Tasting Menu",
@@ -87,6 +74,17 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         price: "₹6,000 per person",
         rating: 4.91,
         reviews: 208,
+        isSoldOut: false
+      }
+    ],
+    home: [
+      {
+        imageUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+        title: "Welcome to Fine Dine",
+        host: "Your culinary journey starts here",
+        price: "Book your table now",
+        rating: 4.88,
+        reviews: 176,
         isSoldOut: false
       }
     ]
