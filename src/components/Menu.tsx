@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Menu as MenuIcon, ChevronUp, X, Share, ChevronRight, CalendarPlus } from 'lucide-react';
+import { Menu as MenuIcon, ChevronUp, X, Share, ChevronRight, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Drawer,
@@ -89,7 +88,7 @@ const Menu: React.FC = () => {
     ? menuItems 
     : menuItems.filter(item => item.category === activeTab);
 
-  const handleReserve = (item: MenuItem) => {
+  const handleBookNow = (item: MenuItem) => {
     setSelectedItem(item);
     setIsBookingDrawerOpen(true);
   };
@@ -172,10 +171,10 @@ const Menu: React.FC = () => {
                               <Button 
                                 className="ml-auto bg-airbnb-red hover:bg-airbnb-red/90 text-white"
                                 size="sm"
-                                onClick={() => handleReserve(item)}
+                                onClick={() => handleBookNow(item)}
                               >
-                                <CalendarPlus className="h-4 w-4 mr-1" />
-                                Reserve Now
+                                <CalendarCheck className="h-4 w-4 mr-1" />
+                                Book Now
                               </Button>
                             </div>
                           </CardContent>

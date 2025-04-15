@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Star, Share, Eye, CalendarPlus } from 'lucide-react';
+import { Star, Share, Eye, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ExperienceDetailsDrawer from './ExperienceDetailsDrawer';
 import BookingDrawer from './BookingDrawer';
@@ -27,7 +27,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
 
-  const handleReserveNow = (e: React.MouseEvent) => {
+  const handleBookNow = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsBookingDrawerOpen(true);
   };
@@ -83,11 +83,11 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           
           <Button 
             className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90 text-white"
-            onClick={handleReserveNow}
+            onClick={handleBookNow}
             disabled={isSoldOut}
           >
-            <CalendarPlus className="mr-2 h-4 w-4" />
-            Reserve Now
+            <CalendarCheck className="mr-2 h-4 w-4" />
+            Book Now
           </Button>
         </div>
       </div>
