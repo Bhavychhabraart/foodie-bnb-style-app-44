@@ -112,6 +112,7 @@ const UpcomingExperiences: React.FC = () => {
       phone: "",
       specialRequests: "",
     },
+    mode: "onChange", // This enables validation as fields change
   });
 
   const handleBookNow = (experience: Experience) => {
@@ -129,12 +130,41 @@ const UpcomingExperiences: React.FC = () => {
     setDrawerOpen(true);
   };
 
-  const handleSubmit = (values: FormValues) => {
+  const onSubmit = (values: FormValues) => {
+    console.log("Form submitted with values:", values);
+    
     if (bookingStep < 3) {
       setBookingStep(bookingStep + 1);
     } else {
+      console.log("Booking complete!");
       setBookingComplete(true);
     }
+  };
+
+  const handleManualContinue = () => {
+    console.log("Manual continue button clicked");
+    const currentStepFields: Record<number, string[]> = {
+      1: ["time", "guests"],
+      2: ["name", "email", "phone"],
+      3: [],
+    };
+
+    // Get the fields to validate for the current step
+    const fieldsToValidate = currentStepFields[bookingStep] || [];
+    
+    // Trigger validation for the current step's fields
+    form.trigger(fieldsToValidate as any).then((isValid) => {
+      console.log("Form validation result:", isValid);
+      
+      if (isValid) {
+        if (bookingStep < 3) {
+          setBookingStep(bookingStep + 1);
+        } else {
+          // For the final step, we'll submit the entire form
+          form.handleSubmit(onSubmit)();
+        }
+      }
+    });
   };
 
   const handlePrevious = () => {
@@ -185,7 +215,7 @@ const UpcomingExperiences: React.FC = () => {
 
     return (
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 px-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 px-6">
           {renderStepIndicator()}
           
           {bookingStep === 1 && (
@@ -369,7 +399,8 @@ const UpcomingExperiences: React.FC = () => {
               )}
               
               <Button 
-                type="submit" 
+                type="button" 
+                onClick={handleManualContinue}
                 className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
               >
                 {bookingStep === 3 ? 'Confirm Booking' : 'Continue'} 
