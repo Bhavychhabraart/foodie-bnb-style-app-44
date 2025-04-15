@@ -12,7 +12,7 @@ import Highlights from '@/components/Highlights';
 import FlipBook from '@/components/FlipBook';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
-import Menu from '@/components/Menu';
+import Spotlight from '@/components/Spotlight';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
@@ -43,7 +43,7 @@ const Index = () => {
       {activeCategory === 'home' ? (
         <div className="space-y-2">
           <UpcomingExperiences />
-          <Menu />
+          <Spotlight />
           <ChefsSpecials />
           <OngoingOffers />
           <PhotoGallery />
