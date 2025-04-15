@@ -14,7 +14,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   
   return (
     <motion.div 
-      className="fixed inset-0 z-50 bg-airbnb-red flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 bg-airbnb-red dark:bg-[#1F1F1F] flex flex-col items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -25,7 +25,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="flex flex-col items-center"
       >
-        <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 shadow-lg">
+        <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center mb-4 shadow-lg">
           <Utensils className="w-12 h-12 text-airbnb-red" />
         </div>
         <motion.h1 

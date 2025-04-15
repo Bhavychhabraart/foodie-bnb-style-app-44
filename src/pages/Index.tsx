@@ -12,6 +12,7 @@ import FlipBook from '@/components/FlipBook';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
@@ -26,13 +27,17 @@ const Index = () => {
   ];
 
   return (
-    <div className="pb-16 bg-white">
+    <div className="pb-16 bg-background">
+      <div className="flex justify-end p-4">
+        <ThemeToggle />
+      </div>
+      
       <MarqueeAnnouncement 
         title="New Summer Desserts!" 
         items={summerDesserts} 
       />
       
-      <div className="sticky top-0 z-10 bg-white shadow-sm">
+      <div className="sticky top-0 z-10 bg-background shadow-sm dark:shadow-gray-800/20">
         <CategorySelector 
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
