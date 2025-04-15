@@ -16,10 +16,8 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const summerDesserts = ["Mango Passion Sorbet", "Berry Pavlova", "Coconut Lime Panna Cotta", "Watermelon Granita", "Lavender Honey Ice Cream"];
-  return <div className="pb-16 bg-background">
-      <div className="flex justify-end p-4">
-        <ThemeToggle />
-      </div>
+  return <div className="pb-16 bg-zinc-900">
+      
       
       <MarqueeAnnouncement title="New Summer Desserts!" items={summerDesserts} />
       
@@ -27,7 +25,7 @@ const Index = () => {
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
-      {activeCategory === 'home' ? <div className="space-y-2 bg-zinc-950">
+      {activeCategory === 'home' ? <div className="space-y-2 bg-zinc-900">
           <Experiences category="home" />
           <Spotlight />
           <ChefsSpecials />

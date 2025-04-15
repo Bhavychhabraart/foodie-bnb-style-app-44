@@ -32,7 +32,7 @@ const spotlightItems = [{
   imageUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1257&q=80"
 }];
 const Spotlight: React.FC = () => {
-  return <div className="section-padding">
+  return <div className="section-padding bg-zinc-900">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
@@ -63,7 +63,7 @@ const Spotlight: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="p-4 bg-zinc-900">
+                    <div className="p-4 bg-zinc-950">
                       <div className="flex justify-between items-start mb-1">
                         <h3 className="text-lg font-medium">{item.title}</h3>
                         <div className="flex items-center">
