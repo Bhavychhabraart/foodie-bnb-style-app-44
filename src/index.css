@@ -173,3 +173,36 @@
 .detail-amenity {
   @apply flex items-start gap-4 py-2;
 }
+
+/* Soft colors for offer cards */
+.bg-soft-green {
+  @apply bg-[#F2FCE2];
+}
+
+.bg-soft-yellow {
+  @apply bg-[#FEF7CD];
+}
+
+.bg-soft-orange {
+  @apply bg-[#FEC6A1];
+}
+
+.bg-soft-purple {
+  @apply bg-[#E5DEFF];
+}
+
+.bg-soft-pink {
+  @apply bg-[#FFDEE2];
+}
+
+.bg-soft-peach {
+  @apply bg-[#FDE1D3];
+}
+
+.bg-soft-blue {
+  @apply bg-[#D3E4FD];
+}
+
+.bg-soft-gray {
+  @apply bg-[#F1F0FB];
+}

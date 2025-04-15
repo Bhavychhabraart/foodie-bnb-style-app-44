@@ -9,6 +9,7 @@ import ChefsSpecials from '@/components/ChefsSpecials';
 import PhotoGallery from '@/components/PhotoGallery';
 import Testimonials from '@/components/Testimonials';
 import Highlights from '@/components/Highlights';
+import OngoingOffers from '@/components/OngoingOffers';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('menu');
@@ -28,6 +29,7 @@ const Index = () => {
         <div className="space-y-2">
           <UpcomingExperiences />
           <ChefsSpecials />
+          <OngoingOffers />
           <PhotoGallery />
           <Testimonials />
           <Highlights />
