@@ -41,14 +41,14 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
     ],
     experiences: [
       {
-        imageUrl: "public/lovable-uploads/caaabcab-eb0c-419c-a0a9-c2ed1af62a64.png",
+        imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
         title: "Train for Gladiator II glory",
         host: "Lucius",
         price: "₹7,039 per night",
         isSoldOut: true
       },
       {
-        imageUrl: "public/lovable-uploads/895f39d4-3d63-4455-8bf4-cbc017f47516.png",
+        imageUrl: "https://images.unsplash.com/photo-1485833077593-4278bba3f11f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
         title: "Connect with your heart in this magical place",
         host: "Joel",
         price: "₹35,198 for 5 nights",
@@ -68,7 +68,7 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         isSoldOut: false
       },
       {
-        imageUrl: "public/lovable-uploads/fc1a91f1-8f05-417b-a507-4b846a1f2ca2.png",
+        imageUrl: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
         title: "Chef's Special Tasting Menu",
         host: "Chef Alessandro",
         price: "₹6,000 per person",

@@ -11,6 +11,7 @@ import Testimonials from '@/components/Testimonials';
 import Highlights from '@/components/Highlights';
 import FlipBook from '@/components/FlipBook';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
+import About from '@/components/About';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
@@ -44,6 +45,7 @@ const Index = () => {
           <ChefsSpecials />
           <OngoingOffers />
           <PhotoGallery />
+          <About />
           <Highlights />
           <Testimonials />
         </div>

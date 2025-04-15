@@ -20,7 +20,7 @@ const Detail = () => {
     <div className="pb-16">
       <div className="relative h-[50vh]">
         <img 
-          src="public/lovable-uploads/895f39d4-3d63-4455-8bf4-cbc017f47516.png" 
+          src="https://images.unsplash.com/photo-1485833077593-4278bba3f11f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
           alt="Room view" 
           className="w-full h-full object-cover"
         />
