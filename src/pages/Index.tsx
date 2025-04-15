@@ -26,6 +26,11 @@ const Index = () => {
 
   return (
     <div className="pb-16 bg-white">
+      <MarqueeAnnouncement 
+        title="New Summer Desserts!" 
+        items={summerDesserts} 
+      />
+      
       <div className="sticky top-0 z-10 bg-white shadow-sm">
         <CategorySelector 
           activeCategory={activeCategory}
@@ -36,10 +41,6 @@ const Index = () => {
       {activeCategory === 'home' ? (
         <div className="space-y-2">
           <UpcomingExperiences />
-          <MarqueeAnnouncement 
-            title="New Summer Desserts!" 
-            items={summerDesserts} 
-          />
           <ChefsSpecials />
           <OngoingOffers />
           <PhotoGallery />
