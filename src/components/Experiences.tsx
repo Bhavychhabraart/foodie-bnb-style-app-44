@@ -6,8 +6,19 @@ interface ExperiencesProps {
   category: string;
 }
 
+// Define a consistent interface for all experience objects
+interface Experience {
+  imageUrl: string;
+  title: string;
+  host: string;
+  price: string;
+  rating?: number;
+  reviews?: number;
+  isSoldOut?: boolean;
+}
+
 const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
-  const experiencesByCategory = {
+  const experiencesByCategory: Record<string, Experience[]> = {
     experiences: [
       {
         imageUrl: "public/lovable-uploads/caaabcab-eb0c-419c-a0a9-c2ed1af62a64.png",
@@ -22,7 +33,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Joel",
         price: "₹35,198 for 5 nights",
         rating: 4.86,
-        reviews: 468
+        reviews: 468,
+        isSoldOut: false
       }
     ],
     'fine-dining': [
@@ -32,7 +44,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Chef Marcus",
         price: "₹2,500 per person",
         rating: 4.92,
-        reviews: 286
+        reviews: 286,
+        isSoldOut: false
       },
       {
         imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
@@ -40,7 +53,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Maria",
         price: "₹3,200 per person",
         rating: 4.78,
-        reviews: 124
+        reviews: 124,
+        isSoldOut: false
       }
     ],
     homestyle: [
@@ -50,7 +64,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Grandma Lucy",
         price: "₹1,800 per person",
         rating: 4.96,
-        reviews: 352
+        reviews: 352,
+        isSoldOut: false
       }
     ],
     outdoor: [
@@ -60,7 +75,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Sky Team",
         price: "₹4,500 per person",
         rating: 4.88,
-        reviews: 176
+        reviews: 176,
+        isSoldOut: false
       }
     ],
     specials: [
@@ -70,7 +86,8 @@ const Experiences: React.FC<ExperiencesProps> = ({ category }) => {
         host: "Chef Alessandro",
         price: "₹6,000 per person",
         rating: 4.91,
-        reviews: 208
+        reviews: 208,
+        isSoldOut: false
       }
     ]
   };
