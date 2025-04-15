@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -139,15 +138,15 @@
 }
 
 .bottom-nav {
-  @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-4;
+  @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2;
 }
 
 .bottom-nav-item {
-  @apply flex items-center justify-center text-airbnb-light;
+  @apply flex items-center justify-center text-xs text-airbnb-light;
 }
 
 .bottom-nav-icon {
-  @apply w-8 h-8;
+  @apply w-6 h-6;
 }
 
 .price-tag {
