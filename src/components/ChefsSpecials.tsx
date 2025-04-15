@@ -18,7 +18,7 @@ const chefsSpecials = [{
   rating: 4.7
 }];
 const ChefsSpecials: React.FC = () => {
-  return <div className="section-padding bg-zinc-950">
+  return <div className="section-padding bg-zinc-900">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Chef's Specials</h2>
