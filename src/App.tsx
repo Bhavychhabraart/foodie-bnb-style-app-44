@@ -12,8 +12,10 @@ import BookingRequest from "./pages/BookingRequest";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
+// Create QueryClient outside of the component
 const queryClient = new QueryClient();
 
+// Create the App component
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
@@ -21,16 +23,16 @@ const App = () => {
     setShowSplash(false);
   };
 
+  // Return the app's JSX
   return (
     <QueryClientProvider client={queryClient}>
-      {/* TooltipProvider needs to wrap React elements */}
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        {showSplash ? (
-          <SplashScreen onFinish={handleSplashFinish} />
-        ) : (
-          <BrowserRouter>
+      <Toaster />
+      <Sonner />
+      {showSplash ? (
+        <SplashScreen onFinish={handleSplashFinish} />
+      ) : (
+        <BrowserRouter>
+          <TooltipProvider>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/detail" element={<Detail />} />
@@ -39,9 +41,9 @@ const App = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        )}
-      </TooltipProvider>
+          </TooltipProvider>
+        </BrowserRouter>
+      )}
     </QueryClientProvider>
   );
 };
