@@ -10,6 +10,8 @@ import PhotoGallery from '@/components/PhotoGallery';
 import Testimonials from '@/components/Testimonials';
 import Highlights from '@/components/Highlights';
 import OngoingOffers from '@/components/OngoingOffers';
+import FlipBook from '@/components/FlipBook';
+import Menu from '@/components/Menu';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('menu');
@@ -34,6 +36,8 @@ const Index = () => {
           <Testimonials />
           <Highlights />
         </div>
+      ) : activeCategory === 'menu' ? (
+        <FlipBook />
       ) : (
         <Experiences category={activeCategory} />
       )}
