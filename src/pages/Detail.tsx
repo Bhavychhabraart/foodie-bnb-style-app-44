@@ -1,12 +1,20 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Share, Heart, Star, Medal, House, Map } from 'lucide-react';
+import { ArrowLeft, Share, Heart, Star, Medal, House, Map, CalendarPlus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
+import BookingDrawer from '@/components/BookingDrawer';
 
 const Detail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const handleReserve = () => {
+    setIsDrawerOpen(true);
+  };
   
   return (
     <div className="pb-16">
@@ -114,12 +122,6 @@ const Detail = () => {
             </div>
           </div>
           
-          <Button className="w-full airbnb-button mt-4">
-            Reserve
-          </Button>
-          
-          <p className="text-center text-sm text-airbnb-light mt-2">You won't be charged yet</p>
-          
           <div className="mt-4 border-t border-b border-gray-200 py-4">
             <div className="flex justify-between mb-2">
               <span className="underline">₹7,039.72 x 5 nights</span>
@@ -133,11 +135,22 @@ const Detail = () => {
         </div>
       </div>
       
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <Button className="w-full airbnb-button">
-          Reserve
+      {/* Center action button for reservations */}
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+        <Button 
+          onClick={handleReserve}
+          className="rounded-full bg-airbnb-red hover:bg-airbnb-red/90 text-white shadow-lg px-6 py-6 flex items-center justify-center"
+        >
+          <CalendarPlus className="mr-2 h-5 w-5" />
+          <span className="font-medium">Reserve</span>
         </Button>
       </div>
+      
+      {/* BookingDrawer component */}
+      <BookingDrawer 
+        open={isDrawerOpen} 
+        onOpenChange={setIsDrawerOpen}
+      />
     </div>
   );
 };
