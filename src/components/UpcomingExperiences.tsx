@@ -4,14 +4,6 @@ import { ChevronRight } from 'lucide-react';
 import ExperienceCard from './ExperienceCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 
-interface Experience {
-  id: number;
-  title: string;
-  date: string;
-  imageUrl: string;
-  price: string;
-}
-
 const experiences = [
   {
     id: 1,

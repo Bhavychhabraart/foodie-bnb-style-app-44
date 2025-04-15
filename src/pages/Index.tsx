@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
@@ -40,7 +41,7 @@ const Index = () => {
       
       {activeCategory === 'home' ? (
         <div className="space-y-2">
-          <Experiences />
+          <Experiences category="home" />
           <Spotlight />
           <ChefsSpecials />
           <OngoingOffers />
