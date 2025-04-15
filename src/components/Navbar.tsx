@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Menu, Search, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -47,14 +47,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="outline" 
-            className="hidden md:flex items-center space-x-2 rounded-full border border-gray-200 shadow-sm px-4 py-2 text-airbnb-dark"
-          >
-            <Search size={16} />
-            <span className="text-sm">Search</span>
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-full p-2">

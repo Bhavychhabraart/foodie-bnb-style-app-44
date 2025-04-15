@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import SearchBar from '@/components/SearchBar';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
 import BottomNav from '@/components/BottomNav';
@@ -20,7 +19,6 @@ const Index = () => {
   return (
     <div className="pb-16 bg-white">
       <div className="sticky top-0 z-10 bg-white shadow-sm">
-        <SearchBar />
         <CategorySelector 
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
