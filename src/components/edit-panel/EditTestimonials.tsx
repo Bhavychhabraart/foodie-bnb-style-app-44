@@ -21,6 +21,16 @@ import {
   MessageSquare
 } from 'lucide-react';
 
+// Define interface for Testimonial
+interface Testimonial {
+  id: number;
+  name: string;
+  avatar: string;
+  date: string;
+  rating: number;
+  text: string;
+}
+
 // Create schema for form validation
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -31,7 +41,7 @@ const formSchema = z.object({
 });
 
 // Mock data
-const initialTestimonials = [
+const initialTestimonials: Testimonial[] = [
   {
     id: 1,
     name: "Sarah Johnson",
@@ -59,7 +69,7 @@ const initialTestimonials = [
 ];
 
 const EditTestimonials: React.FC = () => {
-  const [testimonials, setTestimonials] = useState(initialTestimonials);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -90,7 +100,7 @@ const EditTestimonials: React.FC = () => {
     }
   };
 
-  const handleEdit = (testimonial: any) => {
+  const handleEdit = (testimonial: Testimonial) => {
     setEditingId(testimonial.id);
     form.reset({
       name: testimonial.name,
@@ -126,7 +136,14 @@ const EditTestimonials: React.FC = () => {
     if (editingId !== null) {
       // Update existing
       setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === editingId ? { ...testimonial, ...values } : testimonial
+        testimonial.id === editingId ? {
+          ...testimonial,
+          name: values.name,
+          date: values.date,
+          rating: values.rating,
+          text: values.text,
+          avatar: values.avatar
+        } : testimonial
       ));
       toast({
         title: "Success",
@@ -134,9 +151,13 @@ const EditTestimonials: React.FC = () => {
       });
     } else {
       // Add new
-      const newTestimonial = {
+      const newTestimonial: Testimonial = {
         id: Date.now(),
-        ...values
+        name: values.name,
+        date: values.date,
+        rating: values.rating,
+        text: values.text,
+        avatar: values.avatar
       };
       setTestimonials([...testimonials, newTestimonial]);
       toast({

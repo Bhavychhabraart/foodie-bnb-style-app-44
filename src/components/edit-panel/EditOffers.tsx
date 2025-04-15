@@ -20,6 +20,16 @@ import {
   Calendar
 } from 'lucide-react';
 
+// Define interface for Offer
+interface Offer {
+  id: number;
+  title: string;
+  description: string;
+  validUntil: string;
+  imageUrl: string;
+  couponCode: string;
+}
+
 // Create schema for form validation
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -30,7 +40,7 @@ const formSchema = z.object({
 });
 
 // Mock data
-const initialOffers = [
+const initialOffers: Offer[] = [
   {
     id: 1,
     title: "Weekend Special",
@@ -58,7 +68,7 @@ const initialOffers = [
 ];
 
 const EditOffers: React.FC = () => {
-  const [offers, setOffers] = useState(initialOffers);
+  const [offers, setOffers] = useState<Offer[]>(initialOffers);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -89,7 +99,7 @@ const EditOffers: React.FC = () => {
     }
   };
 
-  const handleEdit = (offer: any) => {
+  const handleEdit = (offer: Offer) => {
     setEditingId(offer.id);
     form.reset({
       title: offer.title,
@@ -125,7 +135,14 @@ const EditOffers: React.FC = () => {
     if (editingId !== null) {
       // Update existing
       setOffers(offers.map(offer => 
-        offer.id === editingId ? { ...offer, ...values } : offer
+        offer.id === editingId ? {
+          ...offer,
+          title: values.title,
+          description: values.description,
+          validUntil: values.validUntil,
+          imageUrl: values.imageUrl,
+          couponCode: values.couponCode
+        } : offer
       ));
       toast({
         title: "Success",
@@ -133,9 +150,13 @@ const EditOffers: React.FC = () => {
       });
     } else {
       // Add new
-      const newOffer = {
+      const newOffer: Offer = {
         id: Date.now(),
-        ...values
+        title: values.title,
+        description: values.description,
+        validUntil: values.validUntil,
+        imageUrl: values.imageUrl,
+        couponCode: values.couponCode
       };
       setOffers([...offers, newOffer]);
       toast({

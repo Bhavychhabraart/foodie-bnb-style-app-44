@@ -20,6 +20,18 @@ import {
   ChefHat
 } from 'lucide-react';
 
+// Define interface for Special
+interface Special {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  imageUrl: string;
+  chef: string;
+  isNew: boolean;
+  isPopular: boolean;
+}
+
 // Create schema for form validation
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -32,7 +44,7 @@ const formSchema = z.object({
 });
 
 // Mock data
-const initialSpecials = [
+const initialSpecials: Special[] = [
   {
     id: 1,
     title: "Truffle Pasta",
@@ -66,7 +78,7 @@ const initialSpecials = [
 ];
 
 const EditSpecials: React.FC = () => {
-  const [specials, setSpecials] = useState(initialSpecials);
+  const [specials, setSpecials] = useState<Special[]>(initialSpecials);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -99,7 +111,7 @@ const EditSpecials: React.FC = () => {
     }
   };
 
-  const handleEdit = (special: any) => {
+  const handleEdit = (special: Special) => {
     setEditingId(special.id);
     form.reset({
       title: special.title,
@@ -107,8 +119,8 @@ const EditSpecials: React.FC = () => {
       price: special.price,
       imageUrl: special.imageUrl,
       chef: special.chef,
-      isNew: !!special.isNew,
-      isPopular: !!special.isPopular
+      isNew: special.isNew,
+      isPopular: special.isPopular
     });
     setImagePreview(special.imageUrl);
   };
@@ -139,7 +151,16 @@ const EditSpecials: React.FC = () => {
     if (editingId !== null) {
       // Update existing
       setSpecials(specials.map(special => 
-        special.id === editingId ? { ...special, ...values } : special
+        special.id === editingId ? {
+          ...special,
+          title: values.title,
+          description: values.description,
+          price: values.price,
+          imageUrl: values.imageUrl,
+          chef: values.chef,
+          isNew: values.isNew || false,
+          isPopular: values.isPopular || false
+        } : special
       ));
       toast({
         title: "Success",
@@ -147,9 +168,15 @@ const EditSpecials: React.FC = () => {
       });
     } else {
       // Add new
-      const newSpecial = {
+      const newSpecial: Special = {
         id: Date.now(),
-        ...values
+        title: values.title,
+        description: values.description,
+        price: values.price,
+        imageUrl: values.imageUrl,
+        chef: values.chef,
+        isNew: values.isNew || false,
+        isPopular: values.isPopular || false
       };
       setSpecials([...specials, newSpecial]);
       toast({

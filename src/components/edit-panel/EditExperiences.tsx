@@ -24,6 +24,19 @@ import {
   Save
 } from 'lucide-react';
 
+// Define the Experience interface
+interface Experience {
+  id: number;
+  title: string;
+  host: string;
+  date: string;
+  price: string;
+  imageUrl: string;
+  rating: number;
+  reviews: number;
+  isSoldOut: boolean;
+}
+
 // Create schema for form validation
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -37,7 +50,7 @@ const formSchema = z.object({
 });
 
 // Mock data
-const initialExperiences = [
+const initialExperiences: Experience[] = [
   {
     id: 1,
     title: "Fine Dine Restaurant Experience",
@@ -74,7 +87,7 @@ const initialExperiences = [
 ];
 
 const EditExperiences: React.FC = () => {
-  const [experiences, setExperiences] = useState(initialExperiences);
+  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -108,7 +121,7 @@ const EditExperiences: React.FC = () => {
     }
   };
 
-  const handleEdit = (experience: any) => {
+  const handleEdit = (experience: Experience) => {
     setEditingId(experience.id);
     form.reset({
       title: experience.title,
@@ -116,9 +129,9 @@ const EditExperiences: React.FC = () => {
       date: experience.date,
       price: experience.price,
       imageUrl: experience.imageUrl,
-      rating: experience.rating || 0,
-      reviews: experience.reviews || 0,
-      isSoldOut: !!experience.isSoldOut
+      rating: experience.rating,
+      reviews: experience.reviews,
+      isSoldOut: experience.isSoldOut
     });
     setImagePreview(experience.imageUrl);
   };
@@ -150,7 +163,17 @@ const EditExperiences: React.FC = () => {
     if (editingId !== null) {
       // Update existing
       setExperiences(experiences.map(exp => 
-        exp.id === editingId ? { ...exp, ...values } : exp
+        exp.id === editingId ? { 
+          ...exp, 
+          title: values.title,
+          host: values.host,
+          date: values.date || "",
+          price: values.price,
+          imageUrl: values.imageUrl,
+          rating: values.rating || 0,
+          reviews: values.reviews || 0,
+          isSoldOut: values.isSoldOut || false
+        } : exp
       ));
       toast({
         title: "Success",
@@ -158,9 +181,16 @@ const EditExperiences: React.FC = () => {
       });
     } else {
       // Add new
-      const newExperience = {
+      const newExperience: Experience = {
         id: Date.now(),
-        ...values
+        title: values.title,
+        host: values.host,
+        date: values.date || "",
+        price: values.price,
+        imageUrl: values.imageUrl,
+        rating: values.rating || 0,
+        reviews: values.reviews || 0,
+        isSoldOut: values.isSoldOut || false
       };
       setExperiences([...experiences, newExperience]);
       toast({
