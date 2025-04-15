@@ -4,6 +4,11 @@ import SearchBar from '@/components/SearchBar';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
 import BottomNav from '@/components/BottomNav';
+import UpcomingExperiences from '@/components/UpcomingExperiences';
+import ChefsSpecials from '@/components/ChefsSpecials';
+import PhotoGallery from '@/components/PhotoGallery';
+import Testimonials from '@/components/Testimonials';
+import Highlights from '@/components/Highlights';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('menu');
@@ -16,7 +21,17 @@ const Index = () => {
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
-      <Experiences category={activeCategory} />
+      {activeCategory === 'home' ? (
+        <>
+          <UpcomingExperiences />
+          <ChefsSpecials />
+          <PhotoGallery />
+          <Testimonials />
+          <Highlights />
+        </>
+      ) : (
+        <Experiences category={activeCategory} />
+      )}
       <BottomNav 
         activeTab={activeTab}
         setActiveTab={setActiveTab}
