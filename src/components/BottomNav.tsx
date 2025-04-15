@@ -18,10 +18,10 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   
   const tabs = [
-    { id: 'influencer', label: 'Influencer', icon: Instagram },
-    { id: 'vip', label: 'VIP', icon: Award },
-    { id: 'support', label: 'Support', icon: LifeBuoy },
-    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'influencer', icon: Instagram },
+    { id: 'vip', icon: Award },
+    { id: 'support', icon: LifeBuoy },
+    { id: 'profile', icon: User },
   ];
 
   const handleTabClick = (tabId: string) => {
@@ -46,7 +46,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
                 onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
-                <span>{tab.label}</span>
               </button>
             ))}
           </div>
@@ -68,7 +67,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
                 onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
-                <span>{tab.label}</span>
               </button>
             ))}
           </div>

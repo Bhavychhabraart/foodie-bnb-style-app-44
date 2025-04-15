@@ -142,15 +142,11 @@
 }
 
 .bottom-nav-item {
-  @apply flex flex-col items-center justify-center text-xs text-airbnb-light;
-}
-
-.bottom-nav-item.active {
-  @apply text-airbnb-red;
+  @apply flex items-center justify-center text-xs text-airbnb-light;
 }
 
 .bottom-nav-icon {
-  @apply w-6 h-6 mb-1;
+  @apply w-6 h-6;
 }
 
 .price-tag {
