@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { CalendarPlus, User, Instagram, LifeBuoy } from 'lucide-react';
+import { CalendarPlus, User, Instagram, LifeBuoy, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BookingDrawer from './BookingDrawer';
 import SupportDrawer from './SupportDrawer';
@@ -18,16 +18,17 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'instagram', label: 'Instagram', icon: Instagram },
+    { id: 'influencer', label: 'Influencer', icon: Instagram },
+    { id: 'vip', label: 'VIP', icon: Award },
     { id: 'support', label: 'Support', icon: LifeBuoy },
+    { id: 'profile', label: 'Profile', icon: User },
   ];
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
-    } else if (tabId === 'instagram') {
+    } else if (tabId === 'influencer') {
       setIsInfluencerDrawerOpen(true);
     }
   };
@@ -38,7 +39,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
         <div className="flex justify-between items-center relative">
           {/* Left side tabs */}
           <div className="flex space-x-6">
-            {tabs.slice(0, 1).map((tab) => (
+            {tabs.slice(0, 2).map((tab) => (
               <button
                 key={tab.id}
                 className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
@@ -52,15 +53,15 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
           
           {/* Center button */}
           <button
-            className="absolute left-1/2 transform -translate-x-1/2 -top-6 bg-airbnb-red text-white rounded-full p-3 shadow-lg"
+            className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-airbnb-red text-white rounded-full p-4 shadow-lg"
             onClick={() => setIsBookingDrawerOpen(true)}
           >
-            <CalendarPlus className="h-6 w-6" />
+            <CalendarPlus className="h-7 w-7" />
           </button>
           
           {/* Right side tabs */}
           <div className="flex space-x-6">
-            {tabs.slice(1).map((tab) => (
+            {tabs.slice(2).map((tab) => (
               <button
                 key={tab.id}
                 className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}

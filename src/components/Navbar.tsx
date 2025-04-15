@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, User, Instagram } from 'lucide-react';
+import { Menu, User, Instagram, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
-    } else if (tabId === 'instagram') {
+    } else if (tabId === 'influencer') {
       setIsInfluencerDrawerOpen(true);
     }
   };
@@ -74,16 +74,19 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               <DropdownMenuContent align="end" className="w-56 bg-white">
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign in</DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign up</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('instagram')}>
-                  <Instagram className="h-4 w-4 mr-2" /> Instagram
+                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('influencer')}>
+                  <Instagram className="h-4 w-4 mr-2" /> Influencer
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('vip')}>
+                  <Award className="h-4 w-4 mr-2" /> VIP
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('support')}>
                   Support
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm md:hidden">
                   <Button 
-                    variant="ghost" 
-                    className="airbnb-button w-full justify-center mt-2"
+                    variant="airbnb" 
+                    className="w-full justify-center mt-2"
                     onClick={() => setActiveTab('booking')}
                   >
                     Reserve a table
