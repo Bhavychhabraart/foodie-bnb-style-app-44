@@ -34,7 +34,7 @@ const highlights = [
 
 const Highlights: React.FC = () => {
   return (
-    <div className="py-10 bg-white">
+    <div className="py-10 bg-zinc-900">
       <div className="container-padding mx-auto">
         <h2 className="text-2xl font-semibold mb-6 text-center">Highlights</h2>
         
@@ -43,13 +43,13 @@ const Highlights: React.FC = () => {
             {highlights.map(highlight => (
               <CarouselItem key={highlight.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <Card 
-                  className="border-none shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+                  className="border-none shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden bg-zinc-950"
                 >
                   <CardContent className="p-6 flex flex-col items-center text-center">
-                    <div className="w-14 h-14 rounded-full bg-soft-orange flex items-center justify-center mb-4">
-                      <highlight.icon className="w-7 h-7 text-airbnb-red" />
+                    <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center mb-4">
+                      <highlight.icon className="w-7 h-7 text-amber-500" />
                     </div>
-                    <h3 className="font-medium text-base">{highlight.title}</h3>
+                    <h3 className="font-medium text-base text-gray-200">{highlight.title}</h3>
                   </CardContent>
                 </Card>
               </CarouselItem>

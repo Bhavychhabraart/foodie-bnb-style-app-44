@@ -33,7 +33,8 @@ const config = {
 					red: '#FF385C',
 					dark: '#222222',
 					light: '#717171',
-					gray: '#F7F7F7'
+					gray: '#F7F7F7',
+					amber: '#F59E0B' // Adding amber as a primary theme color
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

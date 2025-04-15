@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
@@ -12,12 +13,17 @@ import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
+
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const summerDesserts = ["Mango Passion Sorbet", "Berry Pavlova", "Coconut Lime Panna Cotta", "Watermelon Granita", "Lavender Honey Ice Cream"];
-  return <div className="pb-16 bg-zinc-900">
-      
+  
+  return (
+    <div className="pb-16 bg-zinc-900">
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
       
       <MarqueeAnnouncement title="New Summer Desserts!" items={summerDesserts} />
       
@@ -25,7 +31,8 @@ const Index = () => {
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
-      {activeCategory === 'home' ? <div className="space-y-2 bg-zinc-900">
+      {activeCategory === 'home' ? (
+        <div className="space-y-2 bg-zinc-900">
           <Experiences category="home" />
           <Spotlight />
           <ChefsSpecials />
@@ -34,9 +41,18 @@ const Index = () => {
           <About />
           <Highlights />
           <Testimonials />
-        </div> : activeCategory === 'experiences' ? <Experiences category="experiences" /> : activeCategory === 'menu' ? <FlipBook /> : activeCategory === 'offers' ? <OngoingOffers /> : null}
+        </div>
+      ) : activeCategory === 'experiences' ? (
+        <Experiences category="experiences" />
+      ) : activeCategory === 'menu' ? (
+        <FlipBook />
+      ) : activeCategory === 'offers' ? (
+        <OngoingOffers />
+      ) : null}
       
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
