@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { Award, Clock, Sparkles, Utensils } from 'lucide-react';
-
 const About: React.FC = () => {
-  return (
-    <div id="about" className="section-padding">
+  return <div id="about" className="section-padding">
       <div className="container-padding mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -14,11 +11,7 @@ const About: React.FC = () => {
               Our restaurant brings together the finest ingredients, masterful techniques, and 
               elegant ambiance to create an unforgettable dining experience.
             </p>
-            <p className="text-airbnb-light mb-6">
-              Our award-winning chef, Jonathan Marshall, draws inspiration from global cuisines 
-              while celebrating local produce. Every dish tells a story, inviting you on a 
-              gastronomic journey that delights the senses and creates lasting memories.
-            </p>
+            
             
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-start space-x-3">
@@ -53,16 +46,10 @@ const About: React.FC = () => {
           </div>
           
           <div className="h-64 md:h-auto">
-            <img 
-              src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" 
-              alt="Chef preparing food" 
-              className="w-full h-full object-cover rounded-xl"
-            />
+            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" alt="Chef preparing food" className="w-full h-full object-cover rounded-xl" />
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default About;
