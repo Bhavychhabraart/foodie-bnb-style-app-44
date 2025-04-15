@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, User } from 'lucide-react';
+import { Menu, User, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
-    } else if (tabId === 'influencers') {
+    } else if (tabId === 'instagram') {
       setIsInfluencerDrawerOpen(true);
     }
   };
@@ -74,8 +74,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               <DropdownMenuContent align="end" className="w-56 bg-white">
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign in</DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm">Sign up</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('influencers')}>
-                  Influencers
+                <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('instagram')}>
+                  <Instagram className="h-4 w-4 mr-2" /> Instagram
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('support')}>
                   Support

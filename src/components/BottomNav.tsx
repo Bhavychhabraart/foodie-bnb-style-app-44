@@ -19,7 +19,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'influencers', label: 'Influencers', icon: Instagram },
+    { id: 'instagram', label: 'Instagram', icon: Instagram },
     { id: 'support', label: 'Support', icon: LifeBuoy },
   ];
 
@@ -27,7 +27,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
-    } else if (tabId === 'influencers') {
+    } else if (tabId === 'instagram') {
       setIsInfluencerDrawerOpen(true);
     }
   };

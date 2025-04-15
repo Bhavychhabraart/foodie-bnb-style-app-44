@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { Instagram, Linkedin, Globe, Sparkles, Camera, CheckCircle } from 'lucide-react';
+import { Instagram, Camera, CheckCircle } from 'lucide-react';
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -27,7 +27,6 @@ interface FormValues {
   email: string;
   instagram: string;
   followers: string;
-  website: string;
   message: string;
 }
 
@@ -41,13 +40,12 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
       email: '',
       instagram: '',
       followers: '',
-      website: '',
       message: ''
     }
   });
 
   const onSubmit = (data: FormValues) => {
-    console.log('Influencer application submitted:', data);
+    console.log('Instagram influencer application submitted:', data);
     setSubmitted(true);
     toast({
       title: "Application Submitted!",
@@ -67,47 +65,41 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
         <div className="mx-auto w-full max-w-md">
           <DrawerHeader>
             <DrawerTitle className="text-xl flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-airbnb-red" />
-              Influencer Collaboration
+              <Instagram className="h-5 w-5 text-airbnb-red" />
+              Instagram Collaboration
             </DrawerTitle>
             <DrawerDescription>
-              Join our exclusive network of food influencers and unlock unique opportunities
+              Join our exclusive network of food influencers and create amazing content with us
             </DrawerDescription>
           </DrawerHeader>
 
           {!submitted ? (
             <div className="p-4">
-              <div className="mb-6 grid grid-cols-3 gap-4">
-                <Card className="bg-soft-purple flex flex-col items-center justify-center p-3 text-center">
-                  <Instagram className="h-8 w-8 mb-2 text-purple-500" />
-                  <p className="text-sm font-medium">Instagram</p>
-                </Card>
-                <Card className="bg-soft-blue flex flex-col items-center justify-center p-3 text-center">
-                  <Linkedin className="h-8 w-8 mb-2 text-blue-500" />
-                  <p className="text-sm font-medium">LinkedIn</p>
-                </Card>
-                <Card className="bg-soft-orange flex flex-col items-center justify-center p-3 text-center">
-                  <Globe className="h-8 w-8 mb-2 text-orange-500" />
-                  <p className="text-sm font-medium">Bloggers</p>
-                </Card>
-              </div>
-
               <div className="mb-6">
-                <h3 className="font-medium mb-2">Benefits</h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Exclusive restaurant events
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Complimentary dishes for content creation
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Collaborative marketing opportunities
-                  </li>
-                </ul>
+                <Card className="bg-soft-purple p-4 border-none">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Instagram className="h-6 w-6 text-purple-500" />
+                    <h3 className="font-medium">Why collaborate with us?</h3>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span>Exclusive food tasting events</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span>Complimentary dishes for content creation</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span>Featured stories on our social media</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span>Collaborate with our chefs for unique content</span>
+                    </li>
+                  </ul>
+                </Card>
               </div>
 
               <Form {...form}>
@@ -176,27 +168,13 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
                   
                   <FormField
                     control={form.control}
-                    name="website"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Website/Blog (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://yourblog.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
                     name="message"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Message</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Tell us a bit about your content and why you'd like to collaborate..." 
+                            placeholder="Tell us about your content style and why you'd like to collaborate..." 
                             {...field} 
                             className="min-h-[80px]"
                           />
