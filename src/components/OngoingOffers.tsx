@@ -57,7 +57,7 @@ const OngoingOffers: React.FC = () => {
                   <CardContent className="p-0">
                     <div className="relative">
                       <img src={offer.imageUrl} alt={offer.title} className="w-full h-[200px] object-cover rounded-t-xl" />
-                      <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center">
+                      <div className="absolute bottom-3 left-3 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center bg-zinc-800">
                         <Tag className="w-4 h-4 mr-1" />
                         <span className="text-sm font-medium">Valid until: {offer.validUntil}</span>
                       </div>
