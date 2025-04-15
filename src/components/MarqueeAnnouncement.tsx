@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LollipopIcon, Cherry, Candy } from 'lucide-react';
+import { LollipopIcon, Cherry, Candy, IceCream } from 'lucide-react';
 
 interface MarqueeProps {
   title: string;
@@ -26,7 +26,7 @@ const MarqueeAnnouncement: React.FC<MarqueeProps> = ({ title, items }) => {
                   {index === items.length - 1 && dupeIndex === 0 ? null : (
                     <span className="ml-1.5">
                       {index % 3 === 0 ? <Cherry className="h-4 w-4 text-airbnb-red" /> : 
-                       index % 3 === 1 ? <IceCreamCone className="h-4 w-4 text-blue-500 dark:text-blue-400" /> : 
+                       index % 3 === 1 ? <IceCream className="h-4 w-4 text-blue-500 dark:text-blue-400" /> : 
                        <Candy className="h-4 w-4 text-pink-500 dark:text-pink-400" />}
                     </span>
                   )}
