@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Experiences from '@/components/Experiences';
 import BottomNav from '@/components/BottomNav';
-import Experiences from '@/components/Experiences';
 import ChefsSpecials from '@/components/ChefsSpecials';
 import OngoingOffers from '@/components/OngoingOffers';
 import PhotoGallery from '@/components/PhotoGallery';
