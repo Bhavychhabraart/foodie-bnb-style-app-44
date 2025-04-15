@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronRight, Calendar, ArrowRight, ArrowLeft, User, Phone, Mail, AlertCircle } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 interface Experience {
   id: number;
   title: string;
@@ -22,6 +23,7 @@ interface Experience {
   imageUrl: string;
   price: string;
 }
+
 const upcomingExperiences = [{
   id: 1,
   title: "Farm to Table Dinner",
@@ -41,9 +43,9 @@ const upcomingExperiences = [{
   imageUrl: "https://images.unsplash.com/photo-1556761223-4c4282c73f77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1165&q=80",
   price: "₹2,500 per person"
 }];
+
 const timeSlots = ["5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM"];
 
-// Define the form schema with Zod
 const formSchema = z.object({
   time: z.string().min(1, {
     message: "Please select a time"
@@ -62,7 +64,9 @@ const formSchema = z.object({
   }),
   specialRequests: z.string().optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const UpcomingExperiences: React.FC = () => {
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
   const [bookingStep, setBookingStep] = useState(1);
@@ -71,6 +75,7 @@ const UpcomingExperiences: React.FC = () => {
   const {
     toast
   } = useToast();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,8 +86,9 @@ const UpcomingExperiences: React.FC = () => {
       phone: "",
       specialRequests: ""
     },
-    mode: "onChange" // This enables validation as fields change
+    mode: "onChange"
   });
+
   const handleBookNow = (experience: Experience) => {
     setSelectedExperience(experience);
     setBookingStep(1);
@@ -97,6 +103,7 @@ const UpcomingExperiences: React.FC = () => {
     });
     setDrawerOpen(true);
   };
+
   const onSubmit = (values: FormValues) => {
     console.log("Form submitted with values:", values);
     if (bookingStep < 3) {
@@ -106,6 +113,7 @@ const UpcomingExperiences: React.FC = () => {
       setBookingComplete(true);
     }
   };
+
   const handleManualContinue = () => {
     console.log("Manual continue button clicked");
     const currentStepFields: Record<number, string[]> = {
@@ -114,27 +122,26 @@ const UpcomingExperiences: React.FC = () => {
       3: []
     };
 
-    // Get the fields to validate for the current step
     const fieldsToValidate = currentStepFields[bookingStep] || [];
 
-    // Trigger validation for the current step's fields
     form.trigger(fieldsToValidate as any).then(isValid => {
       console.log("Form validation result:", isValid);
       if (isValid) {
         if (bookingStep < 3) {
           setBookingStep(bookingStep + 1);
         } else {
-          // For the final step, we'll submit the entire form
           form.handleSubmit(onSubmit)();
         }
       }
     });
   };
+
   const handlePrevious = () => {
     if (bookingStep > 1) {
       setBookingStep(bookingStep - 1);
     }
   };
+
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
     setTimeout(() => {
@@ -142,11 +149,13 @@ const UpcomingExperiences: React.FC = () => {
       setBookingComplete(false);
     }, 300);
   };
+
   const renderStepIndicator = () => {
     return <div className="flex items-center justify-center space-x-2 mb-6">
         {[1, 2, 3].map(step => <div key={step} className={`w-2.5 h-2.5 rounded-full ${step === bookingStep ? 'bg-airbnb-red' : step < bookingStep ? 'bg-gray-400' : 'bg-gray-200'}`} />)}
       </div>;
   };
+
   const renderBookingStepContent = () => {
     if (bookingComplete) {
       return <BookingConfirmation experienceTitle={selectedExperience?.title || ""} date={selectedExperience?.date || ""} time={form.getValues("time")} guests={form.getValues("guests")} onClose={handleCloseDrawer} />;
@@ -281,6 +290,7 @@ const UpcomingExperiences: React.FC = () => {
         </form>
       </Form>;
   };
+
   return <div className="section-padding">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
@@ -328,10 +338,10 @@ const UpcomingExperiences: React.FC = () => {
                 </Card>
               </CarouselItem>)}
           </CarouselContent>
-          <CarouselPrevious className="left-0 -translate-x-1/2" />
-          <CarouselNext className="right-0 translate-x-1/2" />
+          <CarouselDots className="mt-4" />
         </Carousel>
       </div>
     </div>;
 };
+
 export default UpcomingExperiences;
