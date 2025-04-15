@@ -36,9 +36,9 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   return (
     <>
       <div className="bottom-nav">
-        <div className="flex justify-between items-center relative">
+        <div className="flex justify-between items-center relative px-4">
           {/* Left side tabs */}
-          <div className="flex space-x-6">
+          <div className="flex justify-between w-2/5">
             {tabs.slice(0, 2).map((tab) => (
               <button
                 key={tab.id}
@@ -52,14 +52,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
           
           {/* Center button */}
           <button
-            className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-airbnb-red text-white rounded-full p-4 shadow-lg"
+            className="absolute left-1/2 transform -translate-x-1/2 -top-10 bg-airbnb-red text-white rounded-full p-5 shadow-lg"
             onClick={() => setIsBookingDrawerOpen(true)}
           >
-            <CalendarPlus className="h-7 w-7" />
+            <CalendarPlus className="h-8 w-8" />
           </button>
           
           {/* Right side tabs */}
-          <div className="flex space-x-6">
+          <div className="flex justify-between w-2/5">
             {tabs.slice(2).map((tab) => (
               <button
                 key={tab.id}
