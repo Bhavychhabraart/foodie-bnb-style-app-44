@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -28,11 +29,12 @@ const config = {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+				// Replace Airbnb red with earthy brown tones
 				airbnb: {
-					red: '#FF385C',
-					dark: '#222222',
-					light: '#717171',
-					gray: '#F7F7F7'
+					red: '#8B4513', // Saddle Brown
+					dark: '#5D4037', // Dark Brown
+					light: '#A1887F', // Warm Brown
+					gray: '#D7CCC8' // Light Warm Brown
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
