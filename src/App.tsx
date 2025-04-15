@@ -13,21 +13,12 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EditPanel from "./pages/EditPanel";
 import NotFound from "./pages/NotFound";
 
-// Import Montserrat font
-import "./App.css";
-
 // Create QueryClient outside of the component
 const queryClient = new QueryClient();
 
 // Create the App component
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-
-  // Add Montserrat font
-  const montserratFontLink = document.createElement('link');
-  montserratFontLink.rel = 'stylesheet';
-  montserratFontLink.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap';
-  document.head.appendChild(montserratFontLink);
 
   const handleSplashFinish = () => {
     setShowSplash(false);
