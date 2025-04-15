@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Menu as MenuIcon, ChevronUp, X, Share, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
-import { ExperienceCard } from './ExperienceCard';
+import ExperienceCard from './ExperienceCard';
 
 interface MenuItem {
   id: number;
