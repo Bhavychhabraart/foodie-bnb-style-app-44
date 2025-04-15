@@ -23,7 +23,7 @@ const FlipBook: React.FC = () => {
         </div>
         
         <Card className="w-full max-w-2xl mx-auto overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 rounded-xl">
-          <div className="relative h-72 w-full">
+          <div className="relative h-96 w-full">
             <img 
               src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
               alt="Restaurant menu"
@@ -37,7 +37,7 @@ const FlipBook: React.FC = () => {
                     <span>Open Menu</span>
                   </Button>
                 </DrawerTrigger>
-                <DrawerContent className="h-[90vh] rounded-t-[20px] border-t-4 border-airbnb-red">
+                <DrawerContent className="h-[95vh] rounded-t-[20px] border-t-4 border-airbnb-red">
                   <div className="flex justify-between items-center px-6 pt-4 pb-2">
                     <h2 className="text-2xl font-semibold">Fine Dining Menu</h2>
                     <DrawerClose asChild>
@@ -46,12 +46,12 @@ const FlipBook: React.FC = () => {
                       </Button>
                     </DrawerClose>
                   </div>
-                  <ScrollArea className="h-[calc(90vh-70px)] w-full px-4">
+                  <ScrollArea className="h-[calc(95vh-70px)] w-full px-4">
                     <div className="pb-4 h-full w-full">
                       <iframe 
                         src="https://heyzine.com/flip-book/44253fcd19.html" 
                         title="Restaurant Digital Menu"
-                        className="w-full h-[calc(90vh-100px)] border-0 rounded-lg shadow-sm"
+                        className="w-full h-[calc(95vh-100px)] border-0 rounded-lg shadow-sm"
                         allow="fullscreen"
                       />
                     </div>
