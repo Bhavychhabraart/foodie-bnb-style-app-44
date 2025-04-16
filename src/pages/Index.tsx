@@ -17,7 +17,13 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
-  const upcomingEvents = ["Soulful Sufi Night - 16th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
+  const upcomingEvents = [
+    "Soulful Sufi Night - 16th April", 
+    "Our World with Raja Kikkat - 17th April", 
+    "Thursday Gin & Groove - 17th April", 
+    "Back to 90s - 18th April", 
+    "Bollywood Night - 20th April"
+  ];
   
   return (
     <div className="pb-16 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">

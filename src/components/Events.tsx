@@ -45,6 +45,17 @@ const eventsByCategory: Record<string, Event[]> = {
     isSoldOut: false,
     venue: "Sector 52, Gurgaon",
     time: "05 PM"
+  }, {
+    id: 10,
+    imageUrl: "/lovable-uploads/d9da4075-c4e3-4a25-8d59-7101ec266e33.png",
+    title: "Our World - Raja Kikkat",
+    host: "17th April, 2025",
+    price: "Supporting Acts: Anna Radko, D.Jay, Tanya Chamoli",
+    rating: 4.95,
+    reviews: 218,
+    isSoldOut: false,
+    venue: "SELAH, The Qutub Hotel",
+    time: "Thursday"
   }],
   experiences: [{
     id: 3,
@@ -65,6 +76,17 @@ const eventsByCategory: Record<string, Event[]> = {
     reviews: 468,
     isSoldOut: false,
     venue: "Sector 49, Gurgaon"
+  }, {
+    id: 10,
+    imageUrl: "/lovable-uploads/d9da4075-c4e3-4a25-8d59-7101ec266e33.png",
+    title: "Our World - Raja Kikkat",
+    host: "17th April, 2025",
+    price: "Supporting Acts: Anna Radko, D.Jay, Tanya Chamoli",
+    rating: 4.95,
+    reviews: 218,
+    isSoldOut: false,
+    venue: "SELAH, The Qutub Hotel",
+    time: "Thursday"
   }],
   offers: [{
     id: 5,
@@ -116,6 +138,17 @@ const eventsByCategory: Record<string, Event[]> = {
     rating: 4.78,
     reviews: 28,
     venue: "Sector 49, Gurgaon"
+  }, {
+    id: 10,
+    imageUrl: "/lovable-uploads/d9da4075-c4e3-4a25-8d59-7101ec266e33.png",
+    title: "Our World - Raja Kikkat",
+    host: "17th April, 2025",
+    price: "Supporting Acts: Anna Radko, D.Jay, Tanya Chamoli",
+    rating: 4.95,
+    reviews: 218,
+    isSoldOut: false,
+    venue: "SELAH, The Qutub Hotel",
+    time: "Thursday"
   }]
 };
 
