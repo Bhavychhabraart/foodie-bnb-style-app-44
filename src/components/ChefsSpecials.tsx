@@ -13,6 +13,7 @@ interface ChefSpecial {
   imageUrl: string;
   price: string;
   rating: number;
+  description?: string;
 }
 
 const ChefsSpecials: React.FC = () => {
@@ -24,7 +25,7 @@ const ChefsSpecials: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('chef_specials')
-          .select('id, title, chef, image_url, price, rating')
+          .select('id, title, chef, image_url, price, rating, description')
           .order('created_at', { ascending: false });
         
         if (error) {
@@ -38,7 +39,8 @@ const ChefsSpecials: React.FC = () => {
             chef: item.chef,
             imageUrl: item.image_url,
             price: item.price,
-            rating: item.rating || 4.5
+            rating: item.rating || 4.5,
+            description: item.description
           }));
           setChefsSpecials(formattedData);
         }
