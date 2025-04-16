@@ -79,51 +79,53 @@ const getStatusBadge = (status: string) => {
 const DashboardTable = () => {
   return (
     <div className="rounded-md border border-airbnb-gold/20 overflow-hidden">
-      <Table>
-        <TableHeader className="bg-[#1A1A1A]">
-          <TableRow className="hover:bg-[#1E1E1E] border-airbnb-gold/10">
-            <TableHead className="text-airbnb-light/70">Booking ID</TableHead>
-            <TableHead className="text-airbnb-light/70">Guest</TableHead>
-            <TableHead className="text-airbnb-light/70">Date</TableHead>
-            <TableHead className="text-airbnb-light/70">Experience</TableHead>
-            <TableHead className="text-airbnb-light/70">Amount</TableHead>
-            <TableHead className="text-airbnb-light/70">Status</TableHead>
-            <TableHead className="text-airbnb-light/70 text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {bookings.map((booking) => (
-            <TableRow key={booking.id} className="hover:bg-[#1A1A1A] border-airbnb-gold/10">
-              <TableCell className="font-medium text-airbnb-light">{booking.id}</TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-2 text-airbnb-gold/80" />
-                  <span className="text-airbnb-light">{booking.guest}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-airbnb-gold/80" />
-                  <span className="text-airbnb-light">{formatDate(booking.date)}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-airbnb-light">{booking.experience}</TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1 text-airbnb-gold/80" />
-                  <span className="text-airbnb-light">{booking.amount}</span>
-                </div>
-              </TableCell>
-              <TableCell>{getStatusBadge(booking.status)}</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="text-airbnb-light hover:bg-airbnb-gold/10">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </TableCell>
+      <div className="overflow-x-auto w-full">
+        <Table>
+          <TableHeader className="bg-[#1A1A1A]">
+            <TableRow className="hover:bg-[#1E1E1E] border-airbnb-gold/10">
+              <TableHead className="text-airbnb-light/70 w-[100px]">Booking ID</TableHead>
+              <TableHead className="text-airbnb-light/70">Guest</TableHead>
+              <TableHead className="text-airbnb-light/70">Date</TableHead>
+              <TableHead className="text-airbnb-light/70">Experience</TableHead>
+              <TableHead className="text-airbnb-light/70">Amount</TableHead>
+              <TableHead className="text-airbnb-light/70">Status</TableHead>
+              <TableHead className="text-airbnb-light/70 text-right w-[80px]">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {bookings.map((booking) => (
+              <TableRow key={booking.id} className="hover:bg-[#1A1A1A] border-airbnb-gold/10">
+                <TableCell className="font-medium text-airbnb-light">{booking.id}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <User className="h-4 w-4 mr-2 text-airbnb-gold/80" />
+                    <span className="text-airbnb-light">{booking.guest}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-airbnb-gold/80" />
+                    <span className="text-airbnb-light">{formatDate(booking.date)}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-airbnb-light">{booking.experience}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1 text-airbnb-gold/80" />
+                    <span className="text-airbnb-light">{booking.amount}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" className="text-airbnb-light hover:bg-airbnb-gold/10">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

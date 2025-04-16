@@ -189,19 +189,21 @@ const AdminDashboard = () => {
                       <span>+12.5%</span>
                     </div>
                   </div>
-                  <div className="h-[300px]">
+                  <div className="h-[300px] w-full">
                     <ChartContainer
                       config={{
                         sales: { color: "#B18E72" },
                       }}
+                      className="w-full h-full"
                     >
-                      <LineChart data={salesData}>
+                      <LineChart data={salesData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                         <XAxis
                           dataKey="name"
                           stroke="#888888"
                           fontSize={12}
                           tickLine={false}
                           axisLine={false}
+                          padding={{ left: 10, right: 10 }}
                         />
                         <YAxis
                           stroke="#888888"
@@ -209,13 +211,15 @@ const AdminDashboard = () => {
                           tickLine={false}
                           axisLine={false}
                           tickFormatter={(value) => `$${value}`}
+                          width={60}
                         />
                         <Line
                           type="monotone"
                           dataKey="value"
                           stroke="var(--color-sales)"
                           strokeWidth={2}
-                          dot={false}
+                          dot={{ r: 3 }}
+                          activeDot={{ r: 5 }}
                         />
                         <ChartTooltip
                           content={({ active, payload }) => {
@@ -236,7 +240,7 @@ const AdminDashboard = () => {
                                         Revenue
                                       </span>
                                       <span className="font-bold text-xs text-airbnb-light">
-                                        ${payload[0].value}
+                                        ${payload[0].value.toLocaleString()}
                                       </span>
                                     </div>
                                   </div>
@@ -261,30 +265,34 @@ const AdminDashboard = () => {
                       <span>+8.3%</span>
                     </div>
                   </div>
-                  <div className="h-[300px]">
+                  <div className="h-[300px] w-full">
                     <ChartContainer
                       config={{
                         bookings: { color: "#B18E72" },
                       }}
+                      className="w-full h-full"
                     >
-                      <BarChart data={bookingsData}>
+                      <BarChart data={bookingsData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                         <XAxis
                           dataKey="name"
                           stroke="#888888"
                           fontSize={12}
                           tickLine={false}
                           axisLine={false}
+                          padding={{ left: 10, right: 10 }}
                         />
                         <YAxis
                           stroke="#888888"
                           fontSize={12}
                           tickLine={false}
                           axisLine={false}
+                          width={30}
                         />
                         <Bar
                           dataKey="value"
                           fill="var(--color-bookings)"
                           radius={[4, 4, 0, 0]}
+                          barSize={20}
                         />
                         <ChartTooltip
                           content={({ active, payload }) => {
@@ -327,19 +335,24 @@ const AdminDashboard = () => {
             <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
                 <h3 className="text-lg font-medium text-airbnb-light mb-4">Sales Overview</h3>
-                <div className="h-[400px]">
+                <div className="h-[400px] w-full">
                   <ChartContainer
                     config={{
                       sales: { color: "#B18E72" },
                     }}
+                    className="w-full h-full"
                   >
-                    <LineChart data={salesData}>
+                    <LineChart 
+                      data={salesData} 
+                      margin={{ top: 20, right: 30, bottom: 20, left: 40 }}
+                    >
                       <XAxis
                         dataKey="name"
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        padding={{ left: 10, right: 10 }}
                       />
                       <YAxis
                         stroke="#888888"
@@ -347,14 +360,22 @@ const AdminDashboard = () => {
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value) => `$${value}`}
+                        width={60}
                       />
                       <Line
                         type="monotone"
                         dataKey="value"
                         stroke="var(--color-sales)"
                         strokeWidth={2}
+                        dot={{ r: 4, strokeWidth: 2 }}
+                        activeDot={{ r: 6, strokeWidth: 2 }}
                       />
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip content={
+                        <ChartTooltipContent 
+                          labelFormatter={(value) => `Month: ${value}`}
+                          formatter={(value) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        />
+                      } />
                     </LineChart>
                   </ChartContainer>
                 </div>
@@ -366,32 +387,44 @@ const AdminDashboard = () => {
             <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
                 <h3 className="text-lg font-medium text-airbnb-light mb-4">Booking Trends</h3>
-                <div className="h-[400px]">
+                <div className="h-[400px] w-full">
                   <ChartContainer
                     config={{
                       bookings: { color: "#B18E72" },
                     }}
+                    className="w-full h-full"
                   >
-                    <BarChart data={bookingsData}>
+                    <BarChart 
+                      data={bookingsData}
+                      margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+                    >
                       <XAxis
                         dataKey="name"
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        padding={{ left: 10, right: 10 }}
                       />
                       <YAxis
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        width={30}
                       />
                       <Bar
                         dataKey="value"
                         fill="var(--color-bookings)"
                         radius={[4, 4, 0, 0]}
+                        barSize={30}
                       />
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip content={
+                        <ChartTooltipContent 
+                          labelFormatter={(value) => `Month: ${value}`}
+                          formatter={(value) => [`${value}`, 'Bookings']}
+                        />
+                      } />
                     </BarChart>
                   </ChartContainer>
                 </div>
@@ -403,33 +436,46 @@ const AdminDashboard = () => {
             <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
                 <h3 className="text-lg font-medium text-airbnb-light mb-4">Guest Statistics</h3>
-                <div className="h-[400px]">
+                <div className="h-[400px] w-full">
                   <ChartContainer
                     config={{
                       guests: { color: "#B18E72" },
                     }}
+                    className="w-full h-full"
                   >
-                    <LineChart data={guestData}>
+                    <LineChart 
+                      data={guestData}
+                      margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+                    >
                       <XAxis
                         dataKey="name"
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        padding={{ left: 10, right: 10 }}
                       />
                       <YAxis
                         stroke="#888888"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        width={30}
                       />
                       <Line
                         type="monotone"
                         dataKey="value"
                         stroke="var(--color-guests)"
                         strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
                       />
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip content={
+                        <ChartTooltipContent 
+                          labelFormatter={(value) => `Month: ${value}`}
+                          formatter={(value) => [`${value}`, 'Guests']}
+                        />
+                      } />
                     </LineChart>
                   </ChartContainer>
                 </div>
