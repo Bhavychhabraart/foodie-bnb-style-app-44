@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,97 +18,85 @@ import {
   Trash2, 
   Plus, 
   Star,
-  MessageSquare,
-  Loader2
+  MessageSquare
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { uploadFile } from '@/utils/storage-helpers';
-import { Testimonial } from '@/types/supabase';
+
+// Define interface for Testimonial
+interface Testimonial {
+  id: number;
+  name: string;
+  avatar: string;
+  date: string;
+  rating: number;
+  text: string;
+}
 
 // Create schema for form validation
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
+  date: z.string().min(3, "Date is required"),
   rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
-  review_text: z.string().min(10, "Review text must be at least 10 characters"),
-  avatar_url: z.string().optional(),
-  is_approved: z.boolean().default(true)
+  text: z.string().min(10, "Review text must be at least 10 characters"),
+  avatar: z.string().url("Must be a valid URL"),
 });
 
+// Mock data
+const initialTestimonials: Testimonial[] = [
+  {
+    id: 1,
+    name: "Sarah Johnson",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    date: "March 2025",
+    rating: 5,
+    text: "Absolutely incredible dining experience! The truffle risotto was divine, and the service was impeccable. The ambiance makes it perfect for special occasions."
+  },
+  {
+    id: 2,
+    name: "Michael Chen",
+    avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    date: "February 2025",
+    rating: 4,
+    text: "Great food and atmosphere. The beef tenderloin was cooked to perfection. Only giving 4 stars because we had to wait a bit for our table despite having a reservation."
+  },
+  {
+    id: 3,
+    name: "Emma Roberts",
+    avatar: "https://randomuser.me/api/portraits/women/32.jpg",
+    date: "January 2025",
+    rating: 5,
+    text: "Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny. The staff made us feel so special."
+  }
+];
+
 const EditTestimonials: React.FC = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      date: "",
       rating: 5,
-      review_text: "",
-      avatar_url: "",
-      is_approved: true
+      text: "",
+      avatar: ""
     }
   });
 
-  // Fetch testimonials from Supabase
-  const fetchTestimonials = async () => {
-    setIsFetching(true);
-    try {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        throw error;
-      }
-      
-      setTestimonials(data as Testimonial[]);
-    } catch (error) {
-      console.error('Error fetching testimonials:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load testimonials",
-        variant: "destructive",
-      });
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      try {
-        // Upload avatar to Supabase storage
-        const fileUrl = await uploadFile(file, 'testimonial-avatars');
-        if (fileUrl) {
-          setAvatarPreview(fileUrl);
-          form.setValue('avatar_url', fileUrl);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to upload image",
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error('Error uploading avatar:', error);
-        toast({
-          title: "Error",
-          description: "Failed to upload image",
-          variant: "destructive",
-        });
-      }
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+        form.setValue('avatar', reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -115,12 +104,12 @@ const EditTestimonials: React.FC = () => {
     setEditingId(testimonial.id);
     form.reset({
       name: testimonial.name,
+      date: testimonial.date,
       rating: testimonial.rating,
-      review_text: testimonial.review_text,
-      avatar_url: testimonial.avatar_url || '',
-      is_approved: testimonial.is_approved
+      text: testimonial.text,
+      avatar: testimonial.avatar
     });
-    setAvatarPreview(testimonial.avatar_url);
+    setAvatarPreview(testimonial.avatar);
   };
 
   const startAddNew = () => {
@@ -128,10 +117,10 @@ const EditTestimonials: React.FC = () => {
     setEditingId(null);
     form.reset({
       name: "",
+      date: "",
       rating: 5,
-      review_text: "",
-      avatar_url: "",
-      is_approved: true
+      text: "",
+      avatar: ""
     });
     setAvatarPreview(null);
   };
@@ -143,121 +132,52 @@ const EditTestimonials: React.FC = () => {
     setAvatarPreview(null);
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    
-    try {
-      if (editingId !== null) {
-        // Update existing testimonial
-        const { error } = await supabase
-          .from('testimonials')
-          .update({
-            name: values.name,
-            rating: values.rating,
-            review_text: values.review_text,
-            avatar_url: values.avatar_url || null,
-            is_approved: values.is_approved
-          })
-          .eq('id', editingId);
-          
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "Testimonial updated successfully",
-        });
-      } else {
-        // Add new testimonial
-        const { error } = await supabase
-          .from('testimonials')
-          .insert({
-            name: values.name,
-            rating: values.rating,
-            review_text: values.review_text,
-            avatar_url: values.avatar_url || null,
-            is_approved: values.is_approved
-          });
-          
-        if (error) throw error;
-        
-        toast({
-          title: "Success",
-          description: "New testimonial added successfully",
-        });
-      }
-      
-      // Refetch the testimonials to update the list
-      await fetchTestimonials();
-      
-      setIsAdding(false);
-      setEditingId(null);
-      form.reset();
-      setAvatarPreview(null);
-    } catch (error) {
-      console.error('Error saving testimonial:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save testimonial",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('testimonials')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      setTestimonials(testimonials.filter(testimonial => testimonial.id !== id));
-      
-      toast({
-        title: "Success",
-        description: "Testimonial deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting testimonial:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete testimonial",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const toggleApproval = async (id: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('testimonials')
-        .update({ is_approved: !currentStatus })
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      // Update the local state
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (editingId !== null) {
+      // Update existing
       setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === id 
-          ? {...testimonial, is_approved: !currentStatus} 
-          : testimonial
+        testimonial.id === editingId ? {
+          ...testimonial,
+          name: values.name,
+          date: values.date,
+          rating: values.rating,
+          text: values.text,
+          avatar: values.avatar
+        } : testimonial
       ));
-      
       toast({
         title: "Success",
-        description: `Testimonial ${!currentStatus ? 'approved' : 'unapproved'} successfully`,
+        description: "Testimonial updated successfully",
       });
-    } catch (error) {
-      console.error('Error updating approval status:', error);
+    } else {
+      // Add new
+      const newTestimonial: Testimonial = {
+        id: Date.now(),
+        name: values.name,
+        date: values.date,
+        rating: values.rating,
+        text: values.text,
+        avatar: values.avatar
+      };
+      setTestimonials([...testimonials, newTestimonial]);
       toast({
-        title: "Error",
-        description: "Failed to update testimonial status",
-        variant: "destructive",
+        title: "Success",
+        description: "New testimonial added successfully",
       });
     }
+    
+    setIsAdding(false);
+    setEditingId(null);
+    form.reset();
+    setAvatarPreview(null);
+  };
+
+  const handleDelete = (id: number) => {
+    setTestimonials(testimonials.filter(testimonial => testimonial.id !== id));
+    toast({
+      title: "Success",
+      description: "Testimonial deleted successfully",
+    });
   };
 
   return (
@@ -302,7 +222,7 @@ const EditTestimonials: React.FC = () => {
                         <div className="flex-1">
                           <FormField
                             control={form.control}
-                            name="avatar_url"
+                            name="avatar"
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Avatar URL</FormLabel>
@@ -323,19 +243,35 @@ const EditTestimonials: React.FC = () => {
                         </div>
                       </div>
                       
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Guest Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Sarah Johnson" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Guest Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Sarah Johnson" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="date"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Date</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. March 2025" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       
                       <FormField
                         control={form.control}
@@ -364,7 +300,7 @@ const EditTestimonials: React.FC = () => {
                       
                       <FormField
                         control={form.control}
-                        name="review_text"
+                        name="text"
                         render={({ field }) => (
                           <FormItem className="mt-4">
                             <FormLabel>Testimonial Text</FormLabel>
@@ -375,25 +311,6 @@ const EditTestimonials: React.FC = () => {
                                 {...field} 
                               />
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="is_approved"
-                        render={({ field }) => (
-                          <FormItem className="mt-4 flex items-center space-x-2">
-                            <FormControl>
-                              <input
-                                type="checkbox"
-                                checked={field.value}
-                                onChange={field.onChange}
-                                className="h-4 w-4"
-                              />
-                            </FormControl>
-                            <FormLabel className="font-medium">Approve Testimonial</FormLabel>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -418,6 +335,7 @@ const EditTestimonials: React.FC = () => {
                               </Avatar>
                               <div>
                                 <h3 className="font-medium">{form.watch('name') || 'Guest Name'}</h3>
+                                <p className="text-sm text-gray-500">{form.watch('date') || 'Date'}</p>
                               </div>
                             </div>
                           </div>
@@ -430,30 +348,15 @@ const EditTestimonials: React.FC = () => {
                             ))}
                           </div>
                           <p className="text-gray-700">
-                            {form.watch('review_text') || 'Testimonial text will appear here...'}
+                            {form.watch('text') || 'Testimonial text will appear here...'}
                           </p>
-                          
-                          {!form.watch('is_approved') && (
-                            <div className="mt-3 text-xs text-amber-600 font-medium">
-                              This testimonial will not be visible on the website until approved
-                            </div>
-                          )}
                         </CardContent>
                       </Card>
 
                       <div className="mt-6">
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="h-4 w-4 mr-2" />
-                              {editingId !== null ? "Save Changes" : "Add Testimonial"}
-                            </>
-                          )}
+                        <Button type="submit" className="w-full">
+                          <Save className="h-4 w-4 mr-2" />
+                          {editingId !== null ? "Save Changes" : "Add Testimonial"}
                         </Button>
                       </div>
                     </div>
@@ -473,39 +376,20 @@ const EditTestimonials: React.FC = () => {
         </div>
       )}
 
-      {isFetching ? (
-        <div className="text-center py-12">
-          <Loader2 className="h-8 w-8 mx-auto animate-spin text-gray-500" />
-          <p className="mt-2 text-gray-500">Loading testimonials...</p>
-        </div>
-      ) : testimonials.length === 0 && !isAdding && !editingId ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <MessageSquare className="h-12 w-12 mx-auto text-gray-400" />
-          <h3 className="mt-2 text-lg font-medium">No testimonials yet</h3>
-          <p className="text-gray-500 mt-1">Add your first testimonial to showcase guest feedback</p>
-          <Button onClick={startAddNew} className="mt-4">
-            Add Testimonial
-          </Button>
-        </div>
-      ) : (!isAdding && editingId === null) && (
+      {(!isAdding && editingId === null) && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {testimonials.map((testimonial) => (
-            <Card 
-              key={testimonial.id} 
-              className={`border-none shadow-sm ${!testimonial.is_approved ? 'bg-gray-50' : ''}`}
-            >
+            <Card key={testimonial.id} className="border-none shadow-sm">
               <CardContent className="p-6">
                 <div className="flex justify-between mb-4">
                   <div className="flex items-center">
                     <Avatar className="h-12 w-12 mr-4">
-                      <AvatarImage src={testimonial.avatar_url || ''} alt={testimonial.name} />
+                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                       <AvatarFallback>{testimonial.name.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <h3 className="font-medium">{testimonial.name}</h3>
-                      {!testimonial.is_approved && (
-                        <span className="text-xs text-amber-600 font-medium">Pending approval</span>
-                      )}
+                      <p className="text-sm text-gray-500">{testimonial.date}</p>
                     </div>
                   </div>
                   <div className="flex space-x-1">
@@ -516,24 +400,6 @@ const EditTestimonials: React.FC = () => {
                       onClick={() => handleEdit(testimonial)}
                     >
                       <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className={`h-8 w-8 p-0 ${testimonial.is_approved ? 'text-amber-500 hover:text-amber-600' : 'text-green-500 hover:text-green-600'}`}
-                      onClick={() => toggleApproval(testimonial.id, testimonial.is_approved)}
-                    >
-                      {testimonial.is_approved ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18.6 18H5.4A1.4 1.4 0 0 1 4 16.6V7.4A1.4 1.4 0 0 1 5.4 6h13.2A1.4 1.4 0 0 1 20 7.4v9.2a1.4 1.4 0 0 1-1.4 1.4Z"/>
-                          <line x1="16" x2="2" y1="2" y2="16"/>
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 12l2 2 4-4"/>
-                          <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z"/>
-                        </svg>
-                      )}
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -553,7 +419,7 @@ const EditTestimonials: React.FC = () => {
                     />
                   ))}
                 </div>
-                <p className="text-gray-700">{testimonial.review_text}</p>
+                <p className="text-gray-700">{testimonial.text}</p>
               </CardContent>
             </Card>
           ))}
