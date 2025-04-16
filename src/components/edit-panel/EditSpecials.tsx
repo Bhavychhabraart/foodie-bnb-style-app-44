@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { 
   ImagePlus,
   Edit, 
@@ -18,15 +17,14 @@ import {
   Trash2, 
   Plus, 
   DollarSign,
-  ChefHat,
-  Loader2
+  ChefHat
 } from 'lucide-react';
 
 // Define interface for Special
 interface Special {
-  id: string;
+  id: number;
   title: string;
-  description: string | null;
+  description: string;
   price: string;
   imageUrl: string;
   chef: string;
@@ -45,13 +43,45 @@ const formSchema = z.object({
   isPopular: z.boolean().optional()
 });
 
+// Mock data
+const initialSpecials: Special[] = [
+  {
+    id: 1,
+    title: "Truffle Pasta",
+    description: "Fresh homemade pasta with black truffle, parmesan cream sauce and wild mushrooms",
+    price: "₹1,800",
+    imageUrl: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    chef: "Chef Marcus",
+    isNew: true,
+    isPopular: false
+  },
+  {
+    id: 2,
+    title: "Wagyu Ribeye",
+    description: "Prime A5 Japanese Wagyu ribeye steak with roasted vegetables and red wine reduction",
+    price: "₹3,500",
+    imageUrl: "https://images.unsplash.com/photo-1504973960431-1c467e159aa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    chef: "Chef Alessandro",
+    isNew: false,
+    isPopular: true
+  },
+  {
+    id: 3,
+    title: "Seafood Platter",
+    description: "Selection of fresh lobster, king crab, prawns, and oysters with housemade sauces",
+    price: "₹4,200",
+    imageUrl: "https://images.unsplash.com/photo-1606850246029-dd015c13d94c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    chef: "Chef Maria",
+    isNew: false,
+    isPopular: false
+  }
+];
+
 const EditSpecials: React.FC = () => {
-  const [specials, setSpecials] = useState<Special[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [specials, setSpecials] = useState<Special[]>(initialSpecials);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,48 +96,6 @@ const EditSpecials: React.FC = () => {
       isPopular: false
     }
   });
-
-  // Fetch chef specials from Supabase
-  useEffect(() => {
-    async function fetchChefSpecials() {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('chef_specials')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          const formattedData = data.map(item => ({
-            id: item.id,
-            title: item.title,
-            description: item.description || "",
-            price: item.price,
-            imageUrl: item.image_url,
-            chef: item.chef,
-            isNew: item.is_featured || false,
-            isPopular: false // We'll add this column later if needed
-          }));
-          setSpecials(formattedData);
-        }
-      } catch (error) {
-        console.error('Error fetching chef specials:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load chef specials",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchChefSpecials();
-  }, [toast]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -127,7 +115,7 @@ const EditSpecials: React.FC = () => {
     setEditingId(special.id);
     form.reset({
       title: special.title,
-      description: special.description || "",
+      description: special.description,
       price: special.price,
       imageUrl: special.imageUrl,
       chef: special.chef,
@@ -159,129 +147,57 @@ const EditSpecials: React.FC = () => {
     setImagePreview(null);
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setSubmitting(true);
-    try {
-      if (editingId !== null) {
-        // Update existing special
-        const { error } = await supabase
-          .from('chef_specials')
-          .update({
-            title: values.title,
-            description: values.description,
-            price: values.price,
-            image_url: values.imageUrl,
-            chef: values.chef,
-            is_featured: values.isNew || false
-          })
-          .eq('id', editingId);
-
-        if (error) throw error;
-
-        // Update local state
-        setSpecials(specials.map(special => 
-          special.id === editingId ? {
-            ...special,
-            title: values.title,
-            description: values.description,
-            price: values.price,
-            imageUrl: values.imageUrl,
-            chef: values.chef,
-            isNew: values.isNew || false,
-            isPopular: values.isPopular || false
-          } : special
-        ));
-
-        toast({
-          title: "Success",
-          description: "Chef's special updated successfully",
-        });
-      } else {
-        // Add new special
-        const { data, error } = await supabase
-          .from('chef_specials')
-          .insert({
-            title: values.title,
-            description: values.description,
-            price: values.price,
-            image_url: values.imageUrl,
-            chef: values.chef,
-            is_featured: values.isNew || false
-          })
-          .select();
-
-        if (error) throw error;
-
-        if (data && data[0]) {
-          const newSpecial: Special = {
-            id: data[0].id,
-            title: values.title,
-            description: values.description,
-            price: values.price,
-            imageUrl: values.imageUrl,
-            chef: values.chef,
-            isNew: values.isNew || false,
-            isPopular: values.isPopular || false
-          };
-          setSpecials([newSpecial, ...specials]);
-        }
-
-        toast({
-          title: "Success",
-          description: "New chef's special added successfully",
-        });
-      }
-      
-      setIsAdding(false);
-      setEditingId(null);
-      form.reset();
-      setImagePreview(null);
-    } catch (error: any) {
-      console.error('Error saving chef special:', error);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (editingId !== null) {
+      // Update existing
+      setSpecials(specials.map(special => 
+        special.id === editingId ? {
+          ...special,
+          title: values.title,
+          description: values.description,
+          price: values.price,
+          imageUrl: values.imageUrl,
+          chef: values.chef,
+          isNew: values.isNew || false,
+          isPopular: values.isPopular || false
+        } : special
+      ));
       toast({
-        title: "Error",
-        description: error.message || "Failed to save chef's special",
-        variant: "destructive"
+        title: "Success",
+        description: "Chef's special updated successfully",
       });
-    } finally {
-      setSubmitting(false);
+    } else {
+      // Add new
+      const newSpecial: Special = {
+        id: Date.now(),
+        title: values.title,
+        description: values.description,
+        price: values.price,
+        imageUrl: values.imageUrl,
+        chef: values.chef,
+        isNew: values.isNew || false,
+        isPopular: values.isPopular || false
+      };
+      setSpecials([...specials, newSpecial]);
+      toast({
+        title: "Success",
+        description: "New chef's special added successfully",
+      });
     }
+    
+    setIsAdding(false);
+    setEditingId(null);
+    form.reset();
+    setImagePreview(null);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this chef's special?")) {
-      try {
-        const { error } = await supabase
-          .from('chef_specials')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-
-        setSpecials(specials.filter(special => special.id !== id));
-        toast({
-          title: "Success",
-          description: "Chef's special deleted successfully",
-        });
-      } catch (error: any) {
-        console.error('Error deleting chef special:', error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to delete chef's special",
-          variant: "destructive"
-        });
-      }
-    }
+  const handleDelete = (id: number) => {
+    setSpecials(specials.filter(special => special.id !== id));
+    toast({
+      title: "Success",
+      description: "Chef's special deleted successfully",
+    });
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Loading chef's specials...</span>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -376,7 +292,7 @@ const EditSpecials: React.FC = () => {
                                   className="h-4 w-4"
                                 />
                               </FormControl>
-                              <FormLabel className="text-sm">Feature this dish</FormLabel>
+                              <FormLabel className="text-sm">Mark as New</FormLabel>
                             </FormItem>
                           )}
                         />
@@ -449,18 +365,9 @@ const EditSpecials: React.FC = () => {
                       />
 
                       <div className="mt-6">
-                        <Button type="submit" className="w-full" disabled={submitting}>
-                          {submitting ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="h-4 w-4 mr-2" />
-                              {editingId !== null ? "Save Changes" : "Add Chef's Special"}
-                            </>
-                          )}
+                        <Button type="submit" className="w-full">
+                          <Save className="h-4 w-4 mr-2" />
+                          {editingId !== null ? "Save Changes" : "Add Chef's Special"}
                         </Button>
                       </div>
                     </div>
@@ -481,83 +388,67 @@ const EditSpecials: React.FC = () => {
       )}
 
       {(!isAdding && editingId === null) && (
-        <>
-          {specials.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-              <ChefHat className="h-12 w-12 mx-auto text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No Chef's Specials</h3>
-              <p className="mt-1 text-sm text-gray-500">Get started by creating a new chef's special dish.</p>
-              <div className="mt-6">
-                <Button onClick={startAddNew}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Chef's Special
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {specials.map((special) => (
-                <Card key={special.id} className="overflow-hidden group">
-                  <CardContent className="p-0 relative">
-                    <div className="h-40 relative">
-                      <img 
-                        src={special.imageUrl} 
-                        alt={special.title} 
-                        className="w-full h-full object-cover"
-                      />
-                      {special.isNew && (
-                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                          Featured
-                        </div>
-                      )}
-                      {special.isPopular && (
-                        <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
-                          <span className="mr-1">Popular</span>
-                        </div>
-                      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {specials.map((special) => (
+            <Card key={special.id} className="overflow-hidden group">
+              <CardContent className="p-0 relative">
+                <div className="h-40 relative">
+                  <img 
+                    src={special.imageUrl} 
+                    alt={special.title} 
+                    className="w-full h-full object-cover"
+                  />
+                  {special.isNew && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                      New
                     </div>
-                    
-                    <div className="p-4">
-                      <h3 className="font-medium text-lg">{special.title}</h3>
-                      <p className="text-gray-500 mt-1 text-sm line-clamp-2">{special.description}</p>
-                      
-                      <div className="flex justify-between items-center mt-2">
-                        <div className="flex items-center text-gray-700">
-                          <ChefHat className="h-4 w-4 mr-1" />
-                          <span className="text-sm">{special.chef}</span>
-                        </div>
-                        <div className="font-medium text-airbnb-red">
-                          {special.price}
-                        </div>
-                      </div>
-                      
-                      <div className="flex space-x-2 mt-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => handleEdit(special)}
-                        >
-                          <Edit className="h-3 w-3 mr-2" />
-                          Edit
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleDelete(special.id)}
-                        >
-                          <Trash2 className="h-3 w-3 mr-2" />
-                          Delete
-                        </Button>
-                      </div>
+                  )}
+                  {special.isPopular && (
+                    <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+                      <span className="mr-1">Popular</span>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </>
+                  )}
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="font-medium text-lg">{special.title}</h3>
+                  <p className="text-gray-500 mt-1 text-sm line-clamp-2">{special.description}</p>
+                  
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center text-gray-700">
+                      <ChefHat className="h-4 w-4 mr-1" />
+                      <span className="text-sm">{special.chef}</span>
+                    </div>
+                    <div className="font-medium text-airbnb-red">
+                      {special.price}
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2 mt-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => handleEdit(special)}
+                    >
+                      <Edit className="h-3 w-3 mr-2" />
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDelete(special.id)}
+                    >
+                      <Trash2 className="h-3 w-3 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -17,34 +17,26 @@ import { Instagram, Camera, CheckCircle, User, Mail, MessageSquare } from 'lucid
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { supabase } from "@/integrations/supabase/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
 interface InfluencerDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Create a schema for form validation
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email" }),
-  instagram: z.string().min(1, { message: "Instagram handle is required" }),
-  followers: z.string().min(1, { message: "Followers count is required" }),
-  message: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+interface FormValues {
+  name: string;
+  email: string;
+  instagram: string;
+  followers: string;
+  message: string;
+}
 
 const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange }) => {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -54,41 +46,13 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
     }
   });
 
-  const onSubmit = async (data: FormValues) => {
-    try {
-      setIsSubmitting(true);
-      
-      // Insert data into instagram_collaborations table
-      const { error } = await supabase
-        .from('instagram_collaborations')
-        .insert({
-          name: data.name,
-          email: data.email,
-          instagram_handle: data.instagram,
-          followers_count: parseInt(data.followers),
-          message: data.message || null,
-        });
-
-      if (error) {
-        throw error;
-      }
-      
-      setSubmitted(true);
-      toast({
-        title: "Application Submitted!",
-        description: "We'll review your application and get back to you soon.",
-      });
-      
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      toast({
-        title: "Submission Failed",
-        description: "There was an error submitting your application. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const onSubmit = (data: FormValues) => {
+    console.log('Instagram influencer application submitted:', data);
+    setSubmitted(true);
+    toast({
+      title: "Application Submitted!",
+      description: "We'll review your application and get back to you soon.",
+    });
   };
 
   const resetAndClose = () => {
@@ -338,9 +302,8 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
               <Button 
                 type="submit" 
                 className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                Submit Application
               </Button>
             )}
           </DrawerFooter>
