@@ -30,7 +30,7 @@ const config = {
 				},
 				airbnb: {
 					gold: '#B18E72',
-					dark: '#403E43',
+					dark: '#121212',
 					light: '#FFFFFF'
 				},
 				secondary: {

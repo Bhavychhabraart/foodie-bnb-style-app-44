@@ -1,11 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 240 5% 26%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 100%;
 
     --card: 240 5% 26%;
@@ -46,7 +45,7 @@
   }
 
   .dark {
-    --background: 240 5% 26%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 100%;
 
     --card: 240 5% 26%;
@@ -91,11 +90,11 @@
   }
 
   body {
-    @apply bg-airbnb-dark text-airbnb-light font-montserrat;
+    @apply bg-[#121212] text-white font-montserrat;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-medium tracking-tight text-airbnb-light;
+    @apply font-montserrat font-medium tracking-tight text-white;
   }
 }
 
