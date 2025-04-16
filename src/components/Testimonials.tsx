@@ -63,54 +63,61 @@ const Testimonials: React.FC = () => {
         </motion.div>
         
         <Carousel className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4" as={motion.div} variants={container} initial="hidden" whileInView="show" viewport={{ once: true }}>
-            {testimonials.map(testimonial => (
-              <CarouselItem key={testimonial.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <motion.div variants={item} transition={{ duration: 0.3 }}>
-                  <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 h-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
-                    <CardContent className="p-6 relative h-full">
-                      <Quote className="absolute top-4 right-4 h-10 w-10 text-airbnb-gold/10 rotate-180" />
-                      
-                      <div className="flex items-center mb-4">
-                        <div className="relative">
-                          <Avatar className="h-14 w-14 ring-2 ring-airbnb-gold/20 ring-offset-2 ring-offset-background">
-                            <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                            <AvatarFallback>{testimonial.name.substring(0, 2)}</AvatarFallback>
-                          </Avatar>
-                          <span className="absolute -bottom-1 -right-1 bg-airbnb-gold text-white text-xs font-medium h-5 w-5 flex items-center justify-center rounded-full">"</span>
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {testimonials.map(testimonial => (
+                <CarouselItem key={testimonial.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <motion.div variants={item} transition={{ duration: 0.3 }}>
+                    <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 h-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
+                      <CardContent className="p-6 relative h-full">
+                        <Quote className="absolute top-4 right-4 h-10 w-10 text-airbnb-gold/10 rotate-180" />
+                        
+                        <div className="flex items-center mb-4">
+                          <div className="relative">
+                            <Avatar className="h-14 w-14 ring-2 ring-airbnb-gold/20 ring-offset-2 ring-offset-background">
+                              <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                              <AvatarFallback>{testimonial.name.substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <span className="absolute -bottom-1 -right-1 bg-airbnb-gold text-white text-xs font-medium h-5 w-5 flex items-center justify-center rounded-full">"</span>
+                          </div>
+                          
+                          <div className="ml-4">
+                            <h3 className="font-medium text-airbnb-darkbrown dark:text-white">{testimonial.name}</h3>
+                            <p className="text-sm text-airbnb-light/70 dark:text-airbnb-light/40">{testimonial.date}</p>
+                          </div>
                         </div>
                         
-                        <div className="ml-4">
-                          <h3 className="font-medium text-airbnb-darkbrown dark:text-white">{testimonial.name}</h3>
-                          <p className="text-sm text-airbnb-light/70 dark:text-airbnb-light/40">{testimonial.date}</p>
+                        <div className="flex mb-3">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star 
+                              key={star} 
+                              className={`h-4 w-4 ${star <= testimonial.rating ? 'fill-current text-airbnb-gold' : 'text-gray-300'}`} 
+                            />
+                          ))}
                         </div>
-                      </div>
-                      
-                      <div className="flex mb-3">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <Star 
-                            key={star} 
-                            className={`h-4 w-4 ${star <= testimonial.rating ? 'fill-current text-airbnb-gold' : 'text-gray-300'}`} 
-                          />
-                        ))}
-                      </div>
-                      
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        <p className="text-airbnb-darkbrown/90 dark:text-zinc-100 relative z-10 italic leading-relaxed">
-                          "{testimonial.text}"
-                        </p>
-                      </motion.div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+                        
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          <p className="text-airbnb-darkbrown/90 dark:text-zinc-100 relative z-10 italic leading-relaxed">
+                            "{testimonial.text}"
+                          </p>
+                        </motion.div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </motion.div>
           <CarouselDots className="mt-6" />
         </Carousel>
       </div>
