@@ -38,11 +38,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       <div className="bottom-nav fixed bottom-0 left-0 right-0 bg-[#000000e6] border-t border-airbnb-gold/20 px-4 py-2 z-50">
         <div className="flex justify-between items-center max-w-2xl mx-auto">
           {/* Left side tabs */}
-          <div className="flex space-x-6 flex-1 justify-start">
+          <div className="flex justify-between items-center flex-1 space-x-4">
             {tabs.slice(0, 2).map((tab) => (
               <button
                 key={tab.id}
-                className={`bottom-nav-item flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
+                className={`flex-1 flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
                 onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className="w-6 h-6" />
@@ -59,11 +59,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
           </button>
           
           {/* Right side tabs */}
-          <div className="flex space-x-6 flex-1 justify-end">
+          <div className="flex justify-between items-center flex-1 space-x-4">
             {tabs.slice(2).map((tab) => (
               <button
                 key={tab.id}
-                className={`bottom-nav-item flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
+                className={`flex-1 flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
                 onClick={() => handleTabClick(tab.id)}
               >
                 <tab.icon className="w-6 h-6" />
