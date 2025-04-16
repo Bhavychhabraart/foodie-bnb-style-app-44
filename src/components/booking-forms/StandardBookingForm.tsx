@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -7,7 +6,18 @@ import {
   DrawerFooter 
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag, Check, ChevronRight, Male, Female } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  Calendar as CalendarIcon, 
+  Clock, 
+  Users, 
+  Tag, 
+  Check, 
+  ChevronRight, 
+  User as MaleIcon, 
+  UserFemale as FemaleIcon 
+} from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -90,18 +100,14 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   
   const totalGuests = maleCount + femaleCount;
   
-  // Base price: 1000 per guest
   const basePrice = totalGuests * 1000;
   
-  // Add-on prices
   const queueSkipPrice = addOns.skipQueue ? 100 : 0;
   
-  // Total price
   const totalAmount = basePrice + queueSkipPrice;
 
   const onSubmit = async (values: FormValues) => {
     try {
-      // Validate gender ratio (2 males : 1 female)
       if (values.maleCount > 0 && values.femaleCount > 0) {
         if (values.maleCount > (values.femaleCount * 2)) {
           toast({
@@ -124,7 +130,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         return;
       }
 
-      // Insert reservation
       const { data: reservationData, error: reservationError } = await supabase
         .from('reservations')
         .insert({
@@ -144,7 +149,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
 
       if (reservationError) throw reservationError;
 
-      // Insert male guests
       const maleGuests = Array(values.maleCount).fill({
         reservation_id: reservationData.id,
         name: 'Male Guest',
@@ -152,7 +156,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         cover_charge: 1000
       });
 
-      // Insert female guests
       const femaleGuests = Array(values.femaleCount).fill({
         reservation_id: reservationData.id,
         name: 'Female Guest',
@@ -262,10 +265,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       3: [] // No specific validations for add-ons step
     };
 
-    // Get the fields to validate for the current step
     const fieldsToValidate = currentStepFields[step] || [];
     
-    // For step 1, make sure we have at least one guest
     if (step === 1) {
       const totalGuests = form.getValues('maleCount') + form.getValues('femaleCount');
       if (totalGuests === 0) {
@@ -277,7 +278,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         return;
       }
       
-      // Check gender ratio
       const maleCount = form.getValues('maleCount');
       const femaleCount = form.getValues('femaleCount');
       if (maleCount > 0 && femaleCount > 0) {
@@ -292,13 +292,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       }
     }
     
-    // Trigger validation for the current step's fields
     form.trigger(fieldsToValidate).then((isValid) => {
       if (isValid) {
         if (step < 3) {
           setStep(step + 1);
         } else {
-          // For the final step, we'll submit the entire form
           form.handleSubmit(onSubmit)();
         }
       }
@@ -421,7 +419,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Male className="h-5 w-5 text-blue-500" />
+                          <MaleIcon className="h-5 w-5 text-blue-500" />
                           <FormLabel>Male Guests</FormLabel>
                         </div>
                         <div className="flex items-center">
@@ -472,7 +470,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Female className="h-5 w-5 text-pink-500" />
+                          <FemaleIcon className="h-5 w-5 text-pink-500" />
                           <FormLabel>Female Guests</FormLabel>
                         </div>
                         <div className="flex items-center">
