@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -33,7 +32,7 @@ const Index = () => {
       
       <MarqueeAnnouncement title="Upcoming Events!" items={upcomingEvents} />
       
-      <div className="sticky top-0 z-10 bg-airbnb-cream dark:bg-airbnb-darkbrown shadow-md shadow-black/30">
+      <div className="sticky top-0 z-10 shadow-md shadow-black/30">
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
