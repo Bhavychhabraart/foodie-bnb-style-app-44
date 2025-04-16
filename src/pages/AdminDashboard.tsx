@@ -81,25 +81,25 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-[#121212] border-b border-airbnb-gold/20">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
             <Button 
               variant="ghost" 
               size="sm" 
-              className="mr-4"
+              className="mr-4 text-airbnb-light hover:bg-airbnb-gold/10"
               onClick={() => navigate('/')}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Site
             </Button>
-            <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-xl font-semibold text-airbnb-light">Admin Dashboard</h1>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">Export Data</Button>
-            <Button size="sm">Settings</Button>
+            <Button variant="outline" size="sm" className="border-airbnb-gold/20 text-airbnb-light">Export Data</Button>
+            <Button size="sm" className="bg-airbnb-gold text-airbnb-light hover:bg-airbnb-gold/90">Settings</Button>
           </div>
         </div>
       </header>
@@ -108,60 +108,60 @@ const AdminDashboard = () => {
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card>
+          <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center">
-                <div className="bg-blue-100 p-3 rounded-full mr-4">
-                  <DollarSign className="h-6 w-6 text-blue-600" />
+                <div className="bg-airbnb-gold/10 p-3 rounded-full mr-4">
+                  <DollarSign className="h-6 w-6 text-airbnb-gold" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Total Revenue</p>
-                  <h3 className="text-xl font-semibold">$128,000</h3>
+                  <p className="text-sm text-airbnb-light/70">Total Revenue</p>
+                  <h3 className="text-xl font-semibold text-airbnb-light">$128,000</h3>
                   <p className="text-xs text-green-500">+12% from last month</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center">
-                <div className="bg-green-100 p-3 rounded-full mr-4">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                <div className="bg-airbnb-gold/10 p-3 rounded-full mr-4">
+                  <Calendar className="h-6 w-6 text-airbnb-gold" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Total Bookings</p>
-                  <h3 className="text-xl font-semibold">540</h3>
+                  <p className="text-sm text-airbnb-light/70">Total Bookings</p>
+                  <h3 className="text-xl font-semibold text-airbnb-light">540</h3>
                   <p className="text-xs text-green-500">+8% from last month</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center">
-                <div className="bg-purple-100 p-3 rounded-full mr-4">
-                  <Users className="h-6 w-6 text-purple-600" />
+                <div className="bg-airbnb-gold/10 p-3 rounded-full mr-4">
+                  <Users className="h-6 w-6 text-airbnb-gold" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Total Guests</p>
-                  <h3 className="text-xl font-semibold">1,024</h3>
+                  <p className="text-sm text-airbnb-light/70">Total Guests</p>
+                  <h3 className="text-xl font-semibold text-airbnb-light">1,024</h3>
                   <p className="text-xs text-green-500">+15% from last month</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
             <CardContent className="pt-6">
               <div className="flex items-center">
-                <div className="bg-amber-100 p-3 rounded-full mr-4">
-                  <Star className="h-6 w-6 text-amber-600" />
+                <div className="bg-airbnb-gold/10 p-3 rounded-full mr-4">
+                  <Star className="h-6 w-6 text-airbnb-gold" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Average Rating</p>
-                  <h3 className="text-xl font-semibold">4.8/5</h3>
+                  <p className="text-sm text-airbnb-light/70">Average Rating</p>
+                  <h3 className="text-xl font-semibold text-airbnb-light">4.8/5</h3>
                   <p className="text-xs text-green-500">+0.2 from last month</p>
                 </div>
               </div>
@@ -171,28 +171,28 @@ const AdminDashboard = () => {
 
         {/* Charts Section */}
         <Tabs defaultValue="overview" className="mb-8">
-          <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="sales">Sales</TabsTrigger>
-            <TabsTrigger value="bookings">Bookings</TabsTrigger>
-            <TabsTrigger value="guests">Guests</TabsTrigger>
+          <TabsList className="mb-4 bg-[#1E1E1E] border border-airbnb-gold/20">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Overview</TabsTrigger>
+            <TabsTrigger value="sales" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Sales</TabsTrigger>
+            <TabsTrigger value="bookings" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Bookings</TabsTrigger>
+            <TabsTrigger value="guests" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Guests</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">Revenue Trend</h3>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
+                    <h3 className="text-lg font-medium text-airbnb-light">Revenue Trend</h3>
+                    <div className="flex items-center text-sm text-green-500">
+                      <TrendingUp className="w-4 h-4 mr-1" />
                       <span>+12.5%</span>
                     </div>
                   </div>
                   <div className="h-[300px]">
                     <ChartContainer
                       config={{
-                        sales: { color: "#2563eb" },
+                        sales: { color: "#B18E72" },
                       }}
                     >
                       <LineChart data={salesData}>
@@ -221,21 +221,21 @@ const AdminDashboard = () => {
                           content={({ active, payload }) => {
                             if (active && payload && payload.length) {
                               return (
-                                <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
                                   <div className="grid grid-cols-2 gap-2">
                                     <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
                                         Month
                                       </span>
-                                      <span className="font-bold text-xs">
+                                      <span className="font-bold text-xs text-airbnb-light">
                                         {payload[0].payload.name}
                                       </span>
                                     </div>
                                     <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
                                         Revenue
                                       </span>
-                                      <span className="font-bold text-xs">
+                                      <span className="font-bold text-xs text-airbnb-light">
                                         ${payload[0].value}
                                       </span>
                                     </div>
@@ -252,19 +252,19 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">Booking Statistics</h3>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
+                    <h3 className="text-lg font-medium text-airbnb-light">Booking Statistics</h3>
+                    <div className="flex items-center text-sm text-green-500">
+                      <TrendingUp className="w-4 h-4 mr-1" />
                       <span>+8.3%</span>
                     </div>
                   </div>
                   <div className="h-[300px]">
                     <ChartContainer
                       config={{
-                        bookings: { color: "#8b5cf6" },
+                        bookings: { color: "#B18E72" },
                       }}
                     >
                       <BarChart data={bookingsData}>
@@ -290,21 +290,21 @@ const AdminDashboard = () => {
                           content={({ active, payload }) => {
                             if (active && payload && payload.length) {
                               return (
-                                <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
                                   <div className="grid grid-cols-2 gap-2">
                                     <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
                                         Month
                                       </span>
-                                      <span className="font-bold text-xs">
+                                      <span className="font-bold text-xs text-airbnb-light">
                                         {payload[0].payload.name}
                                       </span>
                                     </div>
                                     <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
                                         Bookings
                                       </span>
-                                      <span className="font-bold text-xs">
+                                      <span className="font-bold text-xs text-airbnb-light">
                                         {payload[0].value}
                                       </span>
                                     </div>
@@ -324,13 +324,13 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="sales">
-            <Card>
+            <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Sales Overview</h3>
+                <h3 className="text-lg font-medium text-airbnb-light mb-4">Sales Overview</h3>
                 <div className="h-[400px]">
                   <ChartContainer
                     config={{
-                      sales: { color: "#2563eb" },
+                      sales: { color: "#B18E72" },
                     }}
                   >
                     <LineChart data={salesData}>
@@ -363,13 +363,13 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="bookings">
-            <Card>
+            <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Booking Trends</h3>
+                <h3 className="text-lg font-medium text-airbnb-light mb-4">Booking Trends</h3>
                 <div className="h-[400px]">
                   <ChartContainer
                     config={{
-                      bookings: { color: "#8b5cf6" },
+                      bookings: { color: "#B18E72" },
                     }}
                   >
                     <BarChart data={bookingsData}>
@@ -400,13 +400,13 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="guests">
-            <Card>
+            <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Guest Statistics</h3>
+                <h3 className="text-lg font-medium text-airbnb-light mb-4">Guest Statistics</h3>
                 <div className="h-[400px]">
                   <ChartContainer
                     config={{
-                      guests: { color: "#ec4899" },
+                      guests: { color: "#B18E72" },
                     }}
                   >
                     <LineChart data={guestData}>
@@ -439,11 +439,11 @@ const AdminDashboard = () => {
         </Tabs>
 
         {/* Recent Bookings Table */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
           <CardContent className="pt-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Recent Bookings</h3>
-              <Button variant="outline" size="sm">View All</Button>
+              <h3 className="text-lg font-medium text-airbnb-light">Recent Bookings</h3>
+              <Button variant="outline" size="sm" className="border-airbnb-gold/20 text-airbnb-light hover:bg-airbnb-gold/10">View All</Button>
             </div>
             <DashboardTable />
           </CardContent>
