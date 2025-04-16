@@ -4,43 +4,38 @@ import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users } from 'lu
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
-
-const spotlightItems = [{
-  id: 1,
-  title: "Chef's Table Experience",
-  description: "Exclusive dining at our kitchen counter with the head chef",
-  date: "May 28, 2025",
-  price: "₹4,500 per person",
-  rating: 4.97,
-  reviews: 124,
-  imageUrl: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-  capacity: "4-8 guests",
-  time: "7:00 PM"
-}, {
-  id: 2,
-  title: "Summer Tasting Menu",
-  description: "Our seasonal multi-course journey through local ingredients",
-  date: "June 15, 2025",
-  price: "₹3,200 per person",
-  rating: 4.89,
-  reviews: 78,
-  imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-  capacity: "2-6 guests",
-  time: "6:30 PM"
-}, {
-  id: 3,
-  title: "Artisan Cocktail Night",
-  description: "Join us for an evening of craft cocktails and appetizers",
-  date: "May 30, 2025",
-  price: "₹2,800 per person",
-  rating: 4.92,
-  reviews: 53,
-  imageUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1257&q=80",
-  capacity: "2-10 guests",
-  time: "8:00 PM"
-}];
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Spotlight: React.FC = () => {
+  const { data: spotlightItems = [], isLoading, error } = useQuery({
+    queryKey: ['spotlightItems'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('spotlight')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      return data;
+    }
+  });
+
+  if (isLoading) return (
+    <div className="section-padding bg-inherit flex justify-center items-center">
+      <span>Loading spotlight items...</span>
+    </div>
+  );
+
+  if (error) return (
+    <div className="section-padding bg-inherit text-red-500">
+      Error loading spotlight items: {error.message}
+    </div>
+  );
+
   return (
     <div className="section-padding bg-inherit">
       <div className="container-padding mx-auto">
@@ -62,38 +57,34 @@ const Spotlight: React.FC = () => {
                 <Card className="border-none rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
                   <CardContent className="p-0">
                     <div className="relative">
-                      {/* Image with gradient overlay */}
                       <div className="h-64 relative overflow-hidden">
                         <img 
-                          src={item.imageUrl} 
+                          src={item.image_url || '/placeholder.svg'} 
                           alt={item.title} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
                       </div>
                       
-                      {/* Featured badge */}
-                      <div className="absolute top-3 right-3 bg-airbnb-gold text-black text-xs font-semibold px-3 py-1 rounded-full transform rotate-2 shadow-md">
-                        Featured
-                      </div>
+                      {item.featured && (
+                        <div className="absolute top-3 right-3 bg-airbnb-gold text-black text-xs font-semibold px-3 py-1 rounded-full transform rotate-2 shadow-md">
+                          Featured
+                        </div>
+                      )}
                       
-                      {/* Rating */}
                       <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-sm px-2 py-1 rounded-lg flex items-center">
                         <Star className="h-3 w-3 fill-current text-airbnb-gold mr-1" />
                         <span>{item.rating.toFixed(1)}</span>
                         <span className="text-xs text-gray-300 ml-1">({item.reviews})</span>
                       </div>
                       
-                      {/* Main content positioned over the bottom of the image */}
                       <div className="absolute bottom-0 left-0 right-0 p-4">
                         <h3 className="text-xl font-bold text-white mb-1 group-hover:text-airbnb-gold transition-colors">{item.title}</h3>
                         <p className="text-gray-200 text-sm line-clamp-2 mb-3">{item.description}</p>
                       </div>
                     </div>
                     
-                    {/* Details section */}
                     <div className="p-4 bg-zinc-900 border-t border-airbnb-gold/20">
-                      {/* Event details */}
                       <div className="grid grid-cols-2 gap-2 mb-4">
                         <div className="flex items-center text-gray-300 text-sm">
                           <Calendar className="h-4 w-4 mr-2 text-airbnb-gold/80" />
