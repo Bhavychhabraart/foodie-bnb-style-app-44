@@ -1,40 +1,46 @@
 
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, X, LayoutGrid, ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Fetch gallery images from Supabase
-const fetchGalleryImages = async () => {
-  const { data, error } = await supabase
-    .from('gallery')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching gallery images:', error);
-    throw error;
-  }
-  
-  return data || [];
-};
+// Static sample gallery data
+const samplePhotos = [
+  {
+    id: '1',
+    image_url: '/lovable-uploads/1b747850-74bd-4752-93b7-eeeab113b43a.png',
+    alt_text: 'Restaurant interior',
+    caption: 'Our elegant dining area'
+  },
+  {
+    id: '2',
+    image_url: '/lovable-uploads/1f8b3900-b741-4507-9b2f-47953f00f3bd.png',
+    alt_text: 'Special dish',
+    caption: 'Chef\'s special creation'
+  },
+  {
+    id: '3',
+    image_url: '/lovable-uploads/2876d9eb-45d5-4fb9-bac5-14a5d8624765.png',
+    alt_text: 'Cocktail preparation',
+    caption: 'Signature cocktails at the bar'
+  },
+  {
+    id: '4',
+    image_url: '/lovable-uploads/63b7aa0e-bd60-4379-aee7-3936cc89fff5.png',
+    alt_text: 'Outdoor seating',
+    caption: 'Our beautiful patio area'
+  },
+];
 
 const PhotoGallery: React.FC = () => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const initialDisplayCount = 6;
+  const initialDisplayCount = 3;
   
-  // Use React Query to fetch and cache gallery images
-  const { data: photos = [], isLoading, error } = useQuery({
-    queryKey: ['galleryPhotos'],
-    queryFn: fetchGalleryImages
-  });
-
+  const photos = samplePhotos;  // Using static data instead of fetching from Supabase
   const displayPhotos = showAll ? photos : photos.slice(0, initialDisplayCount);
   
   const nextPhoto = (e: React.MouseEvent) => {
@@ -46,54 +52,6 @@ const PhotoGallery: React.FC = () => {
     e.stopPropagation();
     setCurrentPhotoIndex(prev => (prev - 1 + photos.length) % photos.length);
   };
-
-  // Show loading state while fetching images
-  if (isLoading) {
-    return (
-      <div id="photos" className="section-padding bg-zinc-900">
-        <div className="container-padding mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">Photo Gallery</h2>
-          <div className="flex justify-center items-center h-64">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 border-4 border-airbnb-gold border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-airbnb-gold/80 mt-4">Loading gallery...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state if there was a problem fetching images
-  if (error) {
-    return (
-      <div id="photos" className="section-padding bg-zinc-900">
-        <div className="container-padding mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">Photo Gallery</h2>
-          <div className="flex justify-center items-center h-64">
-            <p className="text-red-500">Unable to load gallery images</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show empty state if no images exist
-  if (photos.length === 0) {
-    return (
-      <div id="photos" className="section-padding bg-zinc-900">
-        <div className="container-padding mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">Photo Gallery</h2>
-          <div className="flex justify-center items-center h-64">
-            <div className="flex flex-col items-center">
-              <ImageIcon className="w-12 h-12 text-gray-500" />
-              <p className="text-airbnb-gold/80 mt-4">No photos available</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div id="photos" className="section-padding bg-zinc-900">

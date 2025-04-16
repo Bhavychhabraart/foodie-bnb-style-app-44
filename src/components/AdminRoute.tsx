@@ -9,6 +9,7 @@ interface AdminRouteProps {
   children: React.ReactNode;
 }
 
+// Simple Admin Route that checks if user is admin
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const { user, isLoading, isAdmin } = useAuth();
   const { toast } = useToast();
