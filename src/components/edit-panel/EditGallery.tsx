@@ -1,43 +1,66 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  Image, 
-  Upload, 
   Trash2, 
   Plus, 
   ImagePlus
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { v4 as uuidv4 } from 'uuid';
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data for the gallery - in a real app, this would come from a database
-const initialPhotos = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Main dining area with elegant table settings"
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Gourmet dish presentation"
-  },
-  {
-    id: 3,
-    url: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Bar area with premium spirits"
-  }
-];
+interface Photo {
+  id: string;
+  url: string;
+  alt: string;
+}
 
 const EditGallery: React.FC = () => {
-  const [photos, setPhotos] = useState(initialPhotos);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [altText, setAltText] = useState("");
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchGalleryPhotos();
+  }, []);
+
+  const fetchGalleryPhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('gallery')
+        .select('id, image_url, alt_text')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      if (data) {
+        const formattedData = data.map(item => ({
+          id: item.id,
+          url: item.image_url,
+          alt: item.alt_text || ''
+        }));
+        setPhotos(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching gallery photos:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch gallery photos",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -53,7 +76,7 @@ const EditGallery: React.FC = () => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
       toast({
         title: "Error",
@@ -72,32 +95,128 @@ const EditGallery: React.FC = () => {
       return;
     }
 
-    // In a real application, this is where you'd upload to a server
-    // For this demo, we'll just add it to our local state
-    const newPhoto = {
-      id: Date.now(),
-      url: imagePreview as string,
-      alt: altText
-    };
+    setUploading(true);
 
-    setPhotos([...photos, newPhoto]);
-    setSelectedFile(null);
-    setImagePreview(null);
-    setAltText("");
+    try {
+      // Upload image to Supabase Storage
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `gallery/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, selectedFile);
+      
+      if (uploadError) throw uploadError;
+      
+      // Get public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
 
-    toast({
-      title: "Success",
-      description: "Image uploaded successfully",
-    });
+      // Insert record into gallery table
+      const { error: insertError } = await supabase
+        .from('gallery')
+        .insert([
+          { 
+            image_url: publicUrl,
+            alt_text: altText
+          }
+        ]);
+      
+      if (insertError) throw insertError;
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+      
+      // Refresh gallery photos
+      fetchGalleryPhotos();
+      
+      // Reset form
+      setSelectedFile(null);
+      setImagePreview(null);
+      setAltText("");
+      
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setPhotos(photos.filter(photo => photo.id !== id));
-    toast({
-      title: "Success",
-      description: "Image deleted successfully",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      const photoToDelete = photos.find(photo => photo.id === id);
+      
+      if (!photoToDelete) return;
+      
+      // Extract the file path from the URL
+      const urlParts = photoToDelete.url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      const filePath = `gallery/${fileName}`;
+      
+      // Delete from gallery table
+      const { error: deleteError } = await supabase
+        .from('gallery')
+        .delete()
+        .eq('id', id);
+      
+      if (deleteError) throw deleteError;
+      
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('gallery')
+        .remove([filePath]);
+      
+      if (storageError) {
+        // Just log this error as the database record is already deleted
+        console.error('Error deleting file from storage:', storageError);
+      }
+      
+      setPhotos(photos.filter(photo => photo.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Image deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete image",
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Upload New Photo</h2>
+          <Skeleton className="h-64 w-full" />
+        </div>
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Current Gallery Photos</h2>
+            <Skeleton className="h-8 w-32" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-48 w-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -151,10 +270,9 @@ const EditGallery: React.FC = () => {
                 <Button 
                   onClick={handleUpload} 
                   className="w-full"
-                  disabled={!selectedFile || !altText}
+                  disabled={!selectedFile || !altText || uploading}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Photo
+                  {uploading ? "Uploading..." : "Upload Photo"}
                 </Button>
               </div>
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  Image, 
   Upload, 
   Trash2, 
   Plus, 
@@ -26,7 +27,7 @@ import {
 
 // Define the Experience interface
 interface Experience {
-  id: number;
+  id: string;
   title: string;
   host: string;
   date: string;
@@ -46,51 +47,16 @@ const formSchema = z.object({
   imageUrl: z.string().url("Must be a valid URL"),
   rating: z.number().min(0).max(5).optional(),
   reviews: z.number().min(0).optional(),
-  isSoldOut: z.boolean().optional()
+  isSoldOut: z.boolean().optional(),
+  description: z.string().optional()
 });
 
-// Mock data
-const initialExperiences: Experience[] = [
-  {
-    id: 1,
-    title: "Fine Dine Restaurant Experience",
-    host: "Chef Marcus",
-    date: "",
-    price: "₹2,500 per person",
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    rating: 4.92,
-    reviews: 286,
-    isSoldOut: false
-  },
-  {
-    id: 2,
-    title: "Farm to Table Dinner",
-    host: "Maria",
-    date: "May 25, 2025",
-    price: "₹3,200 per person",
-    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    rating: 4.78,
-    reviews: 124,
-    isSoldOut: false
-  },
-  {
-    id: 3,
-    title: "Wine Tasting Evening",
-    host: "Sommelier Jean",
-    date: "June 3, 2025",
-    price: "₹1,800 per person",
-    imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    rating: 4.9,
-    reviews: 158,
-    isSoldOut: false
-  }
-];
-
 const EditExperiences: React.FC = () => {
-  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -103,9 +69,49 @@ const EditExperiences: React.FC = () => {
       imageUrl: "",
       rating: 0,
       reviews: 0,
-      isSoldOut: false
+      isSoldOut: false,
+      description: ""
     }
   });
+
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
+
+  const fetchExperiences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('experiences')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      if (data) {
+        const formattedData = data.map(item => ({
+          id: item.id,
+          title: item.title,
+          host: item.host || "",
+          date: item.date || "",
+          price: item.price,
+          imageUrl: item.image_url,
+          rating: item.rating || 0,
+          reviews: item.reviews || 0,
+          isSoldOut: item.is_sold_out || false
+        }));
+        setExperiences(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching experiences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch experiences",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -131,7 +137,8 @@ const EditExperiences: React.FC = () => {
       imageUrl: experience.imageUrl,
       rating: experience.rating,
       reviews: experience.reviews,
-      isSoldOut: experience.isSoldOut
+      isSoldOut: experience.isSoldOut,
+      description: ""  // Set default as we don't have this in our interface
     });
     setImagePreview(experience.imageUrl);
   };
@@ -147,7 +154,8 @@ const EditExperiences: React.FC = () => {
       imageUrl: "",
       rating: 0,
       reviews: 0,
-      isSoldOut: false
+      isSoldOut: false,
+      description: ""
     });
     setImagePreview(null);
   };
@@ -159,59 +167,127 @@ const EditExperiences: React.FC = () => {
     setImagePreview(null);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (editingId !== null) {
-      // Update existing
-      setExperiences(experiences.map(exp => 
-        exp.id === editingId ? { 
-          ...exp, 
-          title: values.title,
-          host: values.host,
-          date: values.date || "",
-          price: values.price,
-          imageUrl: values.imageUrl,
-          rating: values.rating || 0,
-          reviews: values.reviews || 0,
-          isSoldOut: values.isSoldOut || false
-        } : exp
-      ));
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (editingId !== null) {
+        // Update existing
+        const { error } = await supabase
+          .from('experiences')
+          .update({ 
+            title: values.title,
+            host: values.host,
+            date: values.date || "",
+            price: values.price,
+            image_url: values.imageUrl,
+            rating: values.rating || 0,
+            reviews: values.reviews || 0,
+            is_sold_out: values.isSoldOut || false,
+            description: values.description
+          })
+          .eq('id', editingId);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Experience updated successfully",
+        });
+      } else {
+        // Add new
+        const { error } = await supabase
+          .from('experiences')
+          .insert([{ 
+            title: values.title,
+            host: values.host,
+            date: values.date || "",
+            price: values.price,
+            image_url: values.imageUrl,
+            rating: values.rating || 0,
+            reviews: values.reviews || 0,
+            is_sold_out: values.isSoldOut || false,
+            description: values.description
+          }]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "New experience added successfully",
+        });
+      }
+      
+      // Refresh experiences
+      await fetchExperiences();
+      
+      // Reset form
+      setIsAdding(false);
+      setEditingId(null);
+      form.reset();
+      setImagePreview(null);
+      
+    } catch (error) {
+      console.error('Error saving experience:', error);
       toast({
-        title: "Success",
-        description: "Experience updated successfully",
-      });
-    } else {
-      // Add new
-      const newExperience: Experience = {
-        id: Date.now(),
-        title: values.title,
-        host: values.host,
-        date: values.date || "",
-        price: values.price,
-        imageUrl: values.imageUrl,
-        rating: values.rating || 0,
-        reviews: values.reviews || 0,
-        isSoldOut: values.isSoldOut || false
-      };
-      setExperiences([...experiences, newExperience]);
-      toast({
-        title: "Success",
-        description: "New experience added successfully",
+        title: "Error",
+        description: "Failed to save experience",
+        variant: "destructive"
       });
     }
-    
-    setIsAdding(false);
-    setEditingId(null);
-    form.reset();
-    setImagePreview(null);
   };
 
-  const handleDelete = (id: number) => {
-    setExperiences(experiences.filter(exp => exp.id !== id));
-    toast({
-      title: "Success",
-      description: "Experience deleted successfully",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('experiences')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setExperiences(experiences.filter(exp => exp.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Experience deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting experience:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete experience",
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between">
+          <Skeleton className="h-10 w-40" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-0">
+                <Skeleton className="h-40 w-full" />
+                <div className="p-4">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-1" />
+                  <Skeleton className="h-4 w-1/4 mb-3" />
+                  <div className="flex justify-between">
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-20" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -352,6 +428,24 @@ const EditExperiences: React.FC = () => {
                           )}
                         />
                       </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem className="mt-4">
+                            <FormLabel>Description (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Describe the experience" 
+                                className="resize-none h-20"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
 
                     <div>
@@ -462,11 +556,11 @@ const EditExperiences: React.FC = () => {
                     <span className="text-sm">{experience.price}</span>
                   </div>
                   
-                  {experience.rating && (
+                  {experience.rating > 0 && (
                     <div className="flex items-center mt-1">
                       <Star className="h-3 w-3 mr-1 text-yellow-500 fill-current" />
                       <span className="text-sm">{experience.rating}</span>
-                      {experience.reviews && (
+                      {experience.reviews > 0 && (
                         <span className="text-sm text-gray-500"> · {experience.reviews} reviews</span>
                       )}
                     </div>

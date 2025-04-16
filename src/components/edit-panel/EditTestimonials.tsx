@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,19 +11,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ImagePlus,
   Edit, 
   Save,
   Trash2, 
   Plus, 
-  Star,
-  MessageSquare
+  Star
 } from 'lucide-react';
 
 // Define interface for Testimonial
 interface Testimonial {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   date: string;
@@ -40,39 +41,12 @@ const formSchema = z.object({
   avatar: z.string().url("Must be a valid URL"),
 });
 
-// Mock data
-const initialTestimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    date: "March 2025",
-    rating: 5,
-    text: "Absolutely incredible dining experience! The truffle risotto was divine, and the service was impeccable. The ambiance makes it perfect for special occasions."
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    avatar: "https://randomuser.me/api/portraits/men/22.jpg",
-    date: "February 2025",
-    rating: 4,
-    text: "Great food and atmosphere. The beef tenderloin was cooked to perfection. Only giving 4 stars because we had to wait a bit for our table despite having a reservation."
-  },
-  {
-    id: 3,
-    name: "Emma Roberts",
-    avatar: "https://randomuser.me/api/portraits/women/32.jpg",
-    date: "January 2025",
-    rating: 5,
-    text: "Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny. The staff made us feel so special."
-  }
-];
-
 const EditTestimonials: React.FC = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -85,6 +59,42 @@ const EditTestimonials: React.FC = () => {
       avatar: ""
     }
   });
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      if (data) {
+        const formattedData = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          avatar: item.avatar_url,
+          date: item.date,
+          rating: item.rating,
+          text: item.text
+        }));
+        setTestimonials(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch testimonials",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -132,53 +142,121 @@ const EditTestimonials: React.FC = () => {
     setAvatarPreview(null);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (editingId !== null) {
-      // Update existing
-      setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === editingId ? {
-          ...testimonial,
-          name: values.name,
-          date: values.date,
-          rating: values.rating,
-          text: values.text,
-          avatar: values.avatar
-        } : testimonial
-      ));
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (editingId !== null) {
+        // Update existing
+        const { error } = await supabase
+          .from('testimonials')
+          .update({ 
+            name: values.name,
+            date: values.date,
+            rating: values.rating,
+            text: values.text,
+            avatar_url: values.avatar
+          })
+          .eq('id', editingId);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Testimonial updated successfully",
+        });
+      } else {
+        // Add new
+        const { error } = await supabase
+          .from('testimonials')
+          .insert([{ 
+            name: values.name,
+            date: values.date,
+            rating: values.rating,
+            text: values.text,
+            avatar_url: values.avatar
+          }]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "New testimonial added successfully",
+        });
+      }
+      
+      // Refresh testimonials
+      await fetchTestimonials();
+      
+      // Reset form
+      setIsAdding(false);
+      setEditingId(null);
+      form.reset();
+      setAvatarPreview(null);
+      
+    } catch (error) {
+      console.error('Error saving testimonial:', error);
       toast({
-        title: "Success",
-        description: "Testimonial updated successfully",
-      });
-    } else {
-      // Add new
-      const newTestimonial: Testimonial = {
-        id: Date.now(),
-        name: values.name,
-        date: values.date,
-        rating: values.rating,
-        text: values.text,
-        avatar: values.avatar
-      };
-      setTestimonials([...testimonials, newTestimonial]);
-      toast({
-        title: "Success",
-        description: "New testimonial added successfully",
+        title: "Error",
+        description: "Failed to save testimonial",
+        variant: "destructive"
       });
     }
-    
-    setIsAdding(false);
-    setEditingId(null);
-    form.reset();
-    setAvatarPreview(null);
   };
 
-  const handleDelete = (id: number) => {
-    setTestimonials(testimonials.filter(testimonial => testimonial.id !== id));
-    toast({
-      title: "Success",
-      description: "Testimonial deleted successfully",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setTestimonials(testimonials.filter(testimonial => testimonial.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Testimonial deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting testimonial:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete testimonial",
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between">
+          <Skeleton className="h-10 w-40" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="border-none shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex justify-between mb-4">
+                  <div className="flex items-center">
+                    <Skeleton className="h-12 w-12 rounded-full mr-4" />
+                    <div>
+                      <Skeleton className="h-4 w-32 mb-2" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                </div>
+                <Skeleton className="h-3 w-full mb-2" />
+                <Skeleton className="h-3 w-full mb-2" />
+                <Skeleton className="h-3 w-3/4" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
