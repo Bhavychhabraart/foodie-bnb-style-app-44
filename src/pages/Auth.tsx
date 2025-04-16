@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { User, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Shield, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Form schemas for validation
 const loginSchema = z.object({
@@ -71,6 +72,7 @@ const Auth: React.FC = () => {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdminNote, setShowAdminNote] = useState(false);
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -243,7 +245,7 @@ const Auth: React.FC = () => {
           <CardTitle className="text-2xl text-center">Fine Dine Account</CardTitle>
           <CardDescription className="text-center">Login to your account or create a new one</CardDescription>
         </CardHeader>
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue="login" className="w-full" onValueChange={(value) => setShowAdminNote(value === "admin")}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -425,6 +427,17 @@ const Auth: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="admin">
+              {showAdminNote && (
+                <Alert className="mb-4 bg-amber-50 border-amber-200">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800">Admin Credentials</AlertTitle>
+                  <AlertDescription className="text-amber-700">
+                    <p><strong>Admin Code:</strong> FINEDINE2025</p>
+                    <p className="text-xs mt-1">This would typically be kept private in a production environment.</p>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <Form {...adminSignupForm}>
                 <form onSubmit={adminSignupForm.handleSubmit(handleAdminSignup)} className="space-y-4">
                   <FormField
