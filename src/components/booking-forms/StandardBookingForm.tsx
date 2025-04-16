@@ -7,7 +7,7 @@ import {
   DrawerFooter 
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag, Check, ChevronRight, Male, Female } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -22,18 +22,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface StandardBookingFormProps {
   onBack: () => void;
   onClose: () => void;
 }
-
-const guestSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  gender: z.enum(["male", "female", "other"], {
-    required_error: "Please select a gender",
-  }),
-});
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,9 +37,16 @@ const formSchema = z.object({
     required_error: "Please select a date",
   }),
   time: z.string().min(1, "Please select a time"),
-  guests: z.array(guestSchema).min(1, "At least one guest is required").max(10, "Maximum 10 guests"),
+  maleCount: z.number().min(0, "Cannot be negative").default(0),
+  femaleCount: z.number().min(0, "Cannot be negative").default(0),
   specialRequests: z.string().optional(),
   couponCode: z.string().optional(),
+  skipQueue: z.boolean().default(false),
+  addOns: z.object({
+    skipQueue: z.boolean().default(false),
+    discount: z.boolean().default(false),
+    dessert: z.boolean().default(false),
+  }).default({}),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,15 +71,48 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       phone: "",
       date: undefined,
       time: "",
-      guests: [{ name: "", gender: "other" }],
+      maleCount: 0,
+      femaleCount: 0,
       specialRequests: "",
       couponCode: "",
+      addOns: {
+        skipQueue: false,
+        discount: false,
+        dessert: false,
+      },
     },
     mode: "onChange",
   });
 
+  const maleCount = form.watch('maleCount');
+  const femaleCount = form.watch('femaleCount');
+  const addOns = form.watch('addOns');
+  
+  const totalGuests = maleCount + femaleCount;
+  
+  // Base price: 1000 per guest
+  const basePrice = totalGuests * 1000;
+  
+  // Add-on prices
+  const queueSkipPrice = addOns.skipQueue ? 100 : 0;
+  
+  // Total price
+  const totalAmount = basePrice + queueSkipPrice;
+
   const onSubmit = async (values: FormValues) => {
     try {
+      // Validate gender ratio (2 males : 1 female)
+      if (values.maleCount > 0 && values.femaleCount > 0) {
+        if (values.maleCount > (values.femaleCount * 2)) {
+          toast({
+            title: "Gender Ratio Violation",
+            description: "Maximum 2 males per female allowed.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -89,9 +123,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         });
         return;
       }
-
-      // Calculate total amount (1000 cover charge per guest)
-      const totalAmount = values.guests.length * 1000;
 
       // Insert reservation
       const { data: reservationData, error: reservationError } = await supabase
@@ -113,25 +144,51 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
 
       if (reservationError) throw reservationError;
 
-      // Insert guests
-      const guestInserts = values.guests.map(guest => ({
+      // Insert male guests
+      const maleGuests = Array(values.maleCount).fill({
         reservation_id: reservationData.id,
-        name: guest.name,
-        gender: guest.gender,
+        name: 'Male Guest',
+        gender: 'male',
         cover_charge: 1000
-      }));
+      });
 
-      const { error: guestsError } = await supabase
-        .from('reservation_guests')
-        .insert(guestInserts);
+      // Insert female guests
+      const femaleGuests = Array(values.femaleCount).fill({
+        reservation_id: reservationData.id,
+        name: 'Female Guest',
+        gender: 'female',
+        cover_charge: 1000
+      });
 
-      if (guestsError) throw guestsError;
+      const allGuests = [...maleGuests, ...femaleGuests];
+
+      if (allGuests.length > 0) {
+        const { error: guestsError } = await supabase
+          .from('reservation_guests')
+          .insert(allGuests);
+
+        if (guestsError) throw guestsError;
+      }
 
       setIsComplete(true);
       
+      let confirmationMessage = `Your table for ${totalGuests} guests is reserved for ${format(values.date, 'MMMM dd, yyyy')} at ${values.time}.`;
+      
+      if (values.addOns.skipQueue) {
+        confirmationMessage += " With queue skip.";
+      }
+      
+      if (values.addOns.discount) {
+        confirmationMessage += " 15% discount for next 5 visits.";
+      }
+      
+      if (values.addOns.dessert) {
+        confirmationMessage += " With complimentary dessert.";
+      }
+      
       toast({
         title: "Reservation Successful",
-        description: `Your table for ${values.guests.length} guests is reserved for ${format(values.date, 'MMMM dd, yyyy')} at ${values.time}.`,
+        description: confirmationMessage,
       });
 
     } catch (error) {
@@ -147,7 +204,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const renderStepIndicator = () => {
     return (
       <div className="flex justify-center mb-4">
-        {[1, 2].map((i) => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center">
             <div 
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -160,7 +217,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
             >
               {i < step ? '✓' : i}
             </div>
-            {i < 2 && (
+            {i < 3 && (
               <div 
                 className={`w-10 h-1 ${
                   i < step ? 'bg-green-500' : 'bg-gray-200'
@@ -200,17 +257,45 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
 
   const handleManualContinue = () => {
     const currentStepFields: Record<number, (keyof FormValues)[]> = {
-      1: ["date", "time", "guests"],
-      2: ["name", "email", "phone"]
+      1: ["date", "time", "maleCount", "femaleCount"],
+      2: ["name", "email", "phone"],
+      3: [] // No specific validations for add-ons step
     };
 
     // Get the fields to validate for the current step
     const fieldsToValidate = currentStepFields[step] || [];
     
+    // For step 1, make sure we have at least one guest
+    if (step === 1) {
+      const totalGuests = form.getValues('maleCount') + form.getValues('femaleCount');
+      if (totalGuests === 0) {
+        toast({
+          title: "No guests selected",
+          description: "Please add at least one guest",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Check gender ratio
+      const maleCount = form.getValues('maleCount');
+      const femaleCount = form.getValues('femaleCount');
+      if (maleCount > 0 && femaleCount > 0) {
+        if (maleCount > (femaleCount * 2)) {
+          toast({
+            title: "Gender Ratio Violation",
+            description: "Maximum 2 males per female allowed.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+    }
+    
     // Trigger validation for the current step's fields
     form.trigger(fieldsToValidate).then((isValid) => {
       if (isValid) {
-        if (step < 2) {
+        if (step < 3) {
           setStep(step + 1);
         } else {
           // For the final step, we'll submit the entire form
@@ -226,7 +311,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         experienceTitle="Standard Table Booking"
         date={form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
         time={form.getValues('time')}
-        guests={form.getValues('guests').length.toString()}
+        guests={totalGuests.toString()}
         onClose={onClose}
       />
     );
@@ -247,7 +332,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         <DrawerDescription className="text-center">
           {step === 1 ? "When would you like to visit?" : 
            step === 2 ? "Contact Information" : 
-           "Confirm your reservation"}
+           "Add-on Options"}
         </DrawerDescription>
       </DrawerHeader>
       
@@ -325,71 +410,122 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="guests"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Guest Details</FormLabel>
-                    {field.value.map((guest, index) => (
-                      <div key={index} className="space-y-2 border p-4 rounded-lg">
-                        <FormField
-                          control={form.control}
-                          name={`guests.${index}.name`}
-                          render={({ field: guestNameField }) => (
-                            <FormItem>
-                              <FormLabel>Guest Name</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder={`Guest ${index + 1} name`} 
-                                  {...guestNameField} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`guests.${index}.gender`}
-                          render={({ field: genderField }) => (
-                            <FormItem>
-                              <FormLabel>Gender</FormLabel>
-                              <Select 
-                                onValueChange={genderField.onChange} 
-                                defaultValue={genderField.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select gender" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="male">Male</SelectItem>
-                                  <SelectItem value="female">Female</SelectItem>
-                                  <SelectItem value="other">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+
+              <div className="border rounded-lg p-4 space-y-4">
+                <h3 className="font-medium">Guest Count</h3>
+                
+                <FormField
+                  control={form.control}
+                  name="maleCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Male className="h-5 w-5 text-blue-500" />
+                          <FormLabel>Male Guests</FormLabel>
+                        </div>
+                        <div className="flex items-center">
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              if (field.value > 0) {
+                                field.onChange(field.value - 1);
+                              }
+                            }}
+                          >
+                            -
+                          </Button>
+                          <span className="w-8 text-center">{field.value}</span>
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              if (maleCount + femaleCount < 10) {
+                                field.onChange(field.value + 1);
+                              } else {
+                                toast({
+                                  title: "Maximum guests reached",
+                                  description: "You can add up to 10 guests total",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
                       </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        const currentGuests = form.getValues('guests');
-                        form.setValue('guests', [...currentGuests, { name: "", gender: "other" }]);
-                      }}
-                      disabled={field.value.length >= 10}
-                    >
-                      Add Another Guest
-                    </Button>
-                  </FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="femaleCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Female className="h-5 w-5 text-pink-500" />
+                          <FormLabel>Female Guests</FormLabel>
+                        </div>
+                        <div className="flex items-center">
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              if (field.value > 0) {
+                                field.onChange(field.value - 1);
+                              }
+                            }}
+                          >
+                            -
+                          </Button>
+                          <span className="w-8 text-center">{field.value}</span>
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              if (maleCount + femaleCount < 10) {
+                                field.onChange(field.value + 1);
+                              } else {
+                                toast({
+                                  title: "Maximum guests reached",
+                                  description: "You can add up to 10 guests total",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="text-sm text-muted-foreground mt-2">
+                  Total Guests: {totalGuests} {totalGuests > 0 && `(Cover charge: ₹${basePrice})`}
+                </div>
+                
+                {maleCount > 0 && femaleCount > 0 && maleCount > (femaleCount * 2) && (
+                  <div className="text-sm text-destructive font-medium">
+                    Gender ratio violation: Maximum 2 males per female allowed
+                  </div>
                 )}
-              />
+              </div>
             </>
           )}
 
@@ -436,30 +572,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                   </FormItem>
                 )}
               />
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-lg mb-4">Reservation Summary</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Date:</span>
-                    <span className="font-medium">
-                      {form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Time:</span>
-                    <span className="font-medium">{form.getValues('time')}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Guests:</span>
-                    <span className="font-medium">{form.getValues('guests').length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Cover Charge:</span>
-                    <span className="font-medium">₹{form.getValues('guests').length * 1000}</span>
-                  </div>
-                </div>
-              </div>
 
               <div className="border rounded-md p-4">
                 <FormField
@@ -518,6 +630,118 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
             </>
           )}
 
+          {step === 3 && (
+            <>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium text-lg mb-4">Reservation Summary</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Date:</span>
+                    <span className="font-medium">
+                      {form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Time:</span>
+                    <span className="font-medium">{form.getValues('time')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Guests:</span>
+                    <span className="font-medium">{totalGuests} ({maleCount} male, {femaleCount} female)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Base Cover Charge:</span>
+                    <span className="font-medium">₹{basePrice}</span>
+                  </div>
+                  {addOns.skipQueue && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Skip Queue Fee:</span>
+                      <span className="font-medium">₹100</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between pt-2 border-t mt-2 font-semibold">
+                    <span>Total:</span>
+                    <span>₹{totalAmount}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 space-y-4">
+                <h3 className="font-medium">Add-on Options</h3>
+                <p className="text-sm text-muted-foreground">Enhance your experience with these additional options</p>
+                
+                <div className="grid gap-4">
+                  <FormField
+                    control={form.control}
+                    name="addOns.skipQueue"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Skip the Queue (₹100)</FormLabel>
+                          <FormDescription>
+                            No waiting in line - get immediate entry to the venue
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="addOns.discount"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>15% Discount for 5 Visits</FormLabel>
+                          <FormDescription>
+                            Receive a special 15% discount for your next 5 visits
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="addOns.dessert"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Complimentary Dessert</FormLabel>
+                          <FormDescription>
+                            Enjoy a free chef's special dessert with your meal
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="mt-4 py-3 border-t">
+                  <p className="text-sm font-medium">If no add-ons are selected, standard gate charges apply</p>
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="flex justify-between mt-6">
             {step > 1 ? (
               <Button type="button" variant="outline" onClick={handlePrevious}>
@@ -534,8 +758,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
               onClick={handleManualContinue}
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
             >
-              {step === 2 ? 'Confirm Booking' : 'Continue'} 
-              {step < 2 && <ArrowRight className="ml-2 h-4 w-4" />}
+              {step === 3 ? 'Confirm Booking' : 'Continue'} 
+              {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           </div>
         </form>
