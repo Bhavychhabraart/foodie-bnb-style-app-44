@@ -51,6 +51,66 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          capacity: string | null
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          featured: boolean
+          host: string
+          id: string
+          image_url: string | null
+          is_sold_out: boolean
+          price: string
+          rating: number
+          reviews: number
+          time: string
+          title: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          date: string
+          description?: string | null
+          featured?: boolean
+          host: string
+          id?: string
+          image_url?: string | null
+          is_sold_out?: boolean
+          price: string
+          rating?: number
+          reviews?: number
+          time: string
+          title: string
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          featured?: boolean
+          host?: string
+          id?: string
+          image_url?: string | null
+          is_sold_out?: boolean
+          price?: string
+          rating?: number
+          reviews?: number
+          time?: string
+          title?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           coupon_code: string

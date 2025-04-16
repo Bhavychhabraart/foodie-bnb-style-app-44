@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
+import EditPanel from "./pages/EditPanel";
 
 // Create QueryClient outside of the component
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                  <Route path="/edit-panel" element={<EditPanel />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </TooltipProvider>

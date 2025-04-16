@@ -14,6 +14,7 @@ import EditExperiences from '@/components/edit-panel/EditExperiences';
 import EditOffers from '@/components/edit-panel/EditOffers';
 import EditSpecials from '@/components/edit-panel/EditSpecials';
 import EditTestimonials from '@/components/edit-panel/EditTestimonials';
+import EditEvents from '@/components/edit-panel/EditEvents';
 
 // Define predefined color options
 const colorOptions = [
@@ -189,8 +190,9 @@ const EditPanel: React.FC = () => {
       {/* Main content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 mb-8">
+          <TabsList className="grid grid-cols-6 mb-8">
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="experiences">Experiences</TabsTrigger>
             <TabsTrigger value="offers">Offers</TabsTrigger>
             <TabsTrigger value="specials">Chef's Specials</TabsTrigger>
@@ -199,6 +201,10 @@ const EditPanel: React.FC = () => {
           
           <TabsContent value="gallery">
             <EditGallery />
+          </TabsContent>
+          
+          <TabsContent value="events">
+            <EditEvents />
           </TabsContent>
           
           <TabsContent value="experiences">
