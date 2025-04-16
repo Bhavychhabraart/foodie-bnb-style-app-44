@@ -9,17 +9,64 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      booking_history: {
+        Row: {
+          booking_id: string
+          changed_at: string | null
+          changed_by_user_id: string | null
+          id: string
+          notes: string | null
+          status_changed_from: string | null
+          status_changed_to: string | null
+        }
+        Insert: {
+          booking_id: string
+          changed_at?: string | null
+          changed_by_user_id?: string | null
+          id?: string
+          notes?: string | null
+          status_changed_from?: string | null
+          status_changed_to?: string | null
+        }
+        Update: {
+          booking_id?: string
+          changed_at?: string | null
+          changed_by_user_id?: string | null
+          id?: string
+          notes?: string | null
+          status_changed_from?: string | null
+          status_changed_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_type: string
+          celebration_type: string | null
+          company_name: string | null
           coupon_code: string | null
           created_at: string
           date: string
+          dietary_requirements: string | null
           email: string
+          event_purpose: string | null
+          event_type: string | null
           guests: number
           id: string
           name: string
+          number_of_tables: number | null
           phone: string | null
+          preferred_seating: string | null
+          reservation_notes: string | null
+          special_occasion: boolean | null
           special_requests: string | null
           status: string
           time: string
@@ -27,14 +74,23 @@ export type Database = {
         }
         Insert: {
           booking_type?: string
+          celebration_type?: string | null
+          company_name?: string | null
           coupon_code?: string | null
           created_at?: string
           date: string
+          dietary_requirements?: string | null
           email: string
+          event_purpose?: string | null
+          event_type?: string | null
           guests: number
           id?: string
           name: string
+          number_of_tables?: number | null
           phone?: string | null
+          preferred_seating?: string | null
+          reservation_notes?: string | null
+          special_occasion?: boolean | null
           special_requests?: string | null
           status?: string
           time: string
@@ -42,14 +98,23 @@ export type Database = {
         }
         Update: {
           booking_type?: string
+          celebration_type?: string | null
+          company_name?: string | null
           coupon_code?: string | null
           created_at?: string
           date?: string
+          dietary_requirements?: string | null
           email?: string
+          event_purpose?: string | null
+          event_type?: string | null
           guests?: number
           id?: string
           name?: string
+          number_of_tables?: number | null
           phone?: string | null
+          preferred_seating?: string | null
+          reservation_notes?: string | null
+          special_occasion?: boolean | null
           special_requests?: string | null
           status?: string
           time?: string
@@ -222,6 +287,33 @@ export type Database = {
           id?: string
           is_admin?: boolean
           updated_at?: string
+        }
+        Relationships: []
+      }
+      restaurant_tables: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          id: string
+          is_available: boolean | null
+          location: string
+          table_number: number
+        }
+        Insert: {
+          capacity: number
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          location: string
+          table_number: number
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          location?: string
+          table_number?: number
         }
         Relationships: []
       }

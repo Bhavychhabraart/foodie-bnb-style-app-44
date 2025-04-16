@@ -8,17 +8,16 @@ import {
   TrendingUp, 
   Clock, 
   Star, 
-  ShoppingBag,
   ArrowLeft,
-  BarChart3
+  Columns,
+  LayoutGrid
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
+  ChartTooltip
 } from '@/components/ui/chart';
 import {
   Bar,
@@ -29,7 +28,8 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import DashboardTable from '@/components/DashboardTable';
+import BookingsManagement from '@/components/admin/BookingsManagement';
+import TablesManagement from '@/components/admin/TablesManagement';
 
 // Mock data for charts and stats
 const salesData = [
@@ -98,7 +98,10 @@ const AdminDashboard = () => {
             <h1 className="text-xl font-semibold text-airbnb-light">Admin Dashboard</h1>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-airbnb-gold/20 text-airbnb-light">Export Data</Button>
+            <Button variant="outline" size="sm" className="border-airbnb-gold/20 text-airbnb-light"
+              onClick={() => navigate('/edit')}>
+              Content Editor
+            </Button>
             <Button size="sm" className="bg-airbnb-gold text-airbnb-light hover:bg-airbnb-gold/90">Settings</Button>
           </div>
         </div>
@@ -169,331 +172,344 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Charts Section */}
-        <Tabs defaultValue="overview" className="mb-8">
-          <TabsList className="mb-4 bg-[#1E1E1E] border border-airbnb-gold/20">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Overview</TabsTrigger>
-            <TabsTrigger value="sales" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Sales</TabsTrigger>
-            <TabsTrigger value="bookings" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Bookings</TabsTrigger>
-            <TabsTrigger value="guests" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Guests</TabsTrigger>
+        {/* Main Admin Tabs */}
+        <Tabs defaultValue="dashboard" className="mb-8">
+          <TabsList className="mb-4 bg-[#1E1E1E] border border-airbnb-gold/20 w-full justify-start overflow-x-auto">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">
+              <LayoutGrid className="h-4 w-4 mr-2" /> Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">
+              <Calendar className="h-4 w-4 mr-2" /> Reservations
+            </TabsTrigger>
+            <TabsTrigger value="tables" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">
+              <Columns className="h-4 w-4 mr-2" /> Tables
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium text-airbnb-light">Revenue Trend</h3>
-                    <div className="flex items-center text-sm text-green-500">
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      <span>+12.5%</span>
-                    </div>
-                  </div>
-                  <div className="h-[300px] w-full">
-                    <ChartContainer
-                      config={{
-                        sales: { color: "#B18E72" },
-                      }}
-                      className="w-full h-full"
-                    >
-                      <LineChart data={salesData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                        <XAxis
-                          dataKey="name"
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                          padding={{ left: 10, right: 10 }}
-                        />
-                        <YAxis
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                          tickFormatter={(value) => `$${value}`}
-                          width={60}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="value"
-                          stroke="var(--color-sales)"
-                          strokeWidth={2}
-                          dot={{ r: 3 }}
-                          activeDot={{ r: 5 }}
-                        />
-                        <ChartTooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
-                                        Month
-                                      </span>
-                                      <span className="font-bold text-xs text-airbnb-light">
-                                        {payload[0].payload.name}
-                                      </span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
-                                        Revenue
-                                      </span>
-                                      <span className="font-bold text-xs text-airbnb-light">
-                                        ${payload[0].value.toLocaleString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                      </LineChart>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Dashboard Tab */}
+          <TabsContent value="dashboard">
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-airbnb-light">Analytics Dashboard</h2>
               
-              <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium text-airbnb-light">Booking Statistics</h3>
-                    <div className="flex items-center text-sm text-green-500">
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      <span>+8.3%</span>
-                    </div>
+              <Tabs defaultValue="overview" className="mb-8">
+                <TabsList className="mb-4 bg-[#1E1E1E] border border-airbnb-gold/20">
+                  <TabsTrigger value="overview" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Overview</TabsTrigger>
+                  <TabsTrigger value="sales" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Sales</TabsTrigger>
+                  <TabsTrigger value="bookings" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Bookings</TabsTrigger>
+                  <TabsTrigger value="guests" className="data-[state=active]:bg-airbnb-gold data-[state=active]:text-airbnb-light">Guests</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
+                      <CardContent className="pt-6">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-medium text-airbnb-light">Revenue Trend</h3>
+                          <div className="flex items-center text-sm text-green-500">
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            <span>+12.5%</span>
+                          </div>
+                        </div>
+                        <div className="h-[300px] w-full">
+                          <ChartContainer
+                            config={{
+                              sales: { color: "#B18E72" },
+                            }}
+                            className="w-full h-full"
+                          >
+                            <LineChart data={salesData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                              <XAxis
+                                dataKey="name"
+                                stroke="#888888"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                padding={{ left: 10, right: 10 }}
+                              />
+                              <YAxis
+                                stroke="#888888"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                tickFormatter={(value) => `$${value}`}
+                                width={60}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="value"
+                                stroke="var(--color-sales)"
+                                strokeWidth={2}
+                                dot={{ r: 3 }}
+                                activeDot={{ r: 5 }}
+                              />
+                              <ChartTooltip
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-airbnb-light/70">
+                                              Month
+                                            </span>
+                                            <span className="font-bold text-xs text-airbnb-light">
+                                              {payload[0].payload.name}
+                                            </span>
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-airbnb-light/70">
+                                              Revenue
+                                            </span>
+                                            <span className="font-bold text-xs text-airbnb-light">
+                                              ${payload[0].value.toLocaleString()}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                            </LineChart>
+                          </ChartContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
+                      <CardContent className="pt-6">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-medium text-airbnb-light">Booking Statistics</h3>
+                          <div className="flex items-center text-sm text-green-500">
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            <span>+8.3%</span>
+                          </div>
+                        </div>
+                        <div className="h-[300px] w-full">
+                          <ChartContainer
+                            config={{
+                              bookings: { color: "#B18E72" },
+                            }}
+                            className="w-full h-full"
+                          >
+                            <BarChart data={bookingsData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                              <XAxis
+                                dataKey="name"
+                                stroke="#888888"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                padding={{ left: 10, right: 10 }}
+                              />
+                              <YAxis
+                                stroke="#888888"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                width={30}
+                              />
+                              <Bar
+                                dataKey="value"
+                                fill="var(--color-bookings)"
+                                radius={[4, 4, 0, 0]}
+                                barSize={20}
+                              />
+                              <ChartTooltip
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-airbnb-light/70">
+                                              Month
+                                            </span>
+                                            <span className="font-bold text-xs text-airbnb-light">
+                                              {payload[0].payload.name}
+                                            </span>
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-airbnb-light/70">
+                                              Bookings
+                                            </span>
+                                            <span className="font-bold text-xs text-airbnb-light">
+                                              {payload[0].value}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                            </BarChart>
+                          </ChartContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                  <div className="h-[300px] w-full">
-                    <ChartContainer
-                      config={{
-                        bookings: { color: "#B18E72" },
-                      }}
-                      className="w-full h-full"
-                    >
-                      <BarChart data={bookingsData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                        <XAxis
-                          dataKey="name"
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                          padding={{ left: 10, right: 10 }}
-                        />
-                        <YAxis
-                          stroke="#888888"
-                          fontSize={12}
-                          tickLine={false}
-                          axisLine={false}
-                          width={30}
-                        />
-                        <Bar
-                          dataKey="value"
-                          fill="var(--color-bookings)"
-                          radius={[4, 4, 0, 0]}
-                          barSize={20}
-                        />
-                        <ChartTooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="rounded-lg border bg-[#121212] border-airbnb-gold/20 p-2 shadow-sm">
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
-                                        Month
-                                      </span>
-                                      <span className="font-bold text-xs text-airbnb-light">
-                                        {payload[0].payload.name}
-                                      </span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                      <span className="text-[0.70rem] uppercase text-airbnb-light/70">
-                                        Bookings
-                                      </span>
-                                      <span className="font-bold text-xs text-airbnb-light">
-                                        {payload[0].value}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
+                </TabsContent>
+                
+                <TabsContent value="sales">
+                  <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
+                    <CardContent className="pt-6">
+                      <h3 className="text-lg font-medium text-airbnb-light mb-4">Sales Overview</h3>
+                      <div className="h-[400px] w-full">
+                        <ChartContainer
+                          config={{
+                            sales: { color: "#B18E72" },
                           }}
-                        />
-                      </BarChart>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
+                          className="w-full h-full"
+                        >
+                          <LineChart 
+                            data={salesData} 
+                            margin={{ top: 20, right: 30, bottom: 20, left: 40 }}
+                          >
+                            <XAxis
+                              dataKey="name"
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              padding={{ left: 10, right: 10 }}
+                            />
+                            <YAxis
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              tickFormatter={(value) => `$${value}`}
+                              width={60}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="var(--color-sales)"
+                              strokeWidth={2}
+                              dot={{ r: 4, strokeWidth: 2 }}
+                              activeDot={{ r: 6, strokeWidth: 2 }}
+                            />
+                            <ChartTooltip />
+                          </LineChart>
+                        </ChartContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="bookings">
+                  <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
+                    <CardContent className="pt-6">
+                      <h3 className="text-lg font-medium text-airbnb-light mb-4">Booking Trends</h3>
+                      <div className="h-[400px] w-full">
+                        <ChartContainer
+                          config={{
+                            bookings: { color: "#B18E72" },
+                          }}
+                          className="w-full h-full"
+                        >
+                          <BarChart 
+                            data={bookingsData}
+                            margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+                          >
+                            <XAxis
+                              dataKey="name"
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              padding={{ left: 10, right: 10 }}
+                            />
+                            <YAxis
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              width={30}
+                            />
+                            <Bar
+                              dataKey="value"
+                              fill="var(--color-bookings)"
+                              radius={[4, 4, 0, 0]}
+                              barSize={30}
+                            />
+                            <ChartTooltip />
+                          </BarChart>
+                        </ChartContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="guests">
+                  <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
+                    <CardContent className="pt-6">
+                      <h3 className="text-lg font-medium text-airbnb-light mb-4">Guest Statistics</h3>
+                      <div className="h-[400px] w-full">
+                        <ChartContainer
+                          config={{
+                            guests: { color: "#B18E72" },
+                          }}
+                          className="w-full h-full"
+                        >
+                          <LineChart 
+                            data={guestData}
+                            margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+                          >
+                            <XAxis
+                              dataKey="name"
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              padding={{ left: 10, right: 10 }}
+                            />
+                            <YAxis
+                              stroke="#888888"
+                              fontSize={12}
+                              tickLine={false}
+                              axisLine={false}
+                              width={30}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="var(--color-guests)"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                            <ChartTooltip />
+                          </LineChart>
+                        </ChartContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           </TabsContent>
           
-          <TabsContent value="sales">
-            <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-medium text-airbnb-light mb-4">Sales Overview</h3>
-                <div className="h-[400px] w-full">
-                  <ChartContainer
-                    config={{
-                      sales: { color: "#B18E72" },
-                    }}
-                    className="w-full h-full"
-                  >
-                    <LineChart 
-                      data={salesData} 
-                      margin={{ top: 20, right: 30, bottom: 20, left: 40 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        padding={{ left: 10, right: 10 }}
-                      />
-                      <YAxis
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => `$${value}`}
-                        width={60}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="var(--color-sales)"
-                        strokeWidth={2}
-                        dot={{ r: 4, strokeWidth: 2 }}
-                        activeDot={{ r: 6, strokeWidth: 2 }}
-                      />
-                      <ChartTooltip content={
-                        <ChartTooltipContent 
-                          labelFormatter={(value) => `Month: ${value}`}
-                          formatter={(value) => [`$${value.toLocaleString()}`, 'Revenue']}
-                        />
-                      } />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
+          {/* Bookings Management Tab */}
           <TabsContent value="bookings">
             <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium text-airbnb-light mb-4">Booking Trends</h3>
-                <div className="h-[400px] w-full">
-                  <ChartContainer
-                    config={{
-                      bookings: { color: "#B18E72" },
-                    }}
-                    className="w-full h-full"
-                  >
-                    <BarChart 
-                      data={bookingsData}
-                      margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        padding={{ left: 10, right: 10 }}
-                      />
-                      <YAxis
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        width={30}
-                      />
-                      <Bar
-                        dataKey="value"
-                        fill="var(--color-bookings)"
-                        radius={[4, 4, 0, 0]}
-                        barSize={30}
-                      />
-                      <ChartTooltip content={
-                        <ChartTooltipContent 
-                          labelFormatter={(value) => `Month: ${value}`}
-                          formatter={(value) => [`${value}`, 'Bookings']}
-                        />
-                      } />
-                    </BarChart>
-                  </ChartContainer>
-                </div>
+                <BookingsManagement />
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="guests">
+          {/* Tables Management Tab */}
+          <TabsContent value="tables">
             <Card className="bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium text-airbnb-light mb-4">Guest Statistics</h3>
-                <div className="h-[400px] w-full">
-                  <ChartContainer
-                    config={{
-                      guests: { color: "#B18E72" },
-                    }}
-                    className="w-full h-full"
-                  >
-                    <LineChart 
-                      data={guestData}
-                      margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        padding={{ left: 10, right: 10 }}
-                      />
-                      <YAxis
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        width={30}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="var(--color-guests)"
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
-                      />
-                      <ChartTooltip content={
-                        <ChartTooltipContent 
-                          labelFormatter={(value) => `Month: ${value}`}
-                          formatter={(value) => [`${value}`, 'Guests']}
-                        />
-                      } />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
+                <TablesManagement />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* Recent Bookings Table */}
-        <Card className="mb-6 bg-[#1E1E1E] border border-airbnb-gold/20 shadow-md">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-airbnb-light">Recent Bookings</h3>
-              <Button variant="outline" size="sm" className="border-airbnb-gold/20 text-airbnb-light hover:bg-airbnb-gold/10">View All</Button>
-            </div>
-            <DashboardTable />
-          </CardContent>
-        </Card>
       </main>
     </div>
   );

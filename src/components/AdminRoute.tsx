@@ -3,7 +3,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert, Key } from 'lucide-react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -47,9 +47,15 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
             You need admin privileges to access this page. Please sign in with an admin account.
           </p>
           <div className="space-y-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              To become an admin, use the admin code <strong>FINEDINE2025</strong> when registering.
-            </p>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <div className="flex items-center justify-center mb-2">
+                <Key className="h-5 w-5 text-airbnb-gold mr-2" />
+                <h3 className="text-sm font-medium">Admin Registration</h3>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Use the admin code <span className="font-mono font-semibold">FINEDINE2025</span> when registering a new account to gain admin access.
+              </p>
+            </div>
             <button 
               onClick={() => window.location.href = '/auth'}
               className="w-full px-4 py-2 bg-airbnb-red text-white rounded-md hover:bg-airbnb-red/90 transition-colors"
