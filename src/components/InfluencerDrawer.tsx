@@ -1,366 +1,249 @@
 
 import React, { useState } from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "@/components/ui/drawer";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "@/components/ui/form";
-import { Instagram, Camera, CheckCircle, User, Mail, MessageSquare } from 'lucide-react';
-import { useForm } from "react-hook-form";
-import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Instagram, Check } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InfluencerDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface FormValues {
-  name: string;
-  email: string;
-  instagram: string;
-  followers: string;
-  message: string;
-}
-
 const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange }) => {
-  const [step, setStep] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [followers, setFollowers] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
-  
-  const form = useForm<FormValues>({
-    defaultValues: {
-      name: '',
-      email: '',
-      instagram: '',
-      followers: '',
-      message: ''
-    }
-  });
 
-  const onSubmit = (data: FormValues) => {
-    console.log('Instagram influencer application submitted:', data);
-    setSubmitted(true);
-    toast({
-      title: "Application Submitted!",
-      description: "We'll review your application and get back to you soon.",
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!name || !email || !phone || !instagram || !followers) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate followers is a number
+    const followersCount = parseInt(followers);
+    if (isNaN(followersCount)) {
+      toast({
+        title: "Invalid follower count",
+        description: "Please enter a valid number of followers.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Save the collaboration request to Supabase
+      const { error } = await supabase
+        .from('instagram_collaborations')
+        .insert({
+          name,
+          email,
+          phone,
+          instagram_handle: instagram,
+          followers_count: followersCount,
+          message: message || null,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      setIsSuccess(true);
+      
+      toast({
+        title: "Request submitted!",
+        description: "Your Instagram collaboration request has been submitted for review. We'll get back to you soon!",
+      });
+
+      // Reset form after 3 seconds and close drawer
+      setTimeout(() => {
+        resetForm();
+        onOpenChange(false);
+        setIsSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error submitting collaboration request:', error);
+      toast({
+        title: "Something went wrong",
+        description: "We couldn't submit your request. Please try again.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+    }
   };
 
-  const resetAndClose = () => {
-    form.reset();
-    setStep(1);
-    setSubmitted(false);
+  const resetForm = () => {
+    setName('');
+    setEmail('');
+    setPhone('');
+    setInstagram('');
+    setFollowers('');
+    setMessage('');
+    setIsSubmitting(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    setIsSuccess(false);
     onOpenChange(false);
-  };
-
-  const nextStep = () => {
-    let canProceed = false;
-    
-    if (step === 1) {
-      const nameValue = form.getValues('name');
-      const emailValue = form.getValues('email');
-      
-      if (nameValue && emailValue) {
-        canProceed = true;
-      } else {
-        toast({
-          title: "Missing information",
-          description: "Please fill in all fields before proceeding.",
-          variant: "destructive"
-        });
-      }
-    } else if (step === 2) {
-      const instagramValue = form.getValues('instagram');
-      const followersValue = form.getValues('followers');
-      
-      if (instagramValue && followersValue) {
-        canProceed = true;
-      } else {
-        toast({
-          title: "Missing information",
-          description: "Please fill in all fields before proceeding.",
-          variant: "destructive"
-        });
-      }
-    }
-    
-    if (canProceed) {
-      setStep(step + 1);
-    }
-  };
-
-  const prevStep = () => {
-    setStep(step - 1);
-  };
-
-  const renderStepIndicator = () => {
-    return (
-      <div className="flex justify-center mb-6">
-        <div className="flex items-center space-x-2">
-          {[1, 2, 3].map((i) => (
-            <React.Fragment key={i}>
-              <div 
-                className={`h-8 w-8 rounded-full flex items-center justify-center transition-colors ${
-                  i === step 
-                    ? 'bg-airbnb-red text-white' 
-                    : i < step 
-                      ? 'bg-green-100 text-green-600 border border-green-200' 
-                      : 'bg-gray-100 text-gray-400'
-                }`}
-              >
-                {i < step ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <span>{i}</span>
-                )}
-              </div>
-              {i < 3 && (
-                <div 
-                  className={`h-1 w-10 ${
-                    i < step ? 'bg-green-400' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const renderStepContent = () => {
-    if (submitted) {
-      return (
-        <div className="p-4 flex flex-col items-center text-center space-y-6">
-          <div className="bg-green-100 p-6 rounded-full">
-            <CheckCircle className="h-12 w-12 text-green-600" />
-          </div>
-          <div>
-            <h3 className="text-xl font-medium mb-2">Thank You!</h3>
-            <p className="text-gray-600">
-              We've received your application and our team will get in touch with you shortly.
-              We'll review your Instagram profile and discuss potential collaboration opportunities.
-            </p>
-          </div>
-          <Button onClick={resetAndClose} variant="outline" className="mt-4">
-            Close
-          </Button>
-        </div>
-      );
-    }
-
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {step === 1 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Personal Information</h3>
-              
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input placeholder="John Doe" className="pl-10" {...field} />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input placeholder="your@email.com" type="email" className="pl-10" {...field} />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          
-          {step === 2 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Instagram Details</h3>
-              
-              <FormField
-                control={form.control}
-                name="instagram"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Instagram Handle</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input placeholder="@yourhandle" className="pl-10" {...field} />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="followers"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Followers Count</FormLabel>
-                    <FormControl>
-                      <Input placeholder="10000" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Approximate number of followers
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          
-          {step === 3 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Additional Information</h3>
-              
-              <Card className="bg-amber-50 p-4 border-none mb-4">
-                <div className="flex items-center space-x-3 mb-2">
-                  <Instagram className="h-5 w-5 text-amber-600" />
-                  <h3 className="font-medium text-amber-800">Almost there!</h3>
-                </div>
-                <p className="text-sm text-amber-700">
-                  Tell us about your content style and what type of collaboration you're interested in.
-                </p>
-              </Card>
-              
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input 
-                          placeholder="Tell us about your content style and why you'd like to collaborate..." 
-                          {...field} 
-                          className="min-h-[100px] pt-3 pl-10"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          
-          <DrawerFooter className="px-0 flex-row space-x-2 pt-6">
-            {step > 1 && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={prevStep}
-                className="flex-1"
-              >
-                Back
-              </Button>
-            )}
-            
-            {step < 3 ? (
-              <Button 
-                type="button" 
-                onClick={nextStep}
-                className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90"
-              >
-                Next Step
-              </Button>
-            ) : (
-              <Button 
-                type="submit" 
-                className="flex-1 bg-airbnb-red hover:bg-airbnb-red/90"
-              >
-                Submit Application
-              </Button>
-            )}
-          </DrawerFooter>
-        </form>
-      </Form>
-    );
   };
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]">
-        <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
-          <div className="mx-auto w-full max-w-md">
-            <DrawerHeader>
-              <DrawerTitle className="text-xl flex items-center gap-2">
-                <Instagram className="h-5 w-5 text-airbnb-red" />
-                Instagram Collaboration
-              </DrawerTitle>
-              <DrawerDescription>
-                Join our exclusive network of food influencers and create amazing content with us
-              </DrawerDescription>
-            </DrawerHeader>
-
-            <div className="p-4">
-              {!submitted && renderStepIndicator()}
-              
-              {step === 1 && !submitted && (
-                <div className="mb-6">
-                  <Card className="bg-soft-purple p-4 border-none">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Instagram className="h-6 w-6 text-purple-500" />
-                      <h3 className="font-medium">Why collaborate with us?</h3>
-                    </div>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span>Exclusive food tasting events</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span>Complimentary dishes for content creation</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span>Featured stories on our social media</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span>Collaborate with our chefs for unique content</span>
-                      </li>
-                    </ul>
-                  </Card>
-                </div>
-              )}
-
-              {renderStepContent()}
+      <DrawerContent className="max-h-[90vh] bg-[#121212] border-airbnb-gold/20">
+        <div className="max-h-[90vh] overflow-y-auto pb-safe">
+          <div className="flex flex-col h-full bg-[#121212] text-white">
+            <div className="flex items-center p-4 border-b border-airbnb-gold/20">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mr-2 text-white"
+                onClick={handleClose}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h2 className="text-xl font-semibold">Instagram Collaboration</h2>
             </div>
+
+            <ScrollArea className="flex-1">
+              <div className="px-6 py-6">
+                {isSuccess ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
+                      <Check className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Request Submitted!</h3>
+                    <p className="text-center text-white/80 mb-6">
+                      We've received your collaboration request and will review it shortly.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center mb-6">
+                      <Instagram className="h-6 w-6 text-airbnb-gold mr-3" />
+                      <div>
+                        <DrawerTitle className="text-xl text-white">Partner with Us</DrawerTitle>
+                        <DrawerDescription className="text-white/70">
+                          Submit your details for Instagram collaborations
+                        </DrawerDescription>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div>
+                        <Label htmlFor="name" className="text-white">Full Name</Label>
+                        <Input
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="mt-1.5 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                          placeholder="Your full name"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="email" className="text-white">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="mt-1.5 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                          placeholder="your@email.com"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="phone" className="text-white">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="mt-1.5 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                          placeholder="+91 98765 43210"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="instagram" className="text-white">Instagram Handle</Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-[13px] text-white/50">@</span>
+                          <Input
+                            id="instagram"
+                            value={instagram}
+                            onChange={(e) => setInstagram(e.target.value)}
+                            className="mt-1.5 pl-8 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                            placeholder="your_handle"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="followers" className="text-white">Follower Count</Label>
+                        <Input
+                          id="followers"
+                          value={followers}
+                          onChange={(e) => setFollowers(e.target.value)}
+                          className="mt-1.5 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                          placeholder="e.g. 10000"
+                          type="number"
+                          min="100"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="message" className="text-white">Tell Us About Your Content (Optional)</Label>
+                        <Textarea
+                          id="message"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          className="mt-1.5 h-24 border-airbnb-gold/20 bg-[#1E1E1E] text-white"
+                          placeholder="Share details about your content style, audience demographics, and why you'd like to collaborate with us..."
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <Button
+                          type="submit"
+                          className="w-full bg-airbnb-gold hover:bg-airbnb-gold/90 text-black"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "Submitting..." : "Submit Request"}
+                        </Button>
+                      </div>
+
+                      <p className="text-sm text-center text-white/60 mt-3">
+                        We review all collaboration requests and will get back to you within 2-3 business days.
+                      </p>
+                    </form>
+                  </>
+                )}
+              </div>
+            </ScrollArea>
           </div>
         </div>
       </DrawerContent>
