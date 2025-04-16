@@ -25,7 +25,7 @@ import {
   Save
 } from 'lucide-react';
 
-// Define the Experience interface
+// Define the Experience interface with the newly added fields
 interface Experience {
   id: string;
   title: string;

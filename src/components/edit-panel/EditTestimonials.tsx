@@ -66,6 +66,7 @@ const EditTestimonials: React.FC = () => {
 
   const fetchTestimonials = async () => {
     try {
+      // Using the newly created testimonials table
       const { data, error } = await supabase
         .from('testimonials')
         .select('*')

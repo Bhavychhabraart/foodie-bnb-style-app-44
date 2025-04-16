@@ -98,30 +98,42 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          host: string
           id: string
           image_url: string
           is_featured: boolean | null
+          is_sold_out: boolean | null
           price: string
+          rating: number | null
+          reviews: number | null
           title: string
         }
         Insert: {
           created_at?: string
           date: string
           description?: string | null
+          host?: string
           id?: string
           image_url: string
           is_featured?: boolean | null
+          is_sold_out?: boolean | null
           price: string
+          rating?: number | null
+          reviews?: number | null
           title: string
         }
         Update: {
           created_at?: string
           date?: string
           description?: string | null
+          host?: string
           id?: string
           image_url?: string
           is_featured?: boolean | null
+          is_sold_out?: boolean | null
           price?: string
+          rating?: number | null
+          reviews?: number | null
           title?: string
         }
         Relationships: []
@@ -210,6 +222,36 @@ export type Database = {
           id?: string
           is_admin?: boolean
           updated_at?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          avatar_url: string
+          created_at: string
+          date: string
+          id: string
+          name: string
+          rating: number
+          text: string
+        }
+        Insert: {
+          avatar_url: string
+          created_at?: string
+          date: string
+          id?: string
+          name: string
+          rating: number
+          text: string
+        }
+        Update: {
+          avatar_url?: string
+          created_at?: string
+          date?: string
+          id?: string
+          name?: string
+          rating?: number
+          text?: string
         }
         Relationships: []
       }
