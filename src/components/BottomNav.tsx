@@ -35,38 +35,38 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
 
   return (
     <>
-      <div className="bottom-nav">
-        <div className="flex justify-between items-center relative">
+      <div className="bottom-nav fixed bottom-0 left-0 right-0 bg-[#000000e6] border-t border-airbnb-gold/20 px-4 py-2 z-50">
+        <div className="flex justify-between items-center max-w-2xl mx-auto">
           {/* Left side tabs */}
-          <div className="flex space-x-6">
+          <div className="flex space-x-6 flex-1 justify-start">
             {tabs.slice(0, 2).map((tab) => (
               <button
                 key={tab.id}
-                className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                className={`bottom-nav-item flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
                 onClick={() => handleTabClick(tab.id)}
               >
-                <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
+                <tab.icon className="w-6 h-6" />
               </button>
             ))}
           </div>
           
           {/* Center button */}
           <button
-            className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-airbnb-red text-white rounded-full p-4 shadow-lg"
+            className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-airbnb-gold text-white rounded-full p-4 shadow-lg"
             onClick={() => setIsBookingDrawerOpen(true)}
           >
             <CalendarPlus className="h-7 w-7" />
           </button>
           
           {/* Right side tabs */}
-          <div className="flex space-x-6">
+          <div className="flex space-x-6 flex-1 justify-end">
             {tabs.slice(2).map((tab) => (
               <button
                 key={tab.id}
-                className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                className={`bottom-nav-item flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
                 onClick={() => handleTabClick(tab.id)}
               >
-                <tab.icon className={`bottom-nav-icon ${activeTab === tab.id ? 'text-airbnb-red' : ''}`} />
+                <tab.icon className="w-6 h-6" />
               </button>
             ))}
           </div>
