@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Menu, User, Instagram, Award } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, User, Instagram, Award, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import SupportDrawer from './SupportDrawer';
 import InfluencerDrawer from './InfluencerDrawer';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface NavbarProps {
   activeTab: string;
@@ -19,8 +21,10 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
   const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   
   const navItems = [
     { id: 'about', label: 'About' },
@@ -30,12 +34,45 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'location', label: 'Location' },
   ];
 
+  useEffect(() => {
+    // Check for the current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    // Clean up subscription on unmount
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
     } else if (tabId === 'influencer') {
       setIsInfluencerDrawerOpen(true);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Sign Out Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out",
+      });
     }
   };
 
@@ -72,8 +109,22 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white">
-                <DropdownMenuItem className="cursor-pointer text-sm">Sign in</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-sm">Sign up</DropdownMenuItem>
+                {user ? (
+                  <>
+                    <DropdownMenuItem className="cursor-default text-sm font-medium">
+                      {user.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer text-sm" onClick={handleSignOut}>
+                      <LogOut className="h-4 w-4 mr-2" /> Sign out
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => navigate('/auth')}>
+                      Sign in / Sign up
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('influencer')}>
                   <Instagram className="h-4 w-4 mr-2" /> Influencer
                 </DropdownMenuItem>
