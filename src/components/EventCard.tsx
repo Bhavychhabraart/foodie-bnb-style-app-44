@@ -38,9 +38,9 @@ const EventCard: React.FC<EventCardProps> = ({
   };
   
   return (
-    <div className="mb-8 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
+    <div className="mb-8 rounded-xl overflow-hidden bg-airbnb-cream/10 dark:bg-airbnb-darkbrown/50 shadow-md">
       <div className="relative rounded-xl overflow-hidden mb-2">
-        <AspectRatio ratio={4 / 5} className="bg-airbnb-beige">
+        <AspectRatio ratio={4 / 5} className="bg-airbnb-beige/20">
           <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
         </AspectRatio>
         
@@ -57,13 +57,13 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
       </div>
       
-      <div>
+      <div className="px-3 py-2">
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-medium text-airbnb-darkbrown dark:text-airbnb-cream">{title}</h3>
           {rating > 0 && (
             <div className="flex items-center">
               <Star className="h-4 w-4 fill-current text-airbnb-gold" />
-              <span className="ml-1 text-sm">{rating.toFixed(1)}</span>
+              <span className="ml-1 text-sm text-airbnb-darkbrown dark:text-airbnb-cream">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -87,7 +87,7 @@ const EventCard: React.FC<EventCardProps> = ({
         {isSoldOut ? (
           <p className="font-medium mt-1 text-red-400">Sold out</p>
         ) : (
-          <p className="mt-1 text-airbnb-darkbrown dark:text-white/80">
+          <p className="mt-1 text-airbnb-darkbrown dark:text-white/80 text-sm">
             <span className="font-medium">{price}</span>
           </p>
         )}
@@ -96,19 +96,19 @@ const EventCard: React.FC<EventCardProps> = ({
           <Button 
             variant="outline" 
             onClick={() => setIsDrawerOpen(true)} 
-            className="flex-1 border-airbnb-gold/30 transition-colors text-airbnb-darkbrown dark:text-airbnb-cream bg-airbnb-beige/50 hover:bg-airbnb-beige dark:bg-airbnb-darkbrown dark:hover:bg-airbnb-darkbrown/80"
+            className="flex-1 border-airbnb-gold/30 transition-colors text-airbnb-darkbrown dark:text-airbnb-cream bg-airbnb-beige/50 hover:bg-airbnb-beige dark:bg-airbnb-darkbrown dark:hover:bg-airbnb-darkbrown/80 text-xs sm:text-sm"
           >
-            <Eye className="mr-2 h-4 w-4" />
-            View Details
+            <Eye className="mr-1 h-4 w-4" />
+            View
           </Button>
           
           <Button 
             onClick={handleBookNow} 
             disabled={isSoldOut} 
-            className="flex-1 text-white bg-airbnb-gold hover:bg-airbnb-gold/90"
+            className="flex-1 text-white bg-airbnb-gold hover:bg-airbnb-gold/90 text-xs sm:text-sm"
           >
-            <CalendarCheck className="mr-2 h-4 w-4" />
-            Book Now
+            <CalendarCheck className="mr-1 h-4 w-4" />
+            Book
           </Button>
         </div>
       </div>

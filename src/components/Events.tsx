@@ -1,4 +1,3 @@
-
 import React from 'react';
 import EventCard from './EventCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -161,7 +160,7 @@ const Events: React.FC<EventsProps> = ({
     <div className="section-padding bg-zinc-900">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-2xl">
+          <h2 className="font-semibold text-2xl text-white">
             {category === 'experiences' ? 'Past Events' : 'Events'}
           </h2>
           <button className="flex items-center text-amber-500 hover:underline text-xs text-left">
