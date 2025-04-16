@@ -20,21 +20,26 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StandardBookingFormProps {
   onBack: () => void;
   onClose: () => void;
 }
 
+const guestSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  gender: z.enum(["male", "female", "other"], {
+    required_error: "Please select a gender",
+  }),
+});
+
 const formSchema = z.object({
   date: z.date({
     required_error: "Please select a date",
   }),
   time: z.string().min(1, "Please select a time"),
-  guests: z.string().min(1, "Please select the number of guests"),
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
+  guests: z.array(guestSchema).min(1, "At least one guest is required").max(10, "Maximum 10 guests"),
   specialRequests: z.string().optional(),
   couponCode: z.string().optional(),
 });
@@ -50,58 +55,112 @@ const timeSlots = [
 const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClose }) => {
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
-  const { toast } = useToast();
   const [discountApplied, setDiscountApplied] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      date: undefined,
       time: "",
-      guests: "",
-      name: "",
-      email: "",
-      phone: "",
+      guests: [{ name: "", gender: "other" }],
       specialRequests: "",
       couponCode: "",
     },
     mode: "onChange",
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log("Form submitted with values:", values);
-    
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      console.log("Booking complete!");
+  const onSubmit = async (values: FormValues) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to make a reservation.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Calculate total amount (1000 cover charge per guest)
+      const totalAmount = values.guests.length * 1000;
+
+      // Insert reservation
+      const { data: reservationData, error: reservationError } = await supabase
+        .from('reservations')
+        .insert({
+          user_id: user.id,
+          booking_type: 'standard',
+          date: values.date.toISOString(),
+          time: values.time,
+          total_amount: totalAmount,
+          special_requests: values.specialRequests || null,
+          status: 'pending'
+        })
+        .select('id')
+        .single();
+
+      if (reservationError) throw reservationError;
+
+      // Insert guests
+      const guestInserts = values.guests.map(guest => ({
+        reservation_id: reservationData.id,
+        name: guest.name,
+        gender: guest.gender,
+        cover_charge: 1000
+      }));
+
+      const { error: guestsError } = await supabase
+        .from('reservation_guests')
+        .insert(guestInserts);
+
+      if (guestsError) throw guestsError;
+
       setIsComplete(true);
+      
+      toast({
+        title: "Reservation Successful",
+        description: `Your table for ${values.guests.length} guests is reserved for ${format(values.date, 'MMMM dd, yyyy')} at ${values.time}.`,
+      });
+
+    } catch (error) {
+      console.error('Reservation error:', error);
+      toast({
+        title: "Reservation Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleManualContinue = () => {
-    console.log("Manual continue button clicked");
-    const currentStepFields: Record<number, (keyof FormValues)[]> = {
-      1: ["date", "time", "guests"],
-      2: ["name", "email", "phone"],
-      3: [],
-    };
-
-    // Get the fields to validate for the current step
-    const fieldsToValidate = currentStepFields[step] || [];
-    
-    // Trigger validation for the current step's fields
-    form.trigger(fieldsToValidate).then((isValid) => {
-      console.log("Form validation result:", isValid);
-      
-      if (isValid) {
-        if (step < 3) {
-          setStep(step + 1);
-        } else {
-          // For the final step, we'll submit the entire form
-          form.handleSubmit(onSubmit)();
-        }
-      }
-    });
+  const renderStepIndicator = () => {
+    return (
+      <div className="flex justify-center mb-4">
+        {[1, 2].map((i) => (
+          <div key={i} className="flex items-center">
+            <div 
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                i === step 
+                  ? 'bg-airbnb-red text-white' 
+                  : i < step 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              {i < step ? '✓' : i}
+            </div>
+            {i < 2 && (
+              <div 
+                className={`w-10 h-1 ${
+                  i < step ? 'bg-green-500' : 'bg-gray-200'
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const handlePrevious = () => {
@@ -129,42 +188,13 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
     }
   };
 
-  const renderStepIndicator = () => {
-    return (
-      <div className="flex justify-center mb-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center">
-            <div 
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                i === step 
-                  ? 'bg-airbnb-red text-white' 
-                  : i < step 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {i < step ? '✓' : i}
-            </div>
-            {i < 3 && (
-              <div 
-                className={`w-10 h-1 ${
-                  i < step ? 'bg-green-500' : 'bg-gray-200'
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   if (isComplete) {
     return (
       <BookingConfirmation
         experienceTitle="Standard Table Booking"
         date={form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
         time={form.getValues('time')}
-        guests={form.getValues('guests')}
+        guests={form.getValues('guests').length.toString()}
         onClose={onClose}
       />
     );
@@ -184,11 +214,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         <DrawerTitle className="text-center pt-2">Book a Standard Table</DrawerTitle>
         <DrawerDescription className="text-center">
           {step === 1 ? "When would you like to visit?" : 
-           step === 2 ? "Tell us about yourself" : 
+           step === 2 ? "Confirm your reservation" : 
            "Confirm your reservation"}
         </DrawerDescription>
       </DrawerHeader>
-
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 px-6">
           {renderStepIndicator()}
@@ -263,31 +293,68 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="guests"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Number of guests</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                    <FormLabel>Guest Details</FormLabel>
+                    {field.value.map((guest, index) => (
+                      <div key={index} className="space-y-2 border p-4 rounded-lg">
+                        <FormField
+                          control={form.control}
+                          name={`guests.${index}.name`}
+                          render={({ field: guestNameField }) => (
+                            <FormItem>
+                              <FormLabel>Guest Name</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder={`Guest ${index + 1} name`} 
+                                  {...guestNameField} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`guests.${index}.gender`}
+                          render={({ field: genderField }) => (
+                            <FormItem>
+                              <FormLabel>Gender</FormLabel>
+                              <Select 
+                                onValueChange={genderField.onChange} 
+                                defaultValue={genderField.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select gender" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const currentGuests = form.getValues('guests');
+                        form.setValue('guests', [...currentGuests, { name: "", gender: "other" }]);
+                      }}
+                      disabled={field.value.length >= 10}
                     >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select number of guests" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                          <SelectItem key={num} value={num.toString()}>
-                            {num} {num === 1 ? 'guest' : 'guests'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                      Add Another Guest
+                    </Button>
                   </FormItem>
                 )}
               />
@@ -295,52 +362,6 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
           )}
 
           {step === 2 && (
-            <>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="your@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
-
-          {step === 3 && (
             <>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-lg mb-4">Reservation Summary</h3>
@@ -357,26 +378,12 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Guests:</span>
-                    <span className="font-medium">{form.getValues('guests')}</span>
+                    <span className="font-medium">{form.getValues('guests').length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Name:</span>
-                    <span className="font-medium">{form.getValues('name')}</span>
+                    <span className="text-gray-600">Cover Charge:</span>
+                    <span className="font-medium">₹{form.getValues('guests').length * 1000}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Email:</span>
-                    <span className="font-medium">{form.getValues('email')}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Phone:</span>
-                    <span className="font-medium">{form.getValues('phone')}</span>
-                  </div>
-                  {discountApplied && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount:</span>
-                      <span className="font-medium">Applied</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -449,12 +456,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
             )}
             
             <Button 
-              type="button" 
-              onClick={handleManualContinue}
+              type="submit"
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
             >
-              {step === 3 ? 'Confirm Booking' : 'Continue'} 
-              {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+              {step === 2 ? 'Confirm Booking' : 'Continue'} 
+              {step < 2 && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           </div>
         </form>

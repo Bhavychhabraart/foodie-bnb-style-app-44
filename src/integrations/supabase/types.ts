@@ -174,6 +174,92 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_guests: {
+        Row: {
+          cover_charge: number
+          created_at: string
+          gender: string
+          id: string
+          name: string | null
+          reservation_id: string
+          updated_at: string
+        }
+        Insert: {
+          cover_charge?: number
+          created_at?: string
+          gender: string
+          id?: string
+          name?: string | null
+          reservation_id: string
+          updated_at?: string
+        }
+        Update: {
+          cover_charge?: number
+          created_at?: string
+          gender?: string
+          id?: string
+          name?: string | null
+          reservation_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservation_guests_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reservations: {
+        Row: {
+          booking_type: string
+          created_at: string
+          date: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          special_requests: string | null
+          status: string
+          time: string
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_type: string
+          created_at?: string
+          date: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          special_requests?: string | null
+          status?: string
+          time: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_type?: string
+          created_at?: string
+          date?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          special_requests?: string | null
+          status?: string
+          time?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       spotlight: {
         Row: {
           capacity: string
