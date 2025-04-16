@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from 'uuid';
 import * as z from "zod";
 import { 
   ImagePlus,
@@ -17,61 +18,37 @@ import {
   Trash2, 
   Plus, 
   Tag,
-  Calendar
+  Calendar,
+  Loader2
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define interface for Offer
 interface Offer {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  validUntil: string;
-  imageUrl: string;
-  couponCode: string;
+  valid_until: string;
+  image_url: string | null;
+  coupon_code: string;
 }
 
 // Create schema for form validation
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  validUntil: z.string().min(1, "Valid until date is required"),
-  imageUrl: z.string().url("Must be a valid URL"),
-  couponCode: z.string().min(3, "Coupon code must be at least 3 characters")
+  valid_until: z.string().min(1, "Valid until date is required"),
+  image_url: z.string().nullable(),
+  coupon_code: z.string().min(3, "Coupon code must be at least 3 characters")
 });
 
-// Mock data
-const initialOffers: Offer[] = [
-  {
-    id: 1,
-    title: "Weekend Special",
-    description: "25% off on all desserts every weekend",
-    validUntil: "May 31, 2025",
-    imageUrl: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-    couponCode: "WEEKEND25"
-  },
-  {
-    id: 2,
-    title: "Seasonal Menu",
-    description: "Try our limited spring specialties",
-    validUntil: "June 15, 2025",
-    imageUrl: "https://images.unsplash.com/photo-1559046375-d0593977ebed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-    couponCode: "SPRING2025"
-  },
-  {
-    id: 3,
-    title: "Family Package",
-    description: "Special menu for 4 with complimentary dessert",
-    validUntil: "Ongoing",
-    imageUrl: "https://images.unsplash.com/photo-1611599538835-b52a8c2f9da1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-    couponCode: "FAMILY4"
-  }
-];
-
 const EditOffers: React.FC = () => {
-  const [offers, setOffers] = useState<Offer[]>(initialOffers);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -79,13 +56,48 @@ const EditOffers: React.FC = () => {
     defaultValues: {
       title: "",
       description: "",
-      validUntil: "",
-      imageUrl: "",
-      couponCode: ""
+      valid_until: "",
+      image_url: null,
+      coupon_code: ""
     }
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    fetchOffers();
+  }, []);
+
+  const fetchOffers = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('offers')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching offers:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load offers. Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setOffers(data || []);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
@@ -93,9 +105,39 @@ const EditOffers: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
-        form.setValue('imageUrl', reader.result as string);
       };
       reader.readAsDataURL(file);
+      
+      try {
+        // Upload the image to Supabase storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('offers')
+          .upload(fileName, file);
+          
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Get the public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('offers')
+          .getPublicUrl(fileName);
+          
+        const publicUrl = publicUrlData.publicUrl;
+        
+        // Set the image URL in the form
+        form.setValue('image_url', publicUrl);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+          title: "Upload Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -104,11 +146,11 @@ const EditOffers: React.FC = () => {
     form.reset({
       title: offer.title,
       description: offer.description,
-      validUntil: offer.validUntil,
-      imageUrl: offer.imageUrl,
-      couponCode: offer.couponCode
+      valid_until: offer.valid_until,
+      image_url: offer.image_url,
+      coupon_code: offer.coupon_code
     });
-    setImagePreview(offer.imageUrl);
+    setImagePreview(offer.image_url);
   };
 
   const startAddNew = () => {
@@ -117,9 +159,9 @@ const EditOffers: React.FC = () => {
     form.reset({
       title: "",
       description: "",
-      validUntil: "",
-      imageUrl: "",
-      couponCode: ""
+      valid_until: "",
+      image_url: null,
+      coupon_code: ""
     });
     setImagePreview(null);
   };
@@ -131,53 +173,127 @@ const EditOffers: React.FC = () => {
     setImagePreview(null);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (editingId !== null) {
-      // Update existing
-      setOffers(offers.map(offer => 
-        offer.id === editingId ? {
-          ...offer,
-          title: values.title,
-          description: values.description,
-          validUntil: values.validUntil,
-          imageUrl: values.imageUrl,
-          couponCode: values.couponCode
-        } : offer
-      ));
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setIsSubmitting(true);
+      
+      if (editingId !== null) {
+        // Update existing offer
+        const { error } = await supabase
+          .from('offers')
+          .update({
+            title: values.title,
+            description: values.description,
+            valid_until: values.valid_until,
+            image_url: values.image_url,
+            coupon_code: values.coupon_code,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingId);
+          
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Offer updated successfully",
+        });
+      } else {
+        // Add new offer
+        const { error } = await supabase
+          .from('offers')
+          .insert({
+            title: values.title,
+            description: values.description,
+            valid_until: values.valid_until,
+            image_url: values.image_url,
+            coupon_code: values.coupon_code
+          });
+          
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "New offer added successfully",
+        });
+      }
+      
+      // Refresh the offers list
+      fetchOffers();
+      
+      // Reset form and state
+      setIsAdding(false);
+      setEditingId(null);
+      form.reset();
+      setImagePreview(null);
+    } catch (error) {
+      console.error('Error saving offer:', error);
       toast({
-        title: "Success",
-        description: "Offer updated successfully",
+        title: "Error",
+        description: "Failed to save offer. Please try again.",
+        variant: "destructive",
       });
-    } else {
-      // Add new
-      const newOffer: Offer = {
-        id: Date.now(),
-        title: values.title,
-        description: values.description,
-        validUntil: values.validUntil,
-        imageUrl: values.imageUrl,
-        couponCode: values.couponCode
-      };
-      setOffers([...offers, newOffer]);
-      toast({
-        title: "Success",
-        description: "New offer added successfully",
-      });
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsAdding(false);
-    setEditingId(null);
-    form.reset();
-    setImagePreview(null);
   };
 
-  const handleDelete = (id: number) => {
-    setOffers(offers.filter(offer => offer.id !== id));
-    toast({
-      title: "Success",
-      description: "Offer deleted successfully",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      // Get the offer to find associated image
+      const offerToDelete = offers.find(offer => offer.id === id);
+      
+      // Delete the database record
+      const { error } = await supabase
+        .from('offers')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      // If there's an associated image URL and it's in our storage, delete it
+      if (offerToDelete?.image_url) {
+        try {
+          const imageUrl = offerToDelete.image_url;
+          const fileName = imageUrl.split('/').pop();
+          
+          // Only delete if it's in our storage (not an external URL)
+          if (fileName && imageUrl.includes('supabase')) {
+            await supabase.storage
+              .from('offers')
+              .remove([fileName]);
+          }
+        } catch (imageError) {
+          console.error('Error deleting image:', imageError);
+          // We don't want to fail the whole operation if just the image deletion fails
+        }
+      }
+      
+      // Remove from local state
+      setOffers(offers.filter(offer => offer.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Offer deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting offer:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete offer. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="text-lg font-medium">Loading offers...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -231,7 +347,7 @@ const EditOffers: React.FC = () => {
                       <div className="grid grid-cols-2 gap-4 mt-4">
                         <FormField
                           control={form.control}
-                          name="validUntil"
+                          name="valid_until"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Valid Until</FormLabel>
@@ -245,7 +361,7 @@ const EditOffers: React.FC = () => {
                         
                         <FormField
                           control={form.control}
-                          name="couponCode"
+                          name="coupon_code"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Coupon Code</FormLabel>
@@ -262,7 +378,7 @@ const EditOffers: React.FC = () => {
                     <div>
                       <FormField
                         control={form.control}
-                        name="imageUrl"
+                        name="image_url"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Offer Image</FormLabel>
@@ -293,12 +409,13 @@ const EditOffers: React.FC = () => {
                               </Label>
                               <Input 
                                 {...field} 
-                                placeholder="Or enter image URL" 
-                                className="mt-2"
+                                value={field.value || ''}
                                 onChange={(e) => {
-                                  field.onChange(e.target.value);
+                                  field.onChange(e.target.value ? e.target.value : null);
                                   setImagePreview(e.target.value);
                                 }}
+                                placeholder="Or enter image URL" 
+                                className="mt-2"
                               />
                             </div>
                             <FormMessage />
@@ -307,9 +424,22 @@ const EditOffers: React.FC = () => {
                       />
 
                       <div className="mt-6">
-                        <Button type="submit" className="w-full">
-                          <Save className="h-4 w-4 mr-2" />
-                          {editingId !== null ? "Save Changes" : "Add Offer"}
+                        <Button 
+                          type="submit" 
+                          className="w-full" 
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              {editingId !== null ? "Save Changes" : "Add Offer"}
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -331,67 +461,85 @@ const EditOffers: React.FC = () => {
 
       {(!isAdding && editingId === null) && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {offers.map((offer) => (
-            <Card key={offer.id} className="overflow-hidden group">
-              <CardContent className="p-0 relative">
-                <div className="h-40 relative">
-                  <img 
-                    src={offer.imageUrl} 
-                    alt={offer.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center">
-                    <Tag className="w-4 h-4 mr-1" />
-                    <span className="text-sm font-medium">Valid until: {offer.validUntil}</span>
-                  </div>
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-medium text-lg">{offer.title}</h3>
-                  <p className="text-gray-500 mt-1 text-sm line-clamp-2">{offer.description}</p>
-                  
-                  <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-100 flex justify-between items-center">
-                    <span className="font-mono text-sm">{offer.couponCode}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 text-xs"
-                      onClick={() => {
-                        navigator.clipboard.writeText(offer.couponCode);
-                        toast({
-                          title: "Copied",
-                          description: "Coupon code copied to clipboard",
-                        });
+          {offers.length === 0 ? (
+            <div className="col-span-full text-center py-12 bg-gray-50 dark:bg-zinc-800/30 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+              <Tag className="h-12 w-12 mx-auto text-gray-400" />
+              <h3 className="mt-4 text-lg font-medium">No Offers Yet</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Get started by creating your first offer.
+              </p>
+              <Button onClick={startAddNew} className="mt-4">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Offer
+              </Button>
+            </div>
+          ) : (
+            offers.map((offer) => (
+              <Card key={offer.id} className="overflow-hidden group">
+                <CardContent className="p-0 relative">
+                  <div className="h-40 relative">
+                    <img 
+                      src={offer.image_url || '/placeholder.svg'} 
+                      alt={offer.title} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder.svg';
                       }}
-                    >
-                      Copy
-                    </Button>
+                    />
+                    <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center">
+                      <Tag className="w-4 h-4 mr-1" />
+                      <span className="text-sm font-medium">Valid until: {offer.valid_until}</span>
+                    </div>
                   </div>
                   
-                  <div className="flex space-x-2 mt-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleEdit(offer)}
-                    >
-                      <Edit className="h-3 w-3 mr-2" />
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDelete(offer.id)}
-                    >
-                      <Trash2 className="h-3 w-3 mr-2" />
-                      Delete
-                    </Button>
+                  <div className="p-4">
+                    <h3 className="font-medium text-lg">{offer.title}</h3>
+                    <p className="text-gray-500 mt-1 text-sm line-clamp-2">{offer.description}</p>
+                    
+                    <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-100 flex justify-between items-center">
+                      <span className="font-mono text-sm">{offer.coupon_code}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={() => {
+                          navigator.clipboard.writeText(offer.coupon_code);
+                          toast({
+                            title: "Copied",
+                            description: "Coupon code copied to clipboard",
+                          });
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    
+                    <div className="flex space-x-2 mt-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => handleEdit(offer)}
+                      >
+                        <Edit className="h-3 w-3 mr-2" />
+                        Edit
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleDelete(offer.id)}
+                      >
+                        <Trash2 className="h-3 w-3 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       )}
     </div>

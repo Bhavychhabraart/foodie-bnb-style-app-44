@@ -10,16 +10,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ClipboardCopy, Check, Calendar, Tag, Sparkles, Clock, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Offer {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  validUntil: string;
-  imageUrl: string;
-  couponCode: string;
+  valid_until: string;
+  image_url: string | null;
+  coupon_code: string;
 }
 
 interface CouponDrawerProps {
@@ -38,7 +38,7 @@ const CouponDrawer: React.FC<CouponDrawerProps> = ({
   const isMobile = useIsMobile();
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(offer.couponCode).then(() => {
+    navigator.clipboard.writeText(offer.coupon_code).then(() => {
       setCopied(true);
       toast({
         title: "Coupon copied!",
@@ -90,9 +90,13 @@ const CouponDrawer: React.FC<CouponDrawerProps> = ({
                 {/* Voucher Image */}
                 <div className="relative">
                   <img 
-                    src={offer.imageUrl} 
+                    src={offer.image_url || '/placeholder.svg'} 
                     alt={offer.title} 
                     className="w-full aspect-video object-cover" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   
@@ -112,7 +116,7 @@ const CouponDrawer: React.FC<CouponDrawerProps> = ({
                   <div className="flex items-center justify-center space-x-3 text-sm mb-4">
                     <div className="flex items-center text-airbnb-light/70">
                       <Clock className="h-4 w-4 mr-1" />
-                      <span>Valid until: {offer.validUntil}</span>
+                      <span>Valid until: {offer.valid_until}</span>
                     </div>
                   </div>
                 </div>
@@ -123,7 +127,7 @@ const CouponDrawer: React.FC<CouponDrawerProps> = ({
                 <p className="text-sm text-airbnb-light/70 mb-2 text-center">Your Exclusive Coupon Code:</p>
                 <div className="flex items-center">
                   <Input 
-                    value={offer.couponCode} 
+                    value={offer.coupon_code} 
                     readOnly 
                     className="bg-zinc-900 border-r-0 rounded-r-none text-center text-lg font-mono font-bold text-airbnb-gold" 
                   />

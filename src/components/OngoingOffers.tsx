@@ -1,49 +1,129 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, Tag, Sparkles, Clock } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import CouponDrawer from './CouponDrawer';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-const offers = [{
-  id: 1,
-  title: "Weekend Special",
-  description: "25% off on all desserts every weekend",
-  validUntil: "May 31, 2025",
-  imageUrl: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-  couponCode: "WEEKEND25"
-}, {
-  id: 2,
-  title: "Seasonal Menu",
-  description: "Try our limited spring specialties",
-  validUntil: "June 15, 2025",
-  imageUrl: "https://images.unsplash.com/photo-1559046375-d0593977ebed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-  couponCode: "SPRING2025"
-}, {
-  id: 3,
-  title: "Family Package",
-  description: "Special menu for 4 with complimentary dessert",
-  validUntil: "Ongoing",
-  imageUrl: "https://images.unsplash.com/photo-1611599538835-b52a8c2f9da1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1164&q=80",
-  couponCode: "FAMILY4"
-}, {
-  id: 4,
-  title: "Chef's Recommendation",
-  description: "10% off on chef's special dishes",
-  validUntil: "April 30, 2025",
-  imageUrl: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-  couponCode: "CHEF10"
-}];
+interface Offer {
+  id: string;
+  title: string;
+  description: string;
+  valid_until: string;
+  image_url: string | null;
+  coupon_code: string;
+}
 
 const OngoingOffers: React.FC = () => {
-  const [selectedOffer, setSelectedOffer] = useState<(typeof offers)[0] | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { toast } = useToast();
   
-  const handleAvailNow = (offer: (typeof offers)[0]) => {
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('offers')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching offers:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load offers. Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        setOffers(data || []);
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, [toast]);
+  
+  const handleAvailNow = (offer: Offer) => {
     setSelectedOffer(offer);
     setDrawerOpen(true);
   };
+
+  // If no offers are available yet and still loading, show placeholder
+  if (loading) {
+    return (
+      <div className="section-padding">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center">
+              <Sparkles className="w-5 h-5 mr-2 text-airbnb-gold" />
+              <h2 className="text-2xl font-semibold">Exclusive Offers</h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="border-none rounded-xl overflow-hidden animate-pulse">
+                <CardContent className="p-0">
+                  <div className="h-[180px] bg-gray-700"></div>
+                  <div className="p-5 bg-zinc-900">
+                    <div className="h-6 bg-gray-700 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-700 rounded mb-4"></div>
+                    <div className="h-10 bg-gray-700 rounded"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If there are no offers and we're not loading anymore, provide a way to add offers
+  if (offers.length === 0 && !loading) {
+    return (
+      <div className="section-padding">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center">
+              <Sparkles className="w-5 h-5 mr-2 text-airbnb-gold" />
+              <h2 className="text-2xl font-semibold">Exclusive Offers</h2>
+            </div>
+            <Button 
+              onClick={() => {
+                toast({
+                  title: "Admin Access Required",
+                  description: "Please visit the edit panel to add offers.",
+                });
+              }}
+              className="text-airbnb-gold hover:underline flex items-center"
+              variant="ghost"
+            >
+              <span className="mr-1">Manage Offers</span>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <div className="text-center py-10 bg-zinc-900/50 rounded-xl border border-dashed border-gray-700">
+            <Sparkles className="w-12 h-12 mx-auto mb-4 text-airbnb-gold/50" />
+            <h3 className="text-xl font-medium mb-2">No Offers Available</h3>
+            <p className="text-gray-400 max-w-md mx-auto">
+              There are no active offers at the moment. Check back later for exclusive deals and promotions.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="section-padding">
@@ -68,9 +148,13 @@ const OngoingOffers: React.FC = () => {
                     {/* Voucher Top Part with Image */}
                     <div className="relative h-[180px] overflow-hidden">
                       <img 
-                        src={offer.imageUrl} 
+                        src={offer.image_url || '/placeholder.svg'} 
                         alt={offer.title} 
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/placeholder.svg';
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                       
@@ -97,11 +181,11 @@ const OngoingOffers: React.FC = () => {
                       <div className="flex items-center justify-between text-xs text-airbnb-light/70 mb-4">
                         <div className="flex items-center">
                           <Clock className="w-3 h-3 mr-1" />
-                          <span>Valid until: {offer.validUntil}</span>
+                          <span>Valid until: {offer.valid_until}</span>
                         </div>
                         <div className="flex items-center">
                           <Tag className="w-3 h-3 mr-1" />
-                          <span>Code: {offer.couponCode}</span>
+                          <span>Code: {offer.coupon_code}</span>
                         </div>
                       </div>
                       
