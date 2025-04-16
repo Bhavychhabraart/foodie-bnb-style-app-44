@@ -114,6 +114,54 @@ export type Database = {
         }
         Relationships: []
       }
+      spotlight: {
+        Row: {
+          capacity: string
+          created_at: string
+          date: string
+          description: string
+          featured: boolean
+          id: string
+          image_url: string | null
+          price: string
+          rating: number
+          reviews: number
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity: string
+          created_at?: string
+          date: string
+          description: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          price: string
+          rating?: number
+          reviews?: number
+          time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: string
+          created_at?: string
+          date?: string
+          description?: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          price?: string
+          rating?: number
+          reviews?: number
+          time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -20,7 +20,8 @@ import {
   Plus, 
   DollarSign,
   ChefHat,
-  Loader2
+  Loader2,
+  Star  // Added Star import
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
