@@ -52,12 +52,10 @@ const Index = () => {
         <Events category="experiences" />
       ) : activeCategory === 'menu' ? (
         <div>
-          <Events category="menu" />
           <FlipBook />
         </div>
       ) : activeCategory === 'offers' ? (
         <div>
-          <Events category="offers" />
           <OngoingOffers />
         </div>
       ) : null}
