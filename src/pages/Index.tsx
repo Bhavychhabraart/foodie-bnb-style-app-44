@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -25,7 +26,7 @@ const Index = () => {
   ];
   
   return (
-    <div className="pb-16 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
+    <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
       </div>
@@ -37,7 +38,7 @@ const Index = () => {
       </div>
       
       {activeCategory === 'home' ? (
-        <div className="space-y-2 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
+        <div className="space-y-2 bg-airbnb-dark">
           <Events category="home" />
           <Spotlight />
           <ChefsSpecials />

@@ -5,82 +5,82 @@
 
 @layer base {
   :root {
-    --background: 34 10% 97%;
-    --foreground: 27 18% 9%;
+    --background: 240 5% 26%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 27 18% 9%;
+    --card: 240 5% 26%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 27 18% 9%;
+    --popover: 240 5% 26%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 30 28% 57%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 7% 83%;
-    --secondary-foreground: 27 18% 9%;
+    --secondary: 240 5% 26%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 5% 90%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 240 5% 26%;
+    --muted-foreground: 0 0% 80%;
 
-    --accent: 24 7% 83%;
-    --accent-foreground: 27 18% 9%;
+    --accent: 30 28% 57%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 30 28% 57%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 27 18% 9%;
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 30 28% 57%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 30 15% 95%;
-    --sidebar-foreground: 27 18% 20%;
+    --sidebar-background: 240 5% 26%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 30 28% 57%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 24 7% 90%;
-    --sidebar-accent-foreground: 27 18% 9%;
-    --sidebar-border: 24 7% 83%;
+    --sidebar-accent: 240 5% 26%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 5% 26%;
     --sidebar-ring: 30 28% 57%;
   }
 
   .dark {
     --background: 240 5% 26%;
-    --foreground: 24 7% 83%;
+    --foreground: 0 0% 100%;
 
     --card: 240 5% 26%;
-    --card-foreground: 24 7% 83%;
+    --card-foreground: 0 0% 100%;
 
     --popover: 240 5% 26%;
-    --popover-foreground: 24 7% 83%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 30 28% 57%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 20%;
-    --secondary-foreground: 24 7% 83%;
+    --secondary: 240 5% 26%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 5% 20%;
-    --muted-foreground: 24 5% 65%;
+    --muted: 240 5% 26%;
+    --muted-foreground: 0 0% 80%;
 
-    --accent: 240 5% 20%;
-    --accent-foreground: 24 7% 83%;
+    --accent: 240 5% 26%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 30 28% 57%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 5% 20%;
-    --input: 240 5% 20%;
-    --ring: 24 7% 83%;
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 0 0% 100%;
     
     --sidebar-background: 240 5% 26%;
-    --sidebar-foreground: 24 7% 83%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 30 28% 57%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 20%;
-    --sidebar-accent-foreground: 24 7% 83%;
-    --sidebar-border: 240 5% 20%;
+    --sidebar-accent: 240 5% 26%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 5% 26%;
     --sidebar-ring: 30 28% 57%;
   }
 }
@@ -91,11 +91,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-montserrat;
+    @apply bg-airbnb-dark text-airbnb-light font-montserrat;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-medium tracking-tight dark:text-white;
+    @apply font-montserrat font-medium tracking-tight text-airbnb-light;
   }
 }
 
@@ -112,11 +112,11 @@
 }
 
 .airbnb-card {
-  @apply rounded-xl overflow-hidden border border-airbnb-beige transition-all duration-200 hover:shadow-md dark:border-airbnb-darkbrown dark:hover:shadow-xl dark:hover:shadow-gray-800/20;
+  @apply rounded-xl overflow-hidden border border-airbnb-gold/20 transition-all duration-200 hover:shadow-md shadow-black/20;
 }
 
 .airbnb-button {
-  @apply bg-airbnb-gold text-white font-medium py-3 px-6 rounded-lg transition-opacity hover:opacity-90;
+  @apply bg-airbnb-gold text-airbnb-light font-medium py-3 px-6 rounded-lg transition-opacity hover:opacity-90;
 }
 
 .section-padding {
@@ -128,11 +128,11 @@
 }
 
 .category-pill {
-  @apply flex flex-col items-center justify-center text-xs gap-2 dark:text-airbnb-beige;
+  @apply flex flex-col items-center justify-center text-xs gap-2 text-airbnb-light;
 }
 
 .category-pill.active {
-  @apply border-b-2 border-airbnb-gold dark:border-airbnb-gold pb-2;
+  @apply border-b-2 border-airbnb-gold pb-2;
 }
 
 .category-icon {
@@ -152,11 +152,11 @@
 }
 
 .bottom-nav {
-  @apply fixed bottom-0 left-0 right-0 bg-background border-t dark:border-airbnb-darkbrown px-6 py-2;
+  @apply fixed bottom-0 left-0 right-0 bg-airbnb-dark border-t border-airbnb-gold/20 px-6 py-2;
 }
 
 .bottom-nav-item {
-  @apply flex items-center justify-center text-xs text-muted-foreground;
+  @apply flex items-center justify-center text-xs text-airbnb-light;
 }
 
 .bottom-nav-icon {
@@ -164,15 +164,15 @@
 }
 
 .price-tag {
-  @apply absolute bottom-4 left-4 bg-background dark:bg-gray-800 rounded-full px-3 py-1 text-sm font-medium;
+  @apply absolute bottom-4 left-4 bg-airbnb-dark rounded-full px-3 py-1 text-sm font-medium text-airbnb-light;
 }
 
 .share-button {
-  @apply absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center;
+  @apply absolute top-4 right-4 w-10 h-10 rounded-full bg-airbnb-dark/80 backdrop-blur-sm flex items-center justify-center;
 }
 
 .detail-section {
-  @apply border-b border-airbnb-beige dark:border-airbnb-darkbrown py-6;
+  @apply border-b border-airbnb-gold/20 py-6;
 }
 
 .detail-host {
@@ -181,39 +181,6 @@
 
 .detail-amenity {
   @apply flex items-start gap-4 py-2;
-}
-
-/* Soft colors for offer cards */
-.bg-soft-green {
-  @apply bg-[#F2FCE2] dark:bg-emerald-950/40;
-}
-
-.bg-soft-yellow {
-  @apply bg-amber-500/20 dark:bg-amber-900/50;
-}
-
-.bg-soft-orange {
-  @apply bg-amber-500/30 dark:bg-orange-950/40;
-}
-
-.bg-soft-purple {
-  @apply bg-[#E0DDD7] dark:bg-airbnb-darkbrown/40;
-}
-
-.bg-soft-pink {
-  @apply bg-[#E0DDD7] dark:bg-airbnb-darkbrown/40;
-}
-
-.bg-soft-peach {
-  @apply bg-amber-500/20 dark:bg-red-950/40;
-}
-
-.bg-soft-blue {
-  @apply bg-[#C8C2B9] dark:bg-airbnb-darkbrown/40;
-}
-
-.bg-soft-gray {
-  @apply bg-[#E0DDD7] dark:bg-airbnb-darkbrown/60;
 }
 
 /* Marquee animation */
@@ -232,12 +199,12 @@
 
 @layer utilities {
   .bg-charcoal-light {
-    @apply bg-airbnb-light;
+    @apply bg-airbnb-dark/70;
   }
   .bg-charcoal-dark {
-    @apply bg-airbnb-darkbrown;
+    @apply bg-airbnb-dark;
   }
   .text-charcoal {
-    @apply text-airbnb-dark;
+    @apply text-airbnb-light;
   }
 }

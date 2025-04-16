@@ -29,17 +29,9 @@ const config = {
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				airbnb: {
-					red: '#FF385C',
-					dark: '#403E43',
-					light: '#403E43',
-					gray: '#403E43',
-					amber: '#F59E0B',
 					gold: '#B18E72',
-					darkbrown: '#403E43',
-					beige: '#C8C2B9',
-					cream: '#E0DDD7',
-					purple: '#B18E72',
-					darkpurple: '#7A5E49'
+					dark: '#403E43',
+					light: '#FFFFFF'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

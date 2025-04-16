@@ -2,6 +2,7 @@ import React from 'react';
 import EventCard from './EventCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { ChevronRight } from 'lucide-react';
+
 interface EventsProps {
   category?: string;
 }
@@ -19,6 +20,7 @@ interface Event {
   venue?: string;
   time?: string;
 }
+
 const eventsByCategory: Record<string, Event[]> = {
   menu: [{
     id: 1,
@@ -148,18 +150,19 @@ const eventsByCategory: Record<string, Event[]> = {
     time: "Thursday"
   }]
 };
+
 const Events: React.FC<EventsProps> = ({
   category = 'home'
 }) => {
   const eventsToShow = eventsByCategory[category] || eventsByCategory.home;
-  return <div className="section-padding bg-zinc-900">
+  return <div className="section-padding bg-airbnb-dark">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-2xl text-white">
+          <h2 className="font-semibold text-2xl text-airbnb-light">
             {category === 'experiences' ? 'Past Events' : 'Events'}
           </h2>
-          <button className="flex items-center text-amber-500 hover:underline text-xs text-left">
-            <span className="mr-1 text-airbnb-purple">View all</span>
+          <button className="flex items-center text-airbnb-gold hover:underline text-xs text-left">
+            <span className="mr-1">View all</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -175,4 +178,5 @@ const Events: React.FC<EventsProps> = ({
       </div>
     </div>;
 };
+
 export default Events;
