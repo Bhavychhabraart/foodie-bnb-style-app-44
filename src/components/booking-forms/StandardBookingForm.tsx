@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -35,6 +36,9 @@ const guestSchema = z.object({
 });
 
 const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().min(10, "Please enter a valid phone number"),
   date: z.date({
     required_error: "Please select a date",
   }),
@@ -61,6 +65,9 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
       date: undefined,
       time: "",
       guests: [{ name: "", gender: "other" }],
@@ -92,6 +99,9 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         .insert({
           user_id: user.id,
           booking_type: 'standard',
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
           date: values.date.toISOString(),
           time: values.time,
           total_amount: totalAmount,
@@ -188,6 +198,28 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
     }
   };
 
+  const handleManualContinue = () => {
+    const currentStepFields: Record<number, (keyof FormValues)[]> = {
+      1: ["date", "time", "guests"],
+      2: ["name", "email", "phone"]
+    };
+
+    // Get the fields to validate for the current step
+    const fieldsToValidate = currentStepFields[step] || [];
+    
+    // Trigger validation for the current step's fields
+    form.trigger(fieldsToValidate).then((isValid) => {
+      if (isValid) {
+        if (step < 2) {
+          setStep(step + 1);
+        } else {
+          // For the final step, we'll submit the entire form
+          form.handleSubmit(onSubmit)();
+        }
+      }
+    });
+  };
+
   if (isComplete) {
     return (
       <BookingConfirmation
@@ -214,7 +246,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         <DrawerTitle className="text-center pt-2">Book a Standard Table</DrawerTitle>
         <DrawerDescription className="text-center">
           {step === 1 ? "When would you like to visit?" : 
-           step === 2 ? "Confirm your reservation" : 
+           step === 2 ? "Contact Information" : 
            "Confirm your reservation"}
         </DrawerDescription>
       </DrawerHeader>
@@ -363,6 +395,48 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
 
           {step === 2 && (
             <>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="your@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-lg mb-4">Reservation Summary</h3>
                 <div className="space-y-2">
@@ -456,7 +530,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
             )}
             
             <Button 
-              type="submit"
+              type="button"
+              onClick={handleManualContinue}
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
             >
               {step === 2 ? 'Confirm Booking' : 'Continue'} 
