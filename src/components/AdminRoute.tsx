@@ -3,7 +3,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldAlert, Key } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-airbnb-red mb-4" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
         <p className="text-gray-600 dark:text-gray-400">Checking credentials...</p>
       </div>
     );
@@ -37,41 +37,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       description: "You need admin privileges to access this page",
       variant: "destructive"
     });
-    
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-md">
-          <ShieldAlert className="h-12 w-12 text-airbnb-red mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Admin Access Required</h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            You need admin privileges to access this page. Please sign in with an admin account.
-          </p>
-          <div className="space-y-3">
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-              <div className="flex items-center justify-center mb-2">
-                <Key className="h-5 w-5 text-airbnb-gold mr-2" />
-                <h3 className="text-sm font-medium">Admin Registration</h3>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Use the admin code <span className="font-mono font-semibold">FINEDINE2025</span> when registering a new account to gain admin access.
-              </p>
-            </div>
-            <button 
-              onClick={() => window.location.href = '/auth'}
-              className="w-full px-4 py-2 bg-airbnb-red text-white rounded-md hover:bg-airbnb-red/90 transition-colors"
-            >
-              Go to Login Page
-            </button>
-            <button 
-              onClick={() => window.location.href = '/'}
-              className="w-full px-4 py-2 bg-transparent border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              Return to Home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <Navigate to="/" />;
   }
 
   return <>{children}</>;

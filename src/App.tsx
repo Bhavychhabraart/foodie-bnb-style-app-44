@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,13 +8,8 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import SplashScreen from "./components/SplashScreen";
 import Index from "./pages/Index";
-import Detail from "./pages/Detail";
-import BookingRequest from "./pages/BookingRequest"; 
-import AdminDashboard from "./pages/AdminDashboard";
-import EditPanel from "./pages/EditPanel";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
-import AdminRoute from "./components/AdminRoute";
+import Auth from "./pages/Auth";
 
 // Create QueryClient outside of the component
 const queryClient = new QueryClient();
@@ -42,10 +36,6 @@ const App = () => {
               <TooltipProvider>
                 <Routes>
                   <Route path="/" element={<Index />} />
-                  <Route path="/detail" element={<Detail />} />
-                  <Route path="/booking" element={<BookingRequest />} />
-                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                  <Route path="/edit" element={<AdminRoute><EditPanel /></AdminRoute>} />
                   <Route path="/auth" element={<Auth />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
