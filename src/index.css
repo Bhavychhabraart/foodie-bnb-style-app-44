@@ -19,8 +19,8 @@
     --secondary: 24 7% 83%;
     --secondary-foreground: 27 18% 9%;
 
-    --muted: 24 7% 83%;
-    --muted-foreground: 27 18% 20%;
+    --muted: 240 5% 90%;
+    --muted-foreground: 240 5% 45%;
 
     --accent: 24 7% 83%;
     --accent-foreground: 27 18% 9%;
@@ -28,8 +28,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 24 7% 83%;
-    --input: 24 7% 83%;
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
     --ring: 27 18% 9%;
 
     --radius: 0.5rem;
@@ -215,4 +215,16 @@
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
+}
+
+@layer utilities {
+  .bg-charcoal-light {
+    @apply bg-airbnb-light;
+  }
+  .bg-charcoal-dark {
+    @apply bg-airbnb-darkbrown;
+  }
+  .text-charcoal {
+    @apply text-airbnb-dark;
+  }
 }

@@ -31,8 +31,8 @@ const config = {
 				airbnb: {
 					red: '#FF385C',
 					dark: '#403E43',
-					light: '#717171',
-					gray: '#F7F7F7',
+					light: '#403E43',
+					gray: '#403E43',
 					amber: '#F59E0B',
 					gold: '#B18E72',
 					darkbrown: '#403E43',
