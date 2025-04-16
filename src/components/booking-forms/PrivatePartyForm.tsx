@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -478,37 +477,37 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
           {step === 3 && (
             <>
-              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="bg-[#1E1E1E] border border-airbnb-gold/20 p-4 rounded-lg mb-6 text-white">
                 <h3 className="font-medium text-lg mb-4">Party Details</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Date:</span>
+                    <span className="text-white/70">Date:</span>
                     <span className="font-medium">
                       {form.getValues('eventDate') ? format(form.getValues('eventDate'), 'MMMM dd, yyyy') : ''}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Time:</span>
+                    <span className="text-white/70">Time:</span>
                     <span className="font-medium">
                       {form.getValues('startTime')} - {form.getValues('endTime')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Guests:</span>
+                    <span className="text-white/70">Guests:</span>
                     <span className="font-medium">{form.getValues('guestCount')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Event Type:</span>
+                    <span className="text-white/70">Event Type:</span>
                     <span className="font-medium">
                       {form.getValues('eventType')?.charAt(0).toUpperCase() + form.getValues('eventType')?.slice(1)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Host:</span>
+                    <span className="text-white/70">Host:</span>
                     <span className="font-medium">{form.getValues('hostName')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Budget:</span>
+                    <span className="text-white/70">Budget:</span>
                     <span className="font-medium">{form.getValues('budget')}</span>
                   </div>
                 </div>
