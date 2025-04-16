@@ -9,7 +9,210 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          booking_type: string
+          coupon_code: string | null
+          created_at: string
+          date: string
+          email: string
+          guests: number
+          id: string
+          name: string
+          phone: string | null
+          special_requests: string | null
+          status: string
+          time: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_type?: string
+          coupon_code?: string | null
+          created_at?: string
+          date: string
+          email: string
+          guests: number
+          id?: string
+          name: string
+          phone?: string | null
+          special_requests?: string | null
+          status?: string
+          time: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_type?: string
+          coupon_code?: string | null
+          created_at?: string
+          date?: string
+          email?: string
+          guests?: number
+          id?: string
+          name?: string
+          phone?: string | null
+          special_requests?: string | null
+          status?: string
+          time?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chef_specials: {
+        Row: {
+          chef: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          price: string
+          rating: number | null
+          title: string
+        }
+        Insert: {
+          chef: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          price: string
+          rating?: number | null
+          title: string
+        }
+        Update: {
+          chef?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          price?: string
+          rating?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      experiences: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          price: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          price: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          price?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      gallery: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+        }
+        Relationships: []
+      }
+      instagram_collaborations: {
+        Row: {
+          created_at: string
+          email: string
+          followers_count: number
+          id: string
+          instagram_handle: string
+          message: string | null
+          name: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          followers_count: number
+          id?: string
+          instagram_handle: string
+          message?: string | null
+          name: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          followers_count?: number
+          id?: string
+          instagram_handle?: string
+          message?: string | null
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          is_admin: boolean
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          is_admin?: boolean
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

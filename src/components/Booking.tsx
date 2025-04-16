@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Users, Tag } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from "@/integrations/supabase/client";
 
 const timeSlots = [
   "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", 
@@ -26,6 +27,7 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
   const [phone, setPhone] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleApplyCoupon = () => {
@@ -44,10 +46,10 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!date || !time || !name || !email || !phone) {
+    if (!date || !time || !name || !email) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -56,19 +58,56 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
       return;
     }
 
-    toast({
-      title: "Reservation confirmed!",
-      description: `Your table for ${guests} is reserved for ${format(date, 'MMMM dd, yyyy')} at ${time}.${discountApplied ? ' Discount applied!' : ''}`,
-    });
+    try {
+      setIsSubmitting(true);
 
-    // Reset form
-    setTime(undefined);
-    setGuests("2");
-    setName("");
-    setEmail("");
-    setPhone("");
-    setCouponCode("");
-    setDiscountApplied(false);
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      
+      // Insert booking data into Supabase
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([
+          { 
+            name, 
+            email, 
+            phone: phone || null,
+            date: formattedDate, 
+            time, 
+            guests: parseInt(guests),
+            coupon_code: couponCode || null,
+            booking_type: 'standard'
+          }
+        ])
+        .select();
+      
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Reservation confirmed!",
+        description: `Your table for ${guests} is reserved for ${format(date, 'MMMM dd, yyyy')} at ${time}.${discountApplied ? ' Discount applied!' : ''}`,
+      });
+
+      // Reset form
+      setTime(undefined);
+      setGuests("2");
+      setName("");
+      setEmail("");
+      setPhone("");
+      setCouponCode("");
+      setDiscountApplied(false);
+      
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      toast({
+        title: "Booking failed",
+        description: "There was an error processing your booking. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -197,8 +236,12 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
                   </div>
                 </div>
                 
-                <Button type="submit" className="airbnb-button w-full mt-4">
-                  Reserve now
+                <Button 
+                  type="submit" 
+                  className="airbnb-button w-full mt-4"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : "Reserve now"}
                 </Button>
                 
                 <p className="text-xs text-center text-airbnb-light mt-2">
