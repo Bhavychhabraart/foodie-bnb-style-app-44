@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chefs_specials: {
+        Row: {
+          chef: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_new: boolean
+          is_popular: boolean
+          price: string
+          rating: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chef: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_new?: boolean
+          is_popular?: boolean
+          price: string
+          rating?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chef?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_new?: boolean
+          is_popular?: boolean
+          price?: string
+          rating?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           coupon_code: string

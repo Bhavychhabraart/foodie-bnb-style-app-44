@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { supabase } from '@/integrations/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
 import { 
   ImagePlus,
   Edit, 
@@ -17,19 +19,22 @@ import {
   Trash2, 
   Plus, 
   DollarSign,
-  ChefHat
+  ChefHat,
+  Loader2
 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-// Define interface for Special
-interface Special {
-  id: number;
+// Define interface for Chef's Special
+interface ChefSpecial {
+  id: string;
   title: string;
+  chef: string;
   description: string;
   price: string;
-  imageUrl: string;
-  chef: string;
-  isNew: boolean;
-  isPopular: boolean;
+  image_url: string | null;
+  rating: number;
+  is_new: boolean;
+  is_popular: boolean;
 }
 
 // Create schema for form validation
@@ -37,51 +42,20 @@ const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.string().min(1, "Price is required"),
-  imageUrl: z.string().url("Must be a valid URL"),
   chef: z.string().min(2, "Chef name is required"),
-  isNew: z.boolean().optional(),
-  isPopular: z.boolean().optional()
+  rating: z.number().min(0).max(5).default(4.5),
+  is_new: z.boolean().default(false),
+  is_popular: z.boolean().default(false),
+  image_url: z.string().url("Must be a valid URL").nullable()
 });
 
-// Mock data
-const initialSpecials: Special[] = [
-  {
-    id: 1,
-    title: "Truffle Pasta",
-    description: "Fresh homemade pasta with black truffle, parmesan cream sauce and wild mushrooms",
-    price: "₹1,800",
-    imageUrl: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    chef: "Chef Marcus",
-    isNew: true,
-    isPopular: false
-  },
-  {
-    id: 2,
-    title: "Wagyu Ribeye",
-    description: "Prime A5 Japanese Wagyu ribeye steak with roasted vegetables and red wine reduction",
-    price: "₹3,500",
-    imageUrl: "https://images.unsplash.com/photo-1504973960431-1c467e159aa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    chef: "Chef Alessandro",
-    isNew: false,
-    isPopular: true
-  },
-  {
-    id: 3,
-    title: "Seafood Platter",
-    description: "Selection of fresh lobster, king crab, prawns, and oysters with housemade sauces",
-    price: "₹4,200",
-    imageUrl: "https://images.unsplash.com/photo-1606850246029-dd015c13d94c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    chef: "Chef Maria",
-    isNew: false,
-    isPopular: false
-  }
-];
-
 const EditSpecials: React.FC = () => {
-  const [specials, setSpecials] = useState<Special[]>(initialSpecials);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [specials, setSpecials] = useState<ChefSpecial[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -90,14 +64,46 @@ const EditSpecials: React.FC = () => {
       title: "",
       description: "",
       price: "",
-      imageUrl: "",
       chef: "",
-      isNew: false,
-      isPopular: false
+      rating: 4.5,
+      is_new: false,
+      is_popular: false,
+      image_url: null
     }
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    fetchSpecials();
+  }, []);
+
+  const fetchSpecials = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('chefs_specials')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data) {
+        setSpecials(data);
+      }
+    } catch (error) {
+      console.error('Error fetching chef specials:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load chef's specials",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
@@ -105,24 +111,61 @@ const EditSpecials: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
-        form.setValue('imageUrl', reader.result as string);
       };
       reader.readAsDataURL(file);
+      
+      // Upload file to Supabase Storage
+      setIsUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('chefs_specials')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('chefs_specials')
+          .getPublicUrl(filePath);
+
+        form.setValue('image_url', publicUrlData.publicUrl);
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully",
+        });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+          title: "Error",
+          description: "Failed to upload image",
+          variant: "destructive",
+        });
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
-  const handleEdit = (special: Special) => {
+  const handleEdit = (special: ChefSpecial) => {
     setEditingId(special.id);
+    setIsAdding(true);
     form.reset({
       title: special.title,
       description: special.description,
       price: special.price,
-      imageUrl: special.imageUrl,
       chef: special.chef,
-      isNew: special.isNew,
-      isPopular: special.isPopular
+      rating: special.rating,
+      is_new: special.is_new,
+      is_popular: special.is_popular,
+      image_url: special.image_url
     });
-    setImagePreview(special.imageUrl);
+    setImagePreview(special.image_url);
   };
 
   const startAddNew = () => {
@@ -132,10 +175,11 @@ const EditSpecials: React.FC = () => {
       title: "",
       description: "",
       price: "",
-      imageUrl: "",
       chef: "",
-      isNew: false,
-      isPopular: false
+      rating: 4.5,
+      is_new: false,
+      is_popular: false,
+      image_url: null
     });
     setImagePreview(null);
   };
@@ -147,67 +191,135 @@ const EditSpecials: React.FC = () => {
     setImagePreview(null);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (editingId !== null) {
-      // Update existing
-      setSpecials(specials.map(special => 
-        special.id === editingId ? {
-          ...special,
-          title: values.title,
-          description: values.description,
-          price: values.price,
-          imageUrl: values.imageUrl,
-          chef: values.chef,
-          isNew: values.isNew || false,
-          isPopular: values.isPopular || false
-        } : special
-      ));
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      if (editingId) {
+        // Update existing
+        const { error } = await supabase
+          .from('chefs_specials')
+          .update({
+            title: values.title,
+            description: values.description,
+            price: values.price,
+            chef: values.chef,
+            rating: values.rating,
+            is_new: values.is_new,
+            is_popular: values.is_popular,
+            image_url: values.image_url,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingId);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Chef's special updated successfully",
+        });
+      } else {
+        // Add new
+        const { error } = await supabase
+          .from('chefs_specials')
+          .insert({
+            title: values.title,
+            description: values.description,
+            price: values.price,
+            chef: values.chef,
+            rating: values.rating,
+            is_new: values.is_new,
+            is_popular: values.is_popular,
+            image_url: values.image_url
+          });
+
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "New chef's special added successfully",
+        });
+      }
+      
+      // Refresh the list
+      await fetchSpecials();
+      
+      // Reset form
+      setIsAdding(false);
+      setEditingId(null);
+      form.reset();
+      setImagePreview(null);
+    } catch (error) {
+      console.error('Error saving chef special:', error);
       toast({
-        title: "Success",
-        description: "Chef's special updated successfully",
+        title: "Error",
+        description: "Failed to save chef's special",
+        variant: "destructive",
       });
-    } else {
-      // Add new
-      const newSpecial: Special = {
-        id: Date.now(),
-        title: values.title,
-        description: values.description,
-        price: values.price,
-        imageUrl: values.imageUrl,
-        chef: values.chef,
-        isNew: values.isNew || false,
-        isPopular: values.isPopular || false
-      };
-      setSpecials([...specials, newSpecial]);
-      toast({
-        title: "Success",
-        description: "New chef's special added successfully",
-      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsAdding(false);
-    setEditingId(null);
-    form.reset();
-    setImagePreview(null);
   };
 
-  const handleDelete = (id: number) => {
-    setSpecials(specials.filter(special => special.id !== id));
-    toast({
-      title: "Success",
-      description: "Chef's special deleted successfully",
-    });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this chef's special?")) return;
+    
+    setIsLoading(true);
+    try {
+      // First get the special to check if it has an image
+      const { data: special, error: fetchError } = await supabase
+        .from('chefs_specials')
+        .select('image_url')
+        .eq('id', id)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      // Delete from database
+      const { error: deleteError } = await supabase
+        .from('chefs_specials')
+        .delete()
+        .eq('id', id);
+      
+      if (deleteError) throw deleteError;
+      
+      // Delete image from storage if exists and is from our bucket
+      if (special.image_url && special.image_url.includes('chefs_specials')) {
+        const path = special.image_url.split('/').pop();
+        if (path) {
+          await supabase.storage
+            .from('chefs_specials')
+            .remove([path]);
+        }
+      }
+      
+      // Update local state
+      setSpecials(specials.filter(s => s.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Chef's special deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting chef special:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete chef's special",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
-      {(isAdding || editingId !== null) ? (
+      {isAdding ? (
         <div className="mb-8">
           <div className="flex justify-between mb-4">
             <h2 className="text-2xl font-semibold">
-              {editingId !== null ? "Edit Chef's Special" : "Add New Chef's Special"}
+              {editingId ? "Edit Chef's Special" : "Add New Chef's Special"}
             </h2>
-            <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+            <Button variant="outline" onClick={handleCancel} disabled={isLoading}>Cancel</Button>
           </div>
           
           <Card>
@@ -278,10 +390,31 @@ const EditSpecials: React.FC = () => {
                         />
                       </div>
 
+                      <FormField
+                        control={form.control}
+                        name="rating"
+                        render={({ field }) => (
+                          <FormItem className="mt-4">
+                            <FormLabel>Rating (0-5)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="0.1" 
+                                min="0" 
+                                max="5" 
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value))} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <div className="flex space-x-6 mt-4">
                         <FormField
                           control={form.control}
-                          name="isNew"
+                          name="is_new"
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2">
                               <FormControl>
@@ -299,7 +432,7 @@ const EditSpecials: React.FC = () => {
                         
                         <FormField
                           control={form.control}
-                          name="isPopular"
+                          name="is_popular"
                           render={({ field }) => (
                             <FormItem className="flex items-center space-x-2">
                               <FormControl>
@@ -320,7 +453,7 @@ const EditSpecials: React.FC = () => {
                     <div>
                       <FormField
                         control={form.control}
-                        name="imageUrl"
+                        name="image_url"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Dish Image</FormLabel>
@@ -331,12 +464,18 @@ const EditSpecials: React.FC = () => {
                                 onChange={handleFileChange}
                                 accept="image/*"
                                 className="hidden"
+                                disabled={isUploading}
                               />
                               <Label 
                                 htmlFor="special-image" 
-                                className="cursor-pointer flex h-40 w-full items-center justify-center rounded-md border border-dashed border-gray-300 hover:border-gray-400"
+                                className={`cursor-pointer flex h-40 w-full items-center justify-center rounded-md border border-dashed border-gray-300 hover:border-gray-400 ${isUploading ? 'opacity-50' : ''}`}
                               >
-                                {imagePreview ? (
+                                {isUploading ? (
+                                  <div className="flex flex-col items-center justify-center">
+                                    <Loader2 className="h-10 w-10 text-gray-400 animate-spin" />
+                                    <span className="mt-2 text-sm text-gray-500">Uploading...</span>
+                                  </div>
+                                ) : imagePreview ? (
                                   <img 
                                     src={imagePreview} 
                                     alt="Preview" 
@@ -351,6 +490,7 @@ const EditSpecials: React.FC = () => {
                               </Label>
                               <Input 
                                 {...field} 
+                                value={field.value || ''}
                                 placeholder="Or enter image URL" 
                                 className="mt-2"
                                 onChange={(e) => {
@@ -365,9 +505,22 @@ const EditSpecials: React.FC = () => {
                       />
 
                       <div className="mt-6">
-                        <Button type="submit" className="w-full">
-                          <Save className="h-4 w-4 mr-2" />
-                          {editingId !== null ? "Save Changes" : "Add Chef's Special"}
+                        <Button 
+                          type="submit" 
+                          className="w-full"
+                          disabled={isLoading || isUploading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              {editingId ? "Updating..." : "Adding..."}
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              {editingId ? "Save Changes" : "Add Chef's Special"}
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -378,77 +531,116 @@ const EditSpecials: React.FC = () => {
           </Card>
         </div>
       ) : (
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Chef's Specials</h2>
-          <Button onClick={startAddNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Chef's Special
-          </Button>
-        </div>
-      )}
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Chef's Specials</h2>
+            <Button onClick={startAddNew} disabled={isLoading}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Chef's Special
+            </Button>
+          </div>
 
-      {(!isAdding && editingId === null) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {specials.map((special) => (
-            <Card key={special.id} className="overflow-hidden group">
-              <CardContent className="p-0 relative">
-                <div className="h-40 relative">
-                  <img 
-                    src={special.imageUrl} 
-                    alt={special.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  {special.isNew && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                      New
-                    </div>
-                  )}
-                  {special.isPopular && (
-                    <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
-                      <span className="mr-1">Popular</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-medium text-lg">{special.title}</h3>
-                  <p className="text-gray-500 mt-1 text-sm line-clamp-2">{special.description}</p>
-                  
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex items-center text-gray-700">
-                      <ChefHat className="h-4 w-4 mr-1" />
-                      <span className="text-sm">{special.chef}</span>
-                    </div>
-                    <div className="font-medium text-airbnb-red">
-                      {special.price}
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-2 mt-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleEdit(special)}
-                    >
-                      <Edit className="h-3 w-3 mr-2" />
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDelete(special.id)}
-                    >
-                      <Trash2 className="h-3 w-3 mr-2" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : specials.length === 0 ? (
+            <div className="text-center py-12 border rounded-lg bg-gray-50">
+              <ChefHat className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+              <h3 className="text-lg font-medium text-gray-900">No chef's specials yet</h3>
+              <p className="text-gray-500 mt-1">Get started by adding your first chef's special</p>
+              <Button onClick={startAddNew} className="mt-4">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Chef's Special
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border bg-background shadow">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px]">Image</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Chef</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="text-center">Rating</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {specials.map((special) => (
+                    <TableRow key={special.id}>
+                      <TableCell>
+                        {special.image_url ? (
+                          <img
+                            src={special.image_url}
+                            alt={special.title}
+                            className="h-12 w-12 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded bg-gray-200 flex items-center justify-center">
+                            <ChefHat className="h-6 w-6 text-gray-400" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">{special.title}</TableCell>
+                      <TableCell>{special.chef}</TableCell>
+                      <TableCell>{special.price}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Star className="h-3.5 w-3.5 fill-current text-amber-400" />
+                          <span>{special.rating.toFixed(1)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center gap-1">
+                          {special.is_new && (
+                            <span className="inline-block px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full">
+                              New
+                            </span>
+                          )}
+                          {special.is_popular && (
+                            <span className="inline-block px-2 py-0.5 text-xs bg-orange-100 text-orange-800 rounded-full">
+                              Popular
+                            </span>
+                          )}
+                          {!special.is_new && !special.is_popular && (
+                            <span className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded-full">
+                              Regular
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(special)}
+                            disabled={isLoading}
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDelete(special.id)}
+                            disabled={isLoading}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span className="sr-only">Delete</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
