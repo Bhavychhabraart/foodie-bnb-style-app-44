@@ -48,8 +48,8 @@ const Index = () => {
       
       {activeCategory === 'home' ? (
         <div className="space-y-2 bg-airbnb-dark">
-          <Events category="home" />
           <Spotlight />
+          <Events category="home" />
           <ChefsSpecials />
           <OngoingOffers />
           <PhotoGallery />

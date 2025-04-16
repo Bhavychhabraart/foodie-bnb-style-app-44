@@ -57,7 +57,7 @@ const Spotlight: React.FC = () => {
                 <Card className="border-none rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
                   <CardContent className="p-0">
                     <div className="relative">
-                      <div className="h-64 relative overflow-hidden">
+                      <div className="relative overflow-hidden aspect-[4/6]">
                         <img 
                           src={item.image_url || '/placeholder.svg'} 
                           alt={item.title} 
