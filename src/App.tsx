@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EditPanel from "./pages/EditPanel";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import AdminRoute from "./components/AdminRoute";
 
 // Create QueryClient outside of the component
 const queryClient = new QueryClient();
@@ -43,8 +44,8 @@ const App = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/detail" element={<Detail />} />
                   <Route path="/booking" element={<BookingRequest />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/edit" element={<EditPanel />} />
+                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                  <Route path="/edit" element={<AdminRoute><EditPanel /></AdminRoute>} />
                   <Route path="/auth" element={<Auth />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
