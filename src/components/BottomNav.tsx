@@ -20,6 +20,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'influencer', icon: Instagram },
     { id: 'vip', icon: Award },
+    { id: 'booking', icon: CalendarPlus },
     { id: 'support', icon: LifeBuoy },
     { id: 'profile', icon: User },
   ];
@@ -30,6 +31,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       setIsSupportDrawerOpen(true);
     } else if (tabId === 'influencer') {
       setIsInfluencerDrawerOpen(true);
+    } else if (tabId === 'booking') {
+      setIsBookingDrawerOpen(true);
     }
   };
 
@@ -37,36 +40,24 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
     <>
       <div className="bottom-nav fixed bottom-0 left-0 right-0 bg-[#000000e6] border-t border-airbnb-gold/20 px-4 py-2 z-50">
         <div className="flex justify-between items-center max-w-2xl mx-auto">
-          {/* Left side tabs */}
-          <div className="flex justify-between items-center flex-1 space-x-4">
-            {tabs.slice(0, 2).map((tab) => (
+          <div className="flex justify-between items-center w-full">
+            {tabs.map((tab, index) => (
               <button
                 key={tab.id}
-                className={`flex-1 flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
+                className={`flex-1 flex flex-col items-center justify-center ${
+                  activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'
+                } ${
+                  tab.id === 'booking' ? 'relative -mt-6' : ''
+                }`}
                 onClick={() => handleTabClick(tab.id)}
               >
-                <tab.icon className="w-6 h-6" />
-              </button>
-            ))}
-          </div>
-          
-          {/* Center button */}
-          <button
-            className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-airbnb-gold text-white rounded-full p-4 shadow-lg"
-            onClick={() => setIsBookingDrawerOpen(true)}
-          >
-            <CalendarPlus className="h-7 w-7" />
-          </button>
-          
-          {/* Right side tabs */}
-          <div className="flex justify-between items-center flex-1 space-x-4">
-            {tabs.slice(2).map((tab) => (
-              <button
-                key={tab.id}
-                className={`flex-1 flex flex-col items-center justify-center ${activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'}`}
-                onClick={() => handleTabClick(tab.id)}
-              >
-                <tab.icon className="w-6 h-6" />
+                {tab.id === 'booking' ? (
+                  <div className="bg-airbnb-gold text-white rounded-full p-4 shadow-lg">
+                    <tab.icon className="h-7 w-7" />
+                  </div>
+                ) : (
+                  <tab.icon className="w-6 h-6" />
+                )}
               </button>
             ))}
           </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, Share, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -86,13 +85,6 @@ const Hero: React.FC<{ scrollToBooking: () => void }> = ({ scrollToBooking }) =>
           />
         </div>
       </div>
-
-      <Button 
-        className="md:hidden airbnb-button w-full mt-4"
-        onClick={scrollToBooking}
-      >
-        Reserve a table
-      </Button>
     </div>
   );
 };
