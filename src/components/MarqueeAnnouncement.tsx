@@ -21,7 +21,7 @@ const MarqueeAnnouncement: React.FC<MarqueeProps> = ({ title, items }) => {
       {/* Gradient overlay on right */}
       <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-airbnb-darkbrown to-transparent z-[1]"></div>
       
-      <div className="flex items-center marquee pl-8">
+      <div className="flex items-center marquee pl-8 scrollbar-none">
         <div className="flex shrink-0 items-center space-x-6 py-1 animate-marquee whitespace-nowrap">
           {[...Array(2)].map((_, dupeIndex) => (
             <React.Fragment key={dupeIndex}>
