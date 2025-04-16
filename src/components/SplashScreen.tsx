@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Utensils } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   
   return (
     <motion.div 
-      className="fixed inset-0 z-50 bg-airbnb-red dark:bg-[#1F1F1F] flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 bg-airbnb-gold dark:bg-airbnb-darkbrown flex flex-col items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -25,8 +25,8 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="flex flex-col items-center"
       >
-        <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center mb-4 shadow-lg">
-          <Utensils className="w-12 h-12 text-airbnb-red" />
+        <div className="w-24 h-24 rounded-full bg-white dark:bg-airbnb-darkbrown flex items-center justify-center mb-4 shadow-lg border-2 border-airbnb-beige dark:border-airbnb-gold">
+          <Utensils className="w-12 h-12 text-airbnb-gold dark:text-airbnb-gold" />
         </div>
         <motion.h1 
           className="text-white text-4xl font-bold mb-2"

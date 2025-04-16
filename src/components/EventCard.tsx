@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import ExperienceDetailsDrawer from './ExperienceDetailsDrawer';
 import BookingDrawer from './BookingDrawer';
+
 interface EventCardProps {
   imageUrl: string;
   title: string;
@@ -16,6 +17,7 @@ interface EventCardProps {
   venue?: string;
   time?: string;
 }
+
 const EventCard: React.FC<EventCardProps> = ({
   imageUrl,
   title,
@@ -29,13 +31,16 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  
   const handleBookNow = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsBookingDrawerOpen(true);
   };
-  return <div className="mb-8 bg-zinc-900">
+  
+  return (
+    <div className="mb-8 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
       <div className="relative rounded-xl overflow-hidden mb-2">
-        <AspectRatio ratio={4 / 5} className="bg-zinc-800">
+        <AspectRatio ratio={4 / 5} className="bg-airbnb-beige">
           <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
         </AspectRatio>
         
@@ -44,7 +49,7 @@ const EventCard: React.FC<EventCardProps> = ({
         </button>
         
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-airbnb-purple"></div>
+          <div className="w-2 h-2 rounded-full bg-airbnb-gold"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
@@ -54,53 +59,77 @@ const EventCard: React.FC<EventCardProps> = ({
       
       <div>
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-medium text-purple-100">{title}</h3>
-          {rating > 0 && <div className="flex items-center">
-              <Star className="h-4 w-4 fill-current text-airbnb-purple" />
+          <h3 className="text-lg font-medium text-airbnb-darkbrown dark:text-airbnb-cream">{title}</h3>
+          {rating > 0 && (
+            <div className="flex items-center">
+              <Star className="h-4 w-4 fill-current text-airbnb-gold" />
               <span className="ml-1 text-sm">{rating.toFixed(1)}</span>
-            </div>}
+            </div>
+          )}
         </div>
         
-        <p className="text-gray-300 text-sm">{host}</p>
+        <p className="text-airbnb-darkbrown/80 dark:text-airbnb-beige text-sm">{host}</p>
         
-        {venue && <div className="flex items-center gap-1 mt-1 text-gray-400 text-xs">
+        {venue && (
+          <div className="flex items-center gap-1 mt-1 text-airbnb-darkbrown/70 dark:text-airbnb-beige/70 text-xs">
             <MapPin className="h-3 w-3" />
             <span>{venue}</span>
-          </div>}
+          </div>
+        )}
         
-        {time && <div className="flex items-center gap-1 mt-1 text-gray-400 text-xs">
+        {time && (
+          <div className="flex items-center gap-1 mt-1 text-airbnb-darkbrown/70 dark:text-airbnb-beige/70 text-xs">
             <Clock className="h-3 w-3" />
             <span>{time}</span>
-          </div>}
+          </div>
+        )}
         
-        {isSoldOut ? <p className="font-medium mt-1 text-red-400">Sold out</p> : <p className="mt-1 text-white/80">
+        {isSoldOut ? (
+          <p className="font-medium mt-1 text-red-400">Sold out</p>
+        ) : (
+          <p className="mt-1 text-airbnb-darkbrown dark:text-white/80">
             <span className="font-medium">{price}</span>
-          </p>}
+          </p>
+        )}
 
         <div className="flex gap-2 mt-3">
-          <Button variant="outline" onClick={() => setIsDrawerOpen(true)} className="flex-1 border-purple-700 transition-colors text-purple-50 bg-purple-800 hover:bg-purple-700">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsDrawerOpen(true)} 
+            className="flex-1 border-airbnb-gold/30 transition-colors text-airbnb-darkbrown dark:text-airbnb-cream bg-airbnb-beige/50 hover:bg-airbnb-beige dark:bg-airbnb-darkbrown dark:hover:bg-airbnb-darkbrown/80"
+          >
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Button>
           
-          <Button onClick={handleBookNow} disabled={isSoldOut} className="flex-1 text-white bg-airbnb-purple hover:bg-purple-500">
+          <Button 
+            onClick={handleBookNow} 
+            disabled={isSoldOut} 
+            className="flex-1 text-white bg-airbnb-gold hover:bg-airbnb-gold/90"
+          >
             <CalendarCheck className="mr-2 h-4 w-4" />
             Book Now
           </Button>
         </div>
       </div>
 
-      <ExperienceDetailsDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} experience={{
-      imageUrl,
-      title,
-      host,
-      price,
-      rating,
-      reviews,
-      isSoldOut
-    }} />
+      <ExperienceDetailsDrawer 
+        isOpen={isDrawerOpen} 
+        onClose={() => setIsDrawerOpen(false)} 
+        experience={{
+          imageUrl,
+          title,
+          host,
+          price,
+          rating,
+          reviews,
+          isSoldOut
+        }} 
+      />
 
       <BookingDrawer open={isBookingDrawerOpen} onOpenChange={setIsBookingDrawerOpen} />
-    </div>;
+    </div>
+  );
 };
+
 export default EventCard;

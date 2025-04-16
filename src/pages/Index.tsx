@@ -20,19 +20,19 @@ const Index = () => {
   const upcomingEvents = ["Soulful Sufi Night - 16th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
   
   return (
-    <div className="pb-16 bg-zinc-900">
+    <div className="pb-16 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
       </div>
       
       <MarqueeAnnouncement title="Upcoming Events!" items={upcomingEvents} />
       
-      <div className="sticky top-0 z-10 bg-zinc-900 shadow-md shadow-black/30">
+      <div className="sticky top-0 z-10 bg-airbnb-cream dark:bg-airbnb-darkbrown shadow-md shadow-black/30">
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
       {activeCategory === 'home' ? (
-        <div className="space-y-2 bg-zinc-900">
+        <div className="space-y-2 bg-airbnb-cream/20 dark:bg-airbnb-darkbrown">
           <Events category="home" />
           <Spotlight />
           <ChefsSpecials />

@@ -1,28 +1,35 @@
+
 import React from 'react';
 import { ChevronRight, ChefHat, Star } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
-const chefsSpecials = [{
-  id: 2,
-  title: "Beef Wellington",
-  chef: "Chef Alessandro",
-  imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
-  price: "₹2,400",
-  rating: 4.8
-}, {
-  id: 3,
-  title: "Seafood Paella",
-  chef: "Chef Maria",
-  imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1172&q=80",
-  price: "₹1,800",
-  rating: 4.7
-}];
+
+const chefsSpecials = [
+  {
+    id: 2,
+    title: "Beef Wellington",
+    chef: "Chef Alessandro",
+    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
+    price: "₹2,400",
+    rating: 4.8
+  }, 
+  {
+    id: 3,
+    title: "Seafood Paella",
+    chef: "Chef Maria",
+    imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1172&q=80",
+    price: "₹1,800",
+    rating: 4.7
+  }
+];
+
 const ChefsSpecials: React.FC = () => {
-  return <div className="section-padding bg-zinc-900">
+  return (
+    <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Chef's Specials</h2>
-          <button className="flex items-center text-airbnb-red hover:underline">
+          <h2 className="text-2xl font-semibold text-airbnb-darkbrown dark:text-airbnb-cream">Chef's Specials</h2>
+          <button className="flex items-center text-airbnb-gold hover:underline">
             <span className="mr-1">View menu</span>
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -30,33 +37,41 @@ const ChefsSpecials: React.FC = () => {
         
         <Carousel className="w-full">
           <CarouselContent className="-ml-2 md:-ml-4">
-            {chefsSpecials.map(special => <CarouselItem key={special.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+            {chefsSpecials.map(special => (
+              <CarouselItem key={special.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <Card className="airbnb-card border-none">
                   <CardContent className="p-0">
                     <div className="relative">
-                      <img src={special.imageUrl} alt={special.title} className="w-full h-[200px] object-cover rounded-t-xl" />
-                      <div className="absolute top-3 left-3 backdrop-blur-sm rounded-full px-3 py-1 flex items-center bg-zinc-900">
-                        <ChefHat className="w-4 h-4 mr-1" />
-                        <span className="text-sm font-medium">{special.chef}</span>
+                      <img 
+                        src={special.imageUrl} 
+                        alt={special.title} 
+                        className="w-full h-[200px] object-cover rounded-t-xl" 
+                      />
+                      <div className="absolute top-3 left-3 backdrop-blur-sm rounded-full px-3 py-1 flex items-center bg-airbnb-darkbrown/70">
+                        <ChefHat className="w-4 h-4 mr-1 text-airbnb-cream" />
+                        <span className="text-sm font-medium text-airbnb-cream">{special.chef}</span>
                       </div>
                     </div>
-                    <div className="p-4 bg-zinc-900">
+                    <div className="p-4 bg-airbnb-cream dark:bg-airbnb-darkbrown">
                       <div className="flex justify-between items-start">
-                        <h3 className="font-medium text-lg">{special.title}</h3>
+                        <h3 className="font-medium text-lg text-airbnb-darkbrown dark:text-airbnb-cream">{special.title}</h3>
                         <div className="flex items-center">
-                          <Star className="w-4 h-4 fill-current text-airbnb-red" />
+                          <Star className="w-4 h-4 fill-current text-airbnb-gold" />
                           <span className="ml-1 text-sm">{special.rating}</span>
                         </div>
                       </div>
-                      <p className="text-airbnb-light mt-1">{special.price}</p>
+                      <p className="text-airbnb-darkbrown/70 dark:text-airbnb-beige mt-1">{special.price}</p>
                     </div>
                   </CardContent>
                 </Card>
-              </CarouselItem>)}
+              </CarouselItem>
+            ))}
           </CarouselContent>
           <CarouselDots className="mt-4" />
         </Carousel>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default ChefsSpecials;

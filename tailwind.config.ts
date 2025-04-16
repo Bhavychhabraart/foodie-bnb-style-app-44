@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -35,8 +34,12 @@ const config = {
 					light: '#717171',
 					gray: '#F7F7F7',
 					amber: '#F59E0B',
-					purple: '#8B5CF6',
-					darkpurple: '#6E59A5'
+					gold: '#B18E72',
+					darkbrown: '#1A1713',
+					beige: '#C8C2B9',
+					cream: '#E0DDD7',
+					purple: '#B18E72',
+					darkpurple: '#7A5E49'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
