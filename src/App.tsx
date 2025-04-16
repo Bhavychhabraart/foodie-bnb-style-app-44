@@ -11,6 +11,8 @@ import SplashScreen from "./components/SplashScreen";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminRoute from "./components/AdminRoute";
 
 // Create QueryClient outside of the component
 const queryClient = new QueryClient();
@@ -38,6 +40,7 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </TooltipProvider>
