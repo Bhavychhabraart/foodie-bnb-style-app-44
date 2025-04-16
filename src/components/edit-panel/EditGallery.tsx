@@ -4,44 +4,116 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Image, 
   Upload, 
   Trash2, 
   Plus, 
-  ImagePlus
+  ImagePlus,
+  Loader2
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock data for the gallery - in a real app, this would come from a database
-const initialPhotos = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Main dining area with elegant table settings"
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Gourmet dish presentation"
-  },
-  {
-    id: 3,
-    url: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    alt: "Bar area with premium spirits"
-  }
-];
+// Types for gallery items
+type GalleryItem = {
+  id: string;
+  image_url: string;
+  alt_text?: string;
+  caption?: string;
+  created_at: string;
+};
 
 const EditGallery: React.FC = () => {
-  const [photos, setPhotos] = useState(initialPhotos);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [altText, setAltText] = useState("");
+  const [caption, setCaption] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch gallery images
+  const { data: photos = [], isLoading } = useQuery({
+    queryKey: ['galleryImages'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      return data as GalleryItem[];
+    }
+  });
+
+  // Delete image mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // Get the image URL first to extract the path
+      const { data: imageData } = await supabase
+        .from('gallery')
+        .select('image_url')
+        .eq('id', id)
+        .single();
+      
+      if (imageData?.image_url) {
+        // Extract file path from the URL
+        const path = imageData.image_url.split('/').pop();
+        if (path) {
+          // Delete from storage
+          const { error: storageError } = await supabase.storage
+            .from('gallery')
+            .remove([path]);
+            
+          if (storageError) throw storageError;
+        }
+      }
+
+      // Delete from gallery table
+      const { error } = await supabase
+        .from('gallery')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryPhotos'] });
+      toast({
+        title: "Success",
+        description: "Image deleted successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete image",
+        variant: "destructive"
+      });
+    }
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "Image is too large. Maximum size is 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       setSelectedFile(file);
       
       // Create a preview
@@ -53,7 +125,7 @@ const EditGallery: React.FC = () => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
       toast({
         title: "Error",
@@ -72,31 +144,65 @@ const EditGallery: React.FC = () => {
       return;
     }
 
-    // In a real application, this is where you'd upload to a server
-    // For this demo, we'll just add it to our local state
-    const newPhoto = {
-      id: Date.now(),
-      url: imagePreview as string,
-      alt: altText
-    };
-
-    setPhotos([...photos, newPhoto]);
-    setSelectedFile(null);
-    setImagePreview(null);
-    setAltText("");
-
-    toast({
-      title: "Success",
-      description: "Image uploaded successfully",
-    });
+    try {
+      setIsUploading(true);
+      
+      // Create a unique filename
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = fileName;
+      
+      // Upload to Supabase storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, selectedFile);
+        
+      if (uploadError) throw uploadError;
+      
+      // Get the public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+        
+      // Insert into gallery table
+      const { error: insertError } = await supabase
+        .from('gallery')
+        .insert([
+          {
+            image_url: publicUrlData.publicUrl,
+            alt_text: altText,
+            caption: caption || null
+          }
+        ]);
+        
+      if (insertError) throw insertError;
+      
+      // Reset form and refresh data
+      setSelectedFile(null);
+      setImagePreview(null);
+      setAltText("");
+      setCaption("");
+      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryPhotos'] });
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setPhotos(photos.filter(photo => photo.id !== id));
-    toast({
-      title: "Success",
-      description: "Image deleted successfully",
-    });
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
   };
 
   return (
@@ -147,14 +253,34 @@ const EditGallery: React.FC = () => {
                     className="mt-1"
                   />
                 </div>
+                
+                <div className="mb-4">
+                  <Label htmlFor="caption">Caption (optional)</Label>
+                  <Textarea
+                    id="caption"
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    placeholder="Add a caption for the image"
+                    className="mt-1"
+                  />
+                </div>
 
                 <Button 
                   onClick={handleUpload} 
                   className="w-full"
-                  disabled={!selectedFile || !altText}
+                  disabled={!selectedFile || !altText || isUploading}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Photo
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Photo
+                    </>
+                  )}
                 </Button>
               </div>
 
@@ -166,6 +292,7 @@ const EditGallery: React.FC = () => {
                   <li>Supported formats: JPG, PNG, WebP</li>
                   <li>Always include descriptive alt text for accessibility</li>
                   <li>Optimal aspect ratio is 16:9 for consistency</li>
+                  <li>Adding captions is optional but recommended</li>
                 </ul>
               </div>
             </div>
@@ -179,32 +306,53 @@ const EditGallery: React.FC = () => {
           <span className="text-sm text-gray-500">{photos.length} photos</span>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {photos.map((photo) => (
-            <Card key={photo.id} className="overflow-hidden group">
-              <CardContent className="p-0 relative">
-                <img 
-                  src={photo.url} 
-                  alt={photo.alt} 
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleDelete(photo.id)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm text-gray-500 truncate">{photo.alt}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-40">
+            <Loader2 className="h-6 w-6 animate-spin text-airbnb-gold" />
+            <span className="ml-2">Loading gallery...</span>
+          </div>
+        ) : photos.length === 0 ? (
+          <div className="text-center py-10 border border-dashed rounded-md">
+            <ImagePlus className="h-10 w-10 mx-auto text-gray-400" />
+            <p className="mt-2 text-gray-500">No images in the gallery yet</p>
+            <p className="text-sm text-gray-400">Upload your first image above</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {photos.map((photo) => (
+              <Card key={photo.id} className="overflow-hidden group">
+                <CardContent className="p-0 relative">
+                  <img 
+                    src={photo.image_url} 
+                    alt={photo.alt_text || 'Gallery image'} 
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => handleDelete(photo.id)}
+                      disabled={deleteMutation.isPending}
+                    >
+                      {deleteMutation.isPending && deleteMutation.variables === photo.id ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 mr-2" />
+                      )}
+                      Delete
+                    </Button>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm text-gray-500 truncate">{photo.alt_text}</p>
+                    {photo.caption && (
+                      <p className="text-xs text-gray-400 mt-1 truncate">{photo.caption}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
