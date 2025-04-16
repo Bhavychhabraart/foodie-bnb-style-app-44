@@ -28,7 +28,7 @@ const About: React.FC = () => {
               elegant ambiance to create an unforgettable dining experience.
             </p>
             
-            <div className="grid grid-cols-2 gap-6 mt-8 bg-zinc-950">
+            <div className="grid grid-cols-2 gap-6 mt-8 bg-zinc-900">
               <motion.div whileHover={{
               y: -5
             }} transition={{
