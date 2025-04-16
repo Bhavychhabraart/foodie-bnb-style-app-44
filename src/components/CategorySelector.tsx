@@ -42,13 +42,13 @@ const CategorySelector: React.FC<CategoryProps> = ({
             key={category.id} 
             className={`flex flex-col items-center px-6 py-2 transition-all duration-300 ${
               activeCategory === category.id 
-                ? 'text-amber-500 border-b-2 border-amber-500 -mb-[13px]' 
+                ? 'text-airbnb-purple border-b-2 border-airbnb-purple -mb-[13px]' 
                 : 'text-gray-400 hover:text-gray-300'
             }`} 
             onClick={() => setActiveCategory(category.id)}
           >
             <category.icon className={`h-5 w-5 mb-1 ${
-              activeCategory === category.id ? 'text-amber-500' : 'text-gray-500'
+              activeCategory === category.id ? 'text-airbnb-purple' : 'text-gray-500'
             }`} />
             <span className="text-xs font-medium">{category.label}</span>
           </button>

@@ -34,7 +34,9 @@ const config = {
 					dark: '#222222',
 					light: '#717171',
 					gray: '#F7F7F7',
-					amber: '#F59E0B' // Adding amber as a primary theme color
+					amber: '#F59E0B',
+					purple: '#8B5CF6',
+					darkpurple: '#6E59A5'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

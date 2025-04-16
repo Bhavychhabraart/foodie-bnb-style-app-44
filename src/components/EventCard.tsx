@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Star, Share, Eye, CalendarCheck, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,7 @@ const EventCard: React.FC<EventCardProps> = ({
         </button>
         
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+          <div className="w-2 h-2 rounded-full bg-airbnb-purple"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
           <div className="w-2 h-2 rounded-full bg-white/50"></div>
@@ -53,9 +54,9 @@ const EventCard: React.FC<EventCardProps> = ({
       
       <div>
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-medium text-amber-100">{title}</h3>
+          <h3 className="text-lg font-medium text-purple-100">{title}</h3>
           {rating > 0 && <div className="flex items-center">
-              <Star className="h-4 w-4 fill-current text-amber-500" />
+              <Star className="h-4 w-4 fill-current text-airbnb-purple" />
               <span className="ml-1 text-sm">{rating.toFixed(1)}</span>
             </div>}
         </div>
@@ -77,12 +78,12 @@ const EventCard: React.FC<EventCardProps> = ({
           </p>}
 
         <div className="flex gap-2 mt-3">
-          <Button variant="outline" onClick={() => setIsDrawerOpen(true)} className="flex-1 border-orange-700 transition-colors text-orange-50 bg-amber-600 hover:bg-amber-500">
+          <Button variant="outline" onClick={() => setIsDrawerOpen(true)} className="flex-1 border-purple-700 transition-colors text-purple-50 bg-purple-800 hover:bg-purple-700">
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Button>
           
-          <Button onClick={handleBookNow} disabled={isSoldOut} className="flex-1 text-white bg-amber-500 hover:bg-amber-400">
+          <Button onClick={handleBookNow} disabled={isSoldOut} className="flex-1 text-white bg-airbnb-purple hover:bg-purple-500">
             <CalendarCheck className="mr-2 h-4 w-4" />
             Book Now
           </Button>
