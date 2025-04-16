@@ -68,7 +68,12 @@ export const getCurrentUserProfile = async () => {
  * @param profileData The profile data to update
  * @returns boolean indicating if update was successful
  */
-export const updateUserProfile = async (profileData: any): Promise<boolean> => {
+export const updateUserProfile = async (profileData: {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+}): Promise<boolean> => {
   try {
     // Get the current user session
     const { data: { session } } = await supabase.auth.getSession();
