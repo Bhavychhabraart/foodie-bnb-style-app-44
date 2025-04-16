@@ -314,51 +314,53 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh] overflow-y-auto">
-        <div className="mx-auto w-full max-w-md">
-          <DrawerHeader>
-            <DrawerTitle className="text-xl flex items-center gap-2">
-              <Instagram className="h-5 w-5 text-airbnb-red" />
-              Instagram Collaboration
-            </DrawerTitle>
-            <DrawerDescription>
-              Join our exclusive network of food influencers and create amazing content with us
-            </DrawerDescription>
-          </DrawerHeader>
+      <DrawerContent className="max-h-[90vh]">
+        <div className="max-h-[90vh] overflow-y-auto scrollbar-hide">
+          <div className="mx-auto w-full max-w-md">
+            <DrawerHeader>
+              <DrawerTitle className="text-xl flex items-center gap-2">
+                <Instagram className="h-5 w-5 text-airbnb-red" />
+                Instagram Collaboration
+              </DrawerTitle>
+              <DrawerDescription>
+                Join our exclusive network of food influencers and create amazing content with us
+              </DrawerDescription>
+            </DrawerHeader>
 
-          <div className="p-4">
-            {!submitted && renderStepIndicator()}
-            
-            {step === 1 && !submitted && (
-              <div className="mb-6">
-                <Card className="bg-soft-purple p-4 border-none">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Instagram className="h-6 w-6 text-purple-500" />
-                    <h3 className="font-medium">Why collaborate with us?</h3>
-                  </div>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Exclusive food tasting events</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Complimentary dishes for content creation</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Featured stories on our social media</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Collaborate with our chefs for unique content</span>
-                    </li>
-                  </ul>
-                </Card>
-              </div>
-            )}
+            <div className="p-4">
+              {!submitted && renderStepIndicator()}
+              
+              {step === 1 && !submitted && (
+                <div className="mb-6">
+                  <Card className="bg-soft-purple p-4 border-none">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Instagram className="h-6 w-6 text-purple-500" />
+                      <h3 className="font-medium">Why collaborate with us?</h3>
+                    </div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span>Exclusive food tasting events</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span>Complimentary dishes for content creation</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span>Featured stories on our social media</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span>Collaborate with our chefs for unique content</span>
+                      </li>
+                    </ul>
+                  </Card>
+                </div>
+              )}
 
-            {renderStepContent()}
+              {renderStepContent()}
+            </div>
           </div>
         </div>
       </DrawerContent>

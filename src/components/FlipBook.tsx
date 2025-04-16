@@ -46,16 +46,14 @@ const FlipBook: React.FC = () => {
                       </Button>
                     </DrawerClose>
                   </div>
-                  <ScrollArea className="h-[calc(90vh-70px)] w-full px-4">
-                    <div className="pb-4 h-full w-full">
-                      <iframe 
-                        src="https://heyzine.com/flip-book/44253fcd19.html" 
-                        title="Restaurant Digital Menu"
-                        className="w-full h-[75vh] border-0 rounded-lg shadow-sm"
-                        allow="fullscreen"
-                      />
-                    </div>
-                  </ScrollArea>
+                  <div className="h-[calc(90vh-70px)] w-full px-4 overflow-y-auto">
+                    <iframe 
+                      src="https://heyzine.com/flip-book/44253fcd19.html" 
+                      title="Restaurant Digital Menu"
+                      className="w-full h-[75vh] border-0 rounded-lg shadow-sm"
+                      allow="fullscreen"
+                    />
+                  </div>
                   <div className="flex justify-center pb-6">
                     <Button 
                       variant="ghost" 

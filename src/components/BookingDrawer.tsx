@@ -99,7 +99,7 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh] bg-[#121212] border-airbnb-gold/20">
-        <div className="h-full overflow-y-auto scrollbar-hide">
+        <div className="max-h-[90vh] overflow-y-auto pb-safe scrollbar-hide">
           {renderSelectedForm()}
         </div>
       </DrawerContent>
