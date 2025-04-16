@@ -14,8 +14,6 @@ import {
   Loader2
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 // Types for gallery items
@@ -27,6 +25,24 @@ type GalleryItem = {
   created_at: string;
 };
 
+// Sample data as placeholders
+const samplePhotos: GalleryItem[] = [
+  {
+    id: '1',
+    image_url: '/lovable-uploads/1b747850-74bd-4752-93b7-eeeab113b43a.png',
+    alt_text: 'Restaurant interior',
+    caption: 'Our elegant dining area',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    image_url: '/lovable-uploads/1f8b3900-b741-4507-9b2f-47953f00f3bd.png',
+    alt_text: 'Special dish',
+    caption: 'Chef\'s special creation',
+    created_at: new Date().toISOString()
+  }
+];
+
 const EditGallery: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -34,71 +50,10 @@ const EditGallery: React.FC = () => {
   const [caption, setCaption] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Fetch gallery images
-  const { data: photos = [], isLoading } = useQuery({
-    queryKey: ['galleryImages'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('gallery')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
-      return data as GalleryItem[];
-    }
-  });
-
-  // Delete image mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      // Get the image URL first to extract the path
-      const { data: imageData } = await supabase
-        .from('gallery')
-        .select('image_url')
-        .eq('id', id)
-        .single();
-      
-      if (imageData?.image_url) {
-        // Extract file path from the URL
-        const path = imageData.image_url.split('/').pop();
-        if (path) {
-          // Delete from storage
-          const { error: storageError } = await supabase.storage
-            .from('gallery')
-            .remove([path]);
-            
-          if (storageError) throw storageError;
-        }
-      }
-
-      // Delete from gallery table
-      const { error } = await supabase
-        .from('gallery')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      return id;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-      queryClient.invalidateQueries({ queryKey: ['galleryPhotos'] });
-      toast({
-        title: "Success",
-        description: "Image deleted successfully",
-      });
-    },
-    onError: (error) => {
-      console.error("Error deleting image:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete image",
-        variant: "destructive"
-      });
-    }
-  });
+  
+  // Use local state instead of querying Supabase
+  const [photos, setPhotos] = useState<GalleryItem[]>(samplePhotos);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -147,47 +102,30 @@ const EditGallery: React.FC = () => {
     try {
       setIsUploading(true);
       
-      // Create a unique filename
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = fileName;
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Upload to Supabase storage
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('gallery')
-        .upload(filePath, selectedFile);
-        
-      if (uploadError) throw uploadError;
+      // Create a new photo entry with mock data
+      const newPhoto: GalleryItem = {
+        id: uuidv4(),
+        image_url: imagePreview || '',
+        alt_text: altText,
+        caption: caption || undefined,
+        created_at: new Date().toISOString()
+      };
       
-      // Get the public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(filePath);
-        
-      // Insert into gallery table
-      const { error: insertError } = await supabase
-        .from('gallery')
-        .insert([
-          {
-            image_url: publicUrlData.publicUrl,
-            alt_text: altText,
-            caption: caption || null
-          }
-        ]);
-        
-      if (insertError) throw insertError;
+      // Add to local state
+      setPhotos(prev => [newPhoto, ...prev]);
       
-      // Reset form and refresh data
+      // Reset form
       setSelectedFile(null);
       setImagePreview(null);
       setAltText("");
       setCaption("");
-      queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-      queryClient.invalidateQueries({ queryKey: ['galleryPhotos'] });
       
       toast({
         title: "Success",
-        description: "Image uploaded successfully",
+        description: "Image uploaded successfully (simulated)",
       });
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -202,7 +140,13 @@ const EditGallery: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
+    // Remove from local state
+    setPhotos(prev => prev.filter(photo => photo.id !== id));
+    
+    toast({
+      title: "Success",
+      description: "Image deleted successfully (simulated)",
+    });
   };
 
   return (
@@ -306,7 +250,7 @@ const EditGallery: React.FC = () => {
           <span className="text-sm text-gray-500">{photos.length} photos</span>
         </div>
         
-        {isLoading ? (
+        {loading ? (
           <div className="flex justify-center items-center h-40">
             <Loader2 className="h-6 w-6 animate-spin text-airbnb-gold" />
             <span className="ml-2">Loading gallery...</span>
@@ -332,13 +276,8 @@ const EditGallery: React.FC = () => {
                       variant="destructive" 
                       size="sm"
                       onClick={() => handleDelete(photo.id)}
-                      disabled={deleteMutation.isPending}
                     >
-                      {deleteMutation.isPending && deleteMutation.variables === photo.id ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4 mr-2" />
-                      )}
+                      <Trash2 className="h-4 w-4 mr-2" />
                       Delete
                     </Button>
                   </div>
