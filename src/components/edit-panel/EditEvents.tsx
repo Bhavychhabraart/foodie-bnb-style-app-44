@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,6 +37,16 @@ type Event = {
   capacity: string | null;
 };
 
+type RequiredEventFields = {
+  title: string;
+  host: string;
+  date: string;
+  time: string;
+  venue: string;
+  price: string;
+  category: string;
+};
+
 const EditEvents = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -47,23 +56,22 @@ const EditEvents = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [formData, setFormData] = useState<Partial<Event>>({
+  const [formData, setFormData] = useState<RequiredEventFields & Partial<Event>>({
     title: '',
     host: '',
-    description: '',
     date: '',
     time: '',
     venue: '',
     price: '',
-    capacity: '',
     category: 'home',
+    description: '',
+    capacity: null,
     featured: false,
     is_sold_out: false,
     rating: 4.8,
     reviews: 0,
   });
   
-  // Fetch events
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['admin-events'],
     queryFn: async () => {
@@ -77,12 +85,11 @@ const EditEvents = () => {
     }
   });
   
-  // Create event mutation
   const createEventMutation = useMutation({
-    mutationFn: async (data: Partial<Event>) => {
+    mutationFn: async (data: RequiredEventFields & Partial<Event>) => {
       const { data: eventData, error } = await supabase
         .from('events')
-        .insert([data])
+        .insert(data)
         .select()
         .single();
       
@@ -108,9 +115,8 @@ const EditEvents = () => {
     }
   });
   
-  // Update event mutation
   const updateEventMutation = useMutation({
-    mutationFn: async (data: Partial<Event>) => {
+    mutationFn: async (data: RequiredEventFields & Partial<Event> & { id: string }) => {
       const { id, ...updateData } = data;
       const { data: eventData, error } = await supabase
         .from('events')
@@ -141,7 +147,6 @@ const EditEvents = () => {
     }
   });
   
-  // Delete event mutation
   const deleteEventMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -171,10 +176,8 @@ const EditEvents = () => {
     }
   });
   
-  // Upload image mutation
   const uploadImageMutation = useMutation({
     mutationFn: async ({ file, eventId }: { file: File, eventId: string }) => {
-      // Upload file to storage
       const fileExt = file.name.split('.').pop();
       const filePath = `${eventId}-${Date.now()}.${fileExt}`;
       
@@ -185,13 +188,11 @@ const EditEvents = () => {
         
       if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: publicUrlData } = supabase
         .storage
         .from('event_images')
         .getPublicUrl(filePath);
         
-      // Update event with image URL
       const { error: updateError } = await supabase
         .from('events')
         .update({ image_url: publicUrlData.publicUrl })
@@ -242,13 +243,13 @@ const EditEvents = () => {
     setFormData({
       title: '',
       host: '',
-      description: '',
       date: '',
       time: '',
       venue: '',
       price: '',
-      capacity: '',
       category: 'home',
+      description: '',
+      capacity: null,
       featured: false,
       is_sold_out: false,
       rating: 4.8,
@@ -382,7 +383,6 @@ const EditEvents = () => {
         </div>
       )}
       
-      {/* Add/Edit Event Dialog */}
       <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
         if (!open) {
           setIsAddDialogOpen(false);
