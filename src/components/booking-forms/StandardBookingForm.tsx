@@ -16,7 +16,7 @@ import {
   Check, 
   ChevronRight, 
   User as MaleIcon, 
-  UserFemale as FemaleIcon 
+  UserCircle2 as FemaleIcon 
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
