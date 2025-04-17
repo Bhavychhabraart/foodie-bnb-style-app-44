@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { 
   DrawerHeader, 
   DrawerTitle, 
@@ -33,6 +34,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface StandardBookingFormProps {
   onBack: () => void;
@@ -49,6 +52,7 @@ const formSchema = z.object({
   time: z.string().min(1, "Please select a time"),
   maleCount: z.number().min(0, "Cannot be negative").default(0),
   femaleCount: z.number().min(0, "Cannot be negative").default(0),
+  tableId: z.string().optional(),
   specialRequests: z.string().optional(),
   couponCode: z.string().optional(),
   skipQueue: z.boolean().default(false),
@@ -71,6 +75,9 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
   const [discountApplied, setDiscountApplied] = useState(false);
+  const [availableTables, setAvailableTables] = useState<any[]>([]);
+  const [isLoadingTables, setIsLoadingTables] = useState(false);
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -83,6 +90,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       time: "",
       maleCount: 0,
       femaleCount: 0,
+      tableId: undefined,
       specialRequests: "",
       couponCode: "",
       addOns: {
@@ -96,6 +104,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
 
   const maleCount = form.watch('maleCount');
   const femaleCount = form.watch('femaleCount');
+  const selectedDate = form.watch('date');
+  const selectedTime = form.watch('time');
   const addOns = form.watch('addOns');
   
   const totalGuests = maleCount + femaleCount;
@@ -105,6 +115,81 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const queueSkipPrice = addOns.skipQueue ? 100 : 0;
   
   const totalAmount = basePrice + queueSkipPrice;
+
+  useEffect(() => {
+    // When date and time are selected, fetch available tables
+    if (selectedDate && selectedTime && totalGuests > 0) {
+      fetchAvailableTables();
+    }
+  }, [selectedDate, selectedTime, totalGuests]);
+
+  const fetchAvailableTables = async () => {
+    if (!selectedDate || !selectedTime) return;
+    
+    setIsLoadingTables(true);
+    try {
+      // Convert date to ISO string for the query
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      
+      // Get all tables that can fit our party size
+      const { data: tables, error: tablesError } = await supabase
+        .from('restaurant_tables')
+        .select('*')
+        .gte('capacity', totalGuests)
+        .eq('is_available', true)
+        .order('capacity', { ascending: true });
+      
+      if (tablesError) throw tablesError;
+      
+      if (!tables || tables.length === 0) {
+        setAvailableTables([]);
+        setIsLoadingTables(false);
+        return;
+      }
+      
+      // Now check which tables are already reserved for this time slot
+      const { data: reservations, error: reservationsError } = await supabase
+        .from('reservations')
+        .select('id')
+        .eq('date', dateStr)
+        .eq('time', selectedTime)
+        .eq('status', 'confirmed');
+      
+      if (reservationsError) throw reservationsError;
+      
+      let unavailableTableIds: string[] = [];
+      
+      if (reservations && reservations.length > 0) {
+        // Get all reservation_tables entries for these reservations
+        const reservationIds = reservations.map(res => res.id);
+        
+        const { data: reservedTables, error: reservedTablesError } = await supabase
+          .from('reservation_tables')
+          .select('table_id')
+          .in('reservation_id', reservationIds);
+        
+        if (reservedTablesError) throw reservedTablesError;
+        
+        if (reservedTables && reservedTables.length > 0) {
+          unavailableTableIds = reservedTables.map(rt => rt.table_id);
+        }
+      }
+      
+      // Filter out unavailable tables
+      const filteredTables = tables.filter(table => !unavailableTableIds.includes(table.id));
+      
+      setAvailableTables(filteredTables);
+    } catch (error) {
+      console.error('Error fetching available tables:', error);
+      toast({
+        title: "Error fetching available tables",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingTables(false);
+    }
+  };
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -121,15 +206,9 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to make a reservation.",
-          variant: "destructive"
-        });
-        return;
-      }
-
+      // Convert date to ISO format for storage
+      const dateFormatted = format(values.date, 'yyyy-MM-dd');
+      
       const { data: reservationData, error: reservationError } = await supabase
         .from('reservations')
         .insert({
@@ -138,7 +217,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
           name: values.name,
           email: values.email,
           phone: values.phone,
-          date: values.date.toISOString(),
+          date: dateFormatted,
           time: values.time,
           total_amount: totalAmount,
           special_requests: values.specialRequests || null,
@@ -148,6 +227,18 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         .single();
 
       if (reservationError) throw reservationError;
+
+      // If a table was selected, link it to the reservation
+      if (selectedTableId) {
+        const { error: tableError } = await supabase
+          .from('reservation_tables')
+          .insert({
+            reservation_id: reservationData.id,
+            table_id: selectedTableId
+          });
+          
+        if (tableError) throw tableError;
+      }
 
       const maleGuests = Array(values.maleCount).fill({
         reservation_id: reservationData.id,
@@ -303,6 +394,74 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
     });
   };
 
+  const handleSelectTable = (tableId: string) => {
+    setSelectedTableId(tableId);
+    form.setValue('tableId', tableId);
+  };
+  
+  const renderTableSelection = () => {
+    if (!selectedDate || !selectedTime || totalGuests === 0) {
+      return (
+        <div className="text-center py-4 text-sm text-muted-foreground">
+          Please select date, time and guest count to see available tables
+        </div>
+      );
+    }
+    
+    if (isLoadingTables) {
+      return (
+        <div className="text-center py-4">
+          <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+          <p className="mt-2 text-sm text-muted-foreground">Loading available tables...</p>
+        </div>
+      );
+    }
+    
+    if (availableTables.length === 0) {
+      return (
+        <div className="text-center py-4 text-sm text-destructive">
+          No tables available for {totalGuests} guests at this time. Please select a different date or time.
+        </div>
+      );
+    }
+    
+    return (
+      <div className="max-h-48 overflow-y-auto rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Table #</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Capacity</TableHead>
+              <TableHead className="w-[100px]">Select</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {availableTables.map((table) => (
+              <TableRow 
+                key={table.id}
+                className={selectedTableId === table.id ? "bg-accent/50" : ""}
+              >
+                <TableCell className="font-medium">{table.table_number}</TableCell>
+                <TableCell>{table.location}</TableCell>
+                <TableCell>{table.capacity} guests</TableCell>
+                <TableCell>
+                  <Button
+                    variant={selectedTableId === table.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSelectTable(table.id)}
+                  >
+                    {selectedTableId === table.id ? "Selected" : "Select"}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  };
+
   if (isComplete) {
     return (
       <BookingConfirmation
@@ -388,7 +547,10 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                   <FormItem>
                     <FormLabel>Time</FormLabel>
                     <Select 
-                      onValueChange={field.onChange} 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setSelectedTableId(null);
+                      }} 
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -431,6 +593,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                             onClick={() => {
                               if (field.value > 0) {
                                 field.onChange(field.value - 1);
+                                setSelectedTableId(null);
                               }
                             }}
                           >
@@ -445,6 +608,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                             onClick={() => {
                               if (maleCount + femaleCount < 10) {
                                 field.onChange(field.value + 1);
+                                setSelectedTableId(null);
                               } else {
                                 toast({
                                   title: "Maximum guests reached",
@@ -482,6 +646,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                             onClick={() => {
                               if (field.value > 0) {
                                 field.onChange(field.value - 1);
+                                setSelectedTableId(null);
                               }
                             }}
                           >
@@ -496,6 +661,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                             onClick={() => {
                               if (maleCount + femaleCount < 10) {
                                 field.onChange(field.value + 1);
+                                setSelectedTableId(null);
                               } else {
                                 toast({
                                   title: "Maximum guests reached",
@@ -523,6 +689,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
                     Gender ratio violation: Maximum 2 males per female allowed
                   </div>
                 )}
+              </div>
+
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-medium mb-2">Available Tables</h3>
+                {renderTableSelection()}
               </div>
             </>
           )}
@@ -755,6 +926,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
               type="button"
               onClick={handleManualContinue}
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+              disabled={step === 1 && availableTables.length > 0 && !selectedTableId}
             >
               {step === 3 ? 'Confirm Booking' : 'Continue'} 
               {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
