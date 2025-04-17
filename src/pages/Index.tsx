@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
 import BottomNav from '@/components/BottomNav';
@@ -14,8 +13,6 @@ import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
 import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { EditIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
@@ -31,12 +28,6 @@ const Index = () => {
   return (
     <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <Link to="/edit-panel">
-          <Button variant="outline" size="sm" className="h-8 gap-1 bg-black/40 backdrop-blur-sm border-gray-700 hover:bg-black/60">
-            <EditIcon className="h-3.5 w-3.5" />
-            <span className="text-xs">Edit Site</span>
-          </Button>
-        </Link>
         <ThemeToggle />
       </div>
       
