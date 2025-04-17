@@ -14,7 +14,6 @@ import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
-import UpcomingExperiences from '@/components/UpcomingExperiences';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
 
@@ -45,10 +44,9 @@ const Index = () => {
           <Highlights />
           <Testimonials />
         </div> : activeCategory === 'experiences' ? (
-          <>
-            <UpcomingExperiences />
+          <div className="space-y-2 bg-airbnb-dark">
             <Events category="experiences" />
-          </>
+          </div>
         ) : activeCategory === 'menu' ? <div>
           <FlipBook />
         </div> : activeCategory === 'offers' ? <div>
