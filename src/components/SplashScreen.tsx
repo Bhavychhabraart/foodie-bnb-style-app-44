@@ -52,47 +52,72 @@ const SplashScreen: React.FC<{
       // Generate a random 6-digit password
       const password = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // First check if user exists
-      const { data: existingUsers } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('phone', normalizedPhone)
-        .limit(1);
-        
-      if (existingUsers && existingUsers.length > 0) {
-        // User exists, log them in with their existing email
-        const existingPassword = existingUsers[0].password || password;
-        const { error } = await supabase.auth.signInWithPassword({
-          email: `${normalizedPhone}@hacha.guest`,
-          password: existingPassword
+      // First check if user exists by email (phone number as email)
+      const emailAddress = `${normalizedPhone}@hacha.guest`;
+      
+      const { data: existingUserAuth } = await supabase.auth.signInWithPassword({
+        email: emailAddress,
+        password: password,
+      }).catch(() => ({ data: null })); // Catch error and continue
+      
+      if (existingUserAuth?.user) {
+        // User exists and password matches, we're good to go
+        toast({
+          title: "Welcome back!",
+          description: "Login successful",
         });
-        
-        if (error) throw error;
+        onFinish();
+        return;
+      }
+      
+      // Check if user exists in profiles table
+      const { data: existingProfiles } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('email', emailAddress)
+        .limit(1);
+      
+      if (existingProfiles && existingProfiles.length > 0) {
+        // User exists in profiles, but password might be wrong or changed
+        // Reset password for existing user
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(emailAddress);
+        if (resetError) {
+          // If reset fails, try creating new login
+          const { error: signUpError, data } = await supabase.auth.signUp({
+            email: emailAddress,
+            password: password,
+            options: {
+              data: {
+                full_name: name
+              }
+            }
+          });
+          
+          if (signUpError) throw signUpError;
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "We've reset your access. Please try logging in again.",
+          });
+          setLoading(false);
+          return;
+        }
       } else {
         // Create new user
         const { error: signUpError, data } = await supabase.auth.signUp({
-          email: `${normalizedPhone}@hacha.guest`,
-          password,
+          email: emailAddress,
+          password: password,
           options: {
             data: {
-              full_name: name,
-              phone: normalizedPhone
+              full_name: name
             }
           }
         });
         
         if (signUpError) throw signUpError;
         
-        // Update the profile with phone and generated password
-        if (data.user) {
-          await supabase
-            .from('profiles')
-            .update({ 
-              phone: normalizedPhone,
-              password
-            })
-            .eq('id', data.user.id);
-        }
+        // Profile will be created automatically via trigger in Supabase
+        // No need to update the profile here
       }
       
       toast({

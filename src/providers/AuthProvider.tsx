@@ -7,10 +7,9 @@ interface UserProfile {
   id: string;
   full_name: string | null;
   email: string | null;
-  phone: string | null;
+  phone?: string | null;
   avatar_url: string | null;
   is_admin: boolean;
-  password?: string;  // Added password field
 }
 
 interface AuthContextType {
@@ -56,8 +55,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       if (data) {
-        // Type assertion to match our UserProfile interface
-        setProfile(data as unknown as UserProfile);
+        // Create a UserProfile from the data
+        const userProfile: UserProfile = {
+          id: data.id,
+          full_name: data.full_name,
+          email: data.email,
+          avatar_url: data.avatar_url,
+          is_admin: data.is_admin || false,
+        };
+        
+        setProfile(userProfile);
         setIsAdmin(data.is_admin || false);
       }
     } catch (error) {
