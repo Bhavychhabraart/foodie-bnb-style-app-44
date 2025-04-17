@@ -1,4 +1,5 @@
-import { useState, Suspense, useCallback } from "react";
+
+import { useState, Suspense, useCallback, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,15 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
 import LoadingWrapper from "./components/LoadingWrapper";
+import AdminRoute from "./components/AdminRoute";
+
+// Lazy load pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const EditPanel = lazy(() => import("./pages/EditPanel"));
+const AdminSiteEditor = lazy(() => import("./pages/AdminSiteEditor"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with better defaults
 const queryClient = new QueryClient({
@@ -40,7 +50,7 @@ const App = () => {
             ) : (
               <BrowserRouter>
                 <TooltipProvider>
-                  <Suspense fallback={<LoadingWrapper isLoading={true} />}>
+                  <Suspense fallback={<LoadingWrapper isLoading={true} skeletonHeight="h-screen">Loading...</LoadingWrapper>}>
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/auth" element={<Auth />} />
