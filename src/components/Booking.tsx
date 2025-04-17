@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format, isWeekend } from 'date-fns';
-import { Calendar as CalendarIcon, Users, Tag, Phone } from 'lucide-react';
+import { Calendar as CalendarIcon, Users, Tag, Phone, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/providers/AuthProvider';
 import BookingConfirmation from '@/components/BookingConfirmation';
@@ -36,6 +36,7 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
   const [discountApplied, setDiscountApplied] = useState(false);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add loading state
   const { toast } = useToast();
   const { userProfile } = useAuth();
 
@@ -89,8 +90,13 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
     
     if (!date || !time || !name || !email || !phone) {
       toast({
@@ -101,7 +107,23 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
       return;
     }
 
-    setShowConfirmation(true);
+    try {
+      setIsSubmitting(true); // Start loading state
+      
+      // Simulate API call or processing delay (replace with actual booking logic)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setShowConfirmation(true);
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast({
+        title: "Error processing booking",
+        description: "Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false); // End loading state regardless of outcome
+    }
   };
   
   const handleCloseConfirmation = () => {
@@ -264,8 +286,19 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
                     </div>
                   </div>
                   
-                  <Button type="submit" className="airbnb-button w-full mt-4">
-                    Reserve now
+                  <Button 
+                    type="submit" 
+                    className="airbnb-button w-full mt-4"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Reserve now"
+                    )}
                   </Button>
                   
                   <p className="text-xs text-center text-airbnb-light mt-2">
