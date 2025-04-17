@@ -264,10 +264,10 @@ const InfluencerDrawer: React.FC<InfluencerDrawerProps> = ({ open, onOpenChange 
                     <FormControl>
                       <div className="relative">
                         <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <textarea 
+                        <Input 
                           placeholder="Tell us about your content style and why you'd like to collaborate..." 
                           {...field} 
-                          className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pt-3 pl-10"
+                          className="min-h-[100px] pt-3 pl-10"
                         />
                       </div>
                     </FormControl>

@@ -1,58 +1,84 @@
 
-import React from 'react';
-import { Compass, Home, CalendarRange, Sparkles, Instagram } from 'lucide-react';
-import { Button } from './ui/button';
+import React, { useState } from 'react';
+import { CalendarPlus, User, Instagram, LifeBuoy, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import BookingDrawer from './BookingDrawer';
+import SupportDrawer from './SupportDrawer';
+import InfluencerDrawer from './InfluencerDrawer';
 
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  onOpenInfluencer: () => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, onOpenInfluencer }) => {
+const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
+  const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
+  const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  const tabs = [
+    { id: 'influencer', icon: Instagram },
+    { id: 'vip', icon: Award },
+    { id: 'booking', icon: CalendarPlus },
+    { id: 'support', icon: LifeBuoy },
+    { id: 'profile', icon: User },
+  ];
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'support') {
+      setIsSupportDrawerOpen(true);
+    } else if (tabId === 'influencer') {
+      setIsInfluencerDrawerOpen(true);
+    } else if (tabId === 'booking') {
+      setIsBookingDrawerOpen(true);
+    }
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t dark:border-gray-800 flex justify-around items-center h-16 z-50">
-      <Button
-        variant="ghost"
-        className={`flex flex-col items-center justify-center h-full w-full ${
-          activeTab === 'home' ? 'text-airbnb-red' : 'text-gray-500'
-        }`}
-        onClick={() => setActiveTab('home')}
-      >
-        <Home className="h-5 w-5" />
-        <span className="text-xs mt-1">Home</span>
-      </Button>
-      <Button
-        variant="ghost"
-        className={`flex flex-col items-center justify-center h-full w-full ${
-          activeTab === 'explore' ? 'text-airbnb-red' : 'text-gray-500'
-        }`}
-        onClick={() => setActiveTab('explore')}
-      >
-        <Compass className="h-5 w-5" />
-        <span className="text-xs mt-1">Explore</span>
-      </Button>
-      <Button
-        variant="ghost"
-        className={`flex flex-col items-center justify-center h-full w-full ${
-          activeTab === 'bookings' ? 'text-airbnb-red' : 'text-gray-500'
-        }`}
-        onClick={() => setActiveTab('bookings')}
-      >
-        <CalendarRange className="h-5 w-5" />
-        <span className="text-xs mt-1">Bookings</span>
-      </Button>
-      <Button
-        variant="ghost"
-        className={`flex flex-col items-center justify-center h-full w-full ${
-          activeTab === 'influencer' ? 'text-airbnb-red' : 'text-gray-500'
-        }`}
-        onClick={onOpenInfluencer}
-      >
-        <Instagram className="h-5 w-5" />
-        <span className="text-xs mt-1">Collab</span>
-      </Button>
-    </div>
+    <>
+      <div className="bottom-nav fixed bottom-0 left-0 right-0 bg-[#000000e6] border-t border-airbnb-gold/20 px-4 py-2 z-50">
+        <div className="flex justify-between items-center max-w-2xl mx-auto">
+          <div className="flex justify-between items-center w-full">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.id}
+                className={`flex-1 flex flex-col items-center justify-center ${
+                  activeTab === tab.id ? 'text-airbnb-gold' : 'text-white/70'
+                } ${
+                  tab.id === 'booking' ? 'relative -mt-6' : ''
+                }`}
+                onClick={() => handleTabClick(tab.id)}
+              >
+                {tab.id === 'booking' ? (
+                  <div className="bg-airbnb-gold text-white rounded-full p-4 shadow-lg">
+                    <tab.icon className="h-7 w-7" />
+                  </div>
+                ) : (
+                  <tab.icon className="w-6 h-6" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <BookingDrawer 
+        open={isBookingDrawerOpen} 
+        onOpenChange={setIsBookingDrawerOpen} 
+      />
+
+      <SupportDrawer
+        open={isSupportDrawerOpen}
+        onOpenChange={setIsSupportDrawerOpen}
+      />
+
+      <InfluencerDrawer
+        open={isInfluencerDrawerOpen}
+        onOpenChange={setIsInfluencerDrawerOpen}
+      />
+    </>
   );
 };
 

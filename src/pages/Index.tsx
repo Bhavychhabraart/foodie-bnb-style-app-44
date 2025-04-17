@@ -14,7 +14,6 @@ import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
-import InfluencerDrawer from '@/components/InfluencerDrawer';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
 
@@ -22,7 +21,6 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [influencerOpen, setInfluencerOpen] = useState(false);
   const upcomingEvents = ["Soulful Sufi Night - 16th April", "Our World with Raja Kikkat - 17th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
   
   return <div className="pb-16 bg-airbnb-dark">
@@ -55,14 +53,9 @@ const Index = () => {
           <OngoingOffers />
         </div> : null}
       
-      <BottomNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab}
-        onOpenInfluencer={() => setInfluencerOpen(true)}
-      />
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <BookingDrawer open={bookingOpen} onOpenChange={setBookingOpen} />
-      <InfluencerDrawer open={influencerOpen} onOpenChange={setInfluencerOpen} />
     </div>;
 };
 
