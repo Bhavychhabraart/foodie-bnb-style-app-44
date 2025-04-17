@@ -5,6 +5,7 @@ import ExperienceCard from './ExperienceCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import EventCard from './EventCard';
 
 interface Experience {
   id: string;
@@ -16,6 +17,8 @@ interface Experience {
   is_sold_out: boolean;
   image_url: string;
   date: string;
+  venue: string;
+  time: string;
 }
 
 const UpcomingExperiences: React.FC = () => {
@@ -25,11 +28,10 @@ const UpcomingExperiences: React.FC = () => {
       // Get current date in YYYY-MM-DD format
       const today = new Date();
       
-      // Fetch all events
+      // Fetch events from the events table
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('category', 'experiences')
         .order('date', { ascending: true });
       
       if (error) {
@@ -82,7 +84,7 @@ const UpcomingExperiences: React.FC = () => {
           <CarouselContent className="-ml-2 md:-ml-4">
             {experiences.map(experience => (
               <CarouselItem key={experience.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <ExperienceCard
+                <EventCard
                   imageUrl={experience.image_url || '/placeholder.svg'}
                   title={experience.title}
                   host={`Date: ${experience.date}`}
@@ -90,6 +92,8 @@ const UpcomingExperiences: React.FC = () => {
                   rating={experience.rating}
                   reviews={experience.reviews}
                   isSoldOut={experience.is_sold_out}
+                  venue={experience.venue}
+                  time={experience.time}
                 />
               </CarouselItem>
             ))}
