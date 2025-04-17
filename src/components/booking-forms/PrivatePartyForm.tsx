@@ -18,7 +18,7 @@ import {
   Music,
   Cake,
   Camera,
-  Confetti,
+  PartyPopper,
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -139,7 +139,6 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Convert date to ISO format for storage
       const dateFormatted = format(values.date, 'yyyy-MM-dd');
       
       const { data: reservationData, error: reservationError } = await supabase
@@ -152,7 +151,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
           phone: values.phone,
           date: dateFormatted,
           time: values.time,
-          total_amount: values.guestCount * 2000, // Example pricing
+          total_amount: values.guestCount * 2000,
           occasion_type: values.occasionType,
           special_requests: values.specialInstructions || null,
           guest_count: values.guestCount,
@@ -364,7 +363,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel className="flex items-center"><Confetti className="mr-2 h-4 w-4" /> Special Decorations</FormLabel>
+                        <FormLabel className="flex items-center"><PartyPopper className="mr-2 h-4 w-4" /> Special Decorations</FormLabel>
                         <FormDescription>
                           Custom decorations based on your theme
                         </FormDescription>
