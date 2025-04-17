@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('is_admin, full_name, email, phone') // Added phone to the selection
+        .select('is_admin, full_name, email, phone, avatar_url, created_at, updated_at, id')
         .eq('id', userId)
         .single();
       
