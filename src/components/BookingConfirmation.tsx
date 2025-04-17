@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, PartyPopper } from 'lucide-react';
+import { Check, PartyPopper, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
@@ -19,6 +19,20 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   guests,
   onClose
 }) => {
+  const handleWhatsAppShare = () => {
+    // Format the message for WhatsApp
+    const message = `Booking Confirmed!\n\n${experienceTitle}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
+    
+    // Phone number with the country code
+    const phoneNumber = "919220829369"; // 91 is India's country code followed by the number
+    
+    // Create the WhatsApp URL 
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+    // Open in a new tab
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
       <motion.div
@@ -91,9 +105,22 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         ))}
       </motion.div>
       
-      <Button onClick={onClose} className="mt-4 bg-airbnb-red hover:bg-airbnb-red/90 text-white">
-        Done
-      </Button>
+      <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-center">
+        <Button 
+          onClick={handleWhatsAppShare} 
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          <Send className="mr-2 h-4 w-4" />
+          Send on WhatsApp
+        </Button>
+        
+        <Button 
+          onClick={onClose} 
+          className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+        >
+          Done
+        </Button>
+      </div>
     </div>
   );
 };
