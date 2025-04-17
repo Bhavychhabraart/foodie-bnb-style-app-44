@@ -3,11 +3,23 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 
+interface UserProfile {
+  avatar_url: string;
+  created_at: string;
+  email: string;
+  full_name: string;
+  id: string;
+  is_admin: boolean;
+  updated_at: string;
+  phone?: string; // Added phone as optional field
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
   isAdmin: boolean;
+  userProfile?: UserProfile | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
   isAdmin: false,
+  userProfile: null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -28,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const checkAdminStatus = async (userId: string) => {
     if (!userId) return;
@@ -35,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, full_name, email, phone') // Added phone to the selection
         .eq('id', userId)
         .single();
       
@@ -46,6 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       setIsAdmin(data?.is_admin || false);
+      setUserProfile(data as UserProfile);
     } catch (error) {
       console.error('Exception checking admin status:', error);
       setIsAdmin(false);
@@ -64,6 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await checkAdminStatus(session.user.id);
         } else {
           setIsAdmin(false);
+          setUserProfile(null);
         }
         
         setIsLoading(false);
@@ -88,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, isAdmin }}>
+    <AuthContext.Provider value={{ user, session, isLoading, isAdmin, userProfile }}>
       {children}
     </AuthContext.Provider>
   );

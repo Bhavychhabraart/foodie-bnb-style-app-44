@@ -20,6 +20,7 @@ interface BookingConfirmationRequest {
   tableNumber?: string;
   specialRequests?: string;
   addOns?: string[];
+  phone?: string; // Add phone field
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -38,7 +39,8 @@ const handler = async (req: Request): Promise<Response> => {
       experienceTitle, 
       tableNumber,
       specialRequests,
-      addOns = []
+      addOns = [],
+      phone = '' // Add phone field with default empty string
     }: BookingConfirmationRequest = await req.json();
 
     console.log(`Sending booking confirmation to ${email} for ${experienceTitle}`);
@@ -70,6 +72,14 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     }
 
+    // Generate phone section if provided
+    let phoneHtml = '';
+    if (phone) {
+      phoneHtml = `
+        <p style="margin-bottom: 5px;"><strong>Contact:</strong> ${phone}</p>
+      `;
+    }
+
     const emailResponse = await resend.emails.send({
       from: "Lovable Restaurant <booking@lovablerestaurant.com>",
       to: [email],
@@ -83,6 +93,8 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div style="background-color: white; border-radius: 8px; padding: 15px; margin: 20px 0; border-left: 4px solid #E31C5F;">
               <h2 style="margin-top: 0; color: #333; font-size: 18px;">${experienceTitle}</h2>
+              <p style="margin-bottom: 5px;"><strong>Name:</strong> ${name}</p>
+              ${phoneHtml}
               <p style="margin-bottom: 5px;"><strong>Date:</strong> ${date}</p>
               <p style="margin-bottom: 5px;"><strong>Time:</strong> ${time}</p>
               <p style="margin-bottom: 5px;"><strong>Guests:</strong> ${guests}</p>

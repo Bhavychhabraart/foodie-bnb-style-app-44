@@ -1,17 +1,21 @@
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Check, PartyPopper, Send, Download } from 'lucide-react';
+import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRCodeSVG } from 'qrcode.react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface BookingConfirmationProps {
   experienceTitle: string;
   date: string;
   time: string;
   guests: string;
+  name?: string;
+  phone?: string;
   onClose: () => void;
 }
 
@@ -35,6 +39,8 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   date,
   time,
   guests,
+  name,
+  phone,
   onClose
 }) => {
   const [showWhatsAppCard, setShowWhatsAppCard] = useState(false);
@@ -42,12 +48,18 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const [qrCodeLoaded, setQrCodeLoaded] = useState(false);
   const { toast } = useToast();
   const qrCanvasRef = useRef<HTMLDivElement>(null);
+  const { userProfile } = useAuth();
+  
+  const customerName = name || userProfile?.full_name || "Guest";
+  const contactPhone = phone || userProfile?.phone || "";
   
   const bookingDetails = {
     experience: experienceTitle,
     date: date,
     time: time,
-    guests: guests
+    guests: guests,
+    name: customerName,
+    phone: contactPhone
   };
   
   const bookingDetailsQR = JSON.stringify(bookingDetails);
@@ -63,7 +75,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   }, [showQrCode]);
   
   const handleWhatsAppShare = () => {
-    const message = `Booking Confirmed!\n\n${experienceTitle}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
+    const message = `Booking Confirmed!\n\n${experienceTitle}\nName: ${customerName}\nPhone: ${contactPhone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
     
     const phoneNumber = "919220829369";
     
@@ -152,6 +164,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         <div className="bg-airbnb-dark/50 rounded-lg p-4 mb-6 border border-airbnb-gold/20 shadow-lg">
           <h3 className="font-medium mb-2 text-white">{experienceTitle}</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-airbnb-gold/80">Name:</div>
+            <div className="text-white">{customerName}</div>
+            {contactPhone && (
+              <>
+                <div className="text-airbnb-gold/80">Contact:</div>
+                <div className="text-white">{contactPhone}</div>
+              </>
+            )}
             <div className="text-airbnb-gold/80">Date:</div>
             <div className="text-white">{date}</div>
             <div className="text-airbnb-gold/80">Time:</div>
@@ -232,12 +252,38 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
               <div className="p-4 bg-white rounded-lg shadow-xl" ref={qrCanvasRef}>
                 {showQrCode && <BookingQRCode bookingData={bookingDetailsQR} />}
               </div>
-              <div className="mt-4 text-center">
+              <div className="mt-4 text-center space-y-3">
                 <p className="text-sm text-white/60 mb-1">Scan this code at the restaurant</p>
                 <p className="font-medium text-white">{experienceTitle}</p>
-                <p className="text-sm mt-2 text-airbnb-gold/80">
-                  {date} • {time} • {guests} {parseInt(guests) === 1 ? 'person' : 'people'}
-                </p>
+                
+                <div className="bg-airbnb-dark/70 rounded-lg p-3 border border-airbnb-gold/20">
+                  <div className="flex items-center justify-center mb-2">
+                    <User className="h-4 w-4 text-airbnb-gold mr-1" />
+                    <p className="text-sm text-white">{customerName}</p>
+                  </div>
+                  
+                  {contactPhone && (
+                    <div className="flex items-center justify-center mb-2">
+                      <Phone className="h-4 w-4 text-airbnb-gold mr-1" />
+                      <p className="text-sm text-white">{contactPhone}</p>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-center mb-2">
+                    <Calendar className="h-4 w-4 text-airbnb-gold mr-1" />
+                    <p className="text-sm text-white">{date}</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-center mb-2">
+                    <Clock className="h-4 w-4 text-airbnb-gold mr-1" />
+                    <p className="text-sm text-white">{time}</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-center">
+                    <Users className="h-4 w-4 text-airbnb-gold mr-1" />
+                    <p className="text-sm text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
@@ -265,6 +311,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
                 <div className="bg-airbnb-dark/50 p-3 rounded-md border border-airbnb-gold/20">
                   <p className="font-medium text-white">{experienceTitle}</p>
                   <div className="grid grid-cols-2 gap-1 text-sm mt-2">
+                    <div className="text-airbnb-gold/80">Name:</div>
+                    <div className="text-white">{customerName}</div>
+                    {contactPhone && (
+                      <>
+                        <div className="text-airbnb-gold/80">Contact:</div>
+                        <div className="text-white">{contactPhone}</div>
+                      </>
+                    )}
                     <div className="text-airbnb-gold/80">Date:</div>
                     <div className="text-white">{date}</div>
                     <div className="text-airbnb-gold/80">Time:</div>
