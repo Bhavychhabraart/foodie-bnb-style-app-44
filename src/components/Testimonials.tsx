@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star, Quote } from 'lucide-react';
@@ -8,22 +7,22 @@ import { motion } from 'framer-motion';
 
 const testimonials = [{
   id: 1,
-  name: "Sarah Johnson",
-  avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+  name: "Priya Sharma",
+  avatar: "",
   date: "March 2025",
   rating: 5,
   text: "Absolutely incredible dining experience! The truffle risotto was divine, and the service was impeccable. The ambiance makes it perfect for special occasions."
 }, {
   id: 2,
-  name: "Michael Chen",
-  avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+  name: "Rahul Patel",
+  avatar: "",
   date: "February 2025",
   rating: 4,
   text: "Great food and atmosphere. The beef tenderloin was cooked to perfection. Only giving 4 stars because we had to wait a bit for our table despite having a reservation."
 }, {
   id: 3,
-  name: "Emma Roberts",
-  avatar: "https://randomuser.me/api/portraits/women/32.jpg",
+  name: "Aisha Khan",
+  avatar: "",
   date: "January 2025",
   rating: 5,
   text: "Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny. The staff made us feel so special."
@@ -80,7 +79,6 @@ const Testimonials: React.FC = () => {
                         <div className="flex items-center mb-4">
                           <div className="relative">
                             <Avatar className="h-14 w-14 ring-2 ring-airbnb-gold/20 ring-offset-2 ring-offset-background">
-                              <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                               <AvatarFallback>{testimonial.name.substring(0, 2)}</AvatarFallback>
                             </Avatar>
                             <span className="absolute -bottom-1 -right-1 bg-airbnb-gold text-white text-xs font-medium h-5 w-5 flex items-center justify-center rounded-full">"</span>
