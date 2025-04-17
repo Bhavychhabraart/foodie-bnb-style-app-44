@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -161,11 +162,46 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
         .single();
 
       if (reservationError) throw reservationError;
+      
+      // Send booking confirmation email
+      try {
+        // Build add-ons array from selected amenities
+        const selectedAddOns = [];
+        if (values.amenities.dj) selectedAddOns.push("DJ Setup");
+        if (values.amenities.decorations) selectedAddOns.push("Special Decorations");
+        if (values.amenities.cake) selectedAddOns.push("Celebration Cake");
+        if (values.amenities.photographer) selectedAddOns.push("Professional Photographer");
+        
+        console.log("Sending email confirmation for private party booking");
+        
+        const { data: emailData, error: emailError } = await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            email: values.email,
+            name: values.name,
+            date: format(values.date, 'MMMM dd, yyyy'),
+            time: values.time,
+            guests: values.guestCount.toString(),
+            experienceTitle: `Private Party: ${values.occasionType}`,
+            specialRequests: values.specialInstructions,
+            addOns: selectedAddOns
+          }
+        });
+
+        if (emailError) {
+          console.error("Error sending confirmation email:", emailError);
+          // Don't prevent booking completion if email fails
+        } else {
+          console.log("Email confirmation sent successfully:", emailData);
+        }
+      } catch (emailError) {
+        console.error("Exception sending confirmation email:", emailError);
+        // Don't prevent booking completion if email fails
+      }
 
       setIsComplete(true);
       toast({
         title: "Private Party Booked Successfully",
-        description: `Your ${values.occasionType} party for ${values.guestCount} guests is scheduled for ${format(values.date, 'PPP')}.`,
+        description: `Your ${values.occasionType} party for ${values.guestCount} guests is scheduled for ${format(values.date, 'PPP')}. A confirmation email has been sent to your inbox.`,
       });
     } catch (error) {
       console.error('Reservation error:', error);
