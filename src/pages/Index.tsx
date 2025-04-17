@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
 import BottomNav from '@/components/BottomNav';
@@ -21,6 +22,27 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('explore');
   const [bookingOpen, setBookingOpen] = useState(false);
   const upcomingEvents = ["Soulful Sufi Night - 16th April", "Our World with Raja Kikkat - 17th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
+  
+  useEffect(() => {
+    // Listen for custom category change events
+    const handleCategoryChange = (event: CustomEvent) => {
+      setActiveCategory(event.detail);
+    };
+
+    // Add event listener
+    window.document.addEventListener(
+      "category-change",
+      handleCategoryChange as EventListener
+    );
+
+    // Cleanup
+    return () => {
+      window.document.removeEventListener(
+        "category-change",
+        handleCategoryChange as EventListener
+      );
+    };
+  }, []);
   
   return <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">

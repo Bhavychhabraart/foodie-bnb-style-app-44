@@ -133,10 +133,19 @@ const OngoingOffers: React.FC = () => {
             <Sparkles className="w-5 h-5 mr-2 text-airbnb-gold" />
             <h2 className="text-2xl font-semibold">Exclusive Offers</h2>
           </div>
-          <button className="flex items-center text-airbnb-gold hover:underline">
-            <span className="mr-1">View all</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          <Button 
+            variant="ghost" 
+            className="text-airbnb-gold hover:underline flex items-center group animate-none hover:animate-bounce active:scale-95 transform transition-transform duration-200"
+            onClick={() => {
+              // Navigate to the offers page when clicked
+              window.document.dispatchEvent(
+                new CustomEvent("category-change", { detail: "offers" })
+              );
+            }}
+          >
+            <span className="mr-1 group-hover:mr-2 transition-all">View all</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
         
         <Carousel className="w-full">
@@ -191,7 +200,7 @@ const OngoingOffers: React.FC = () => {
                       
                       <Button 
                         onClick={() => handleAvailNow(offer)} 
-                        className="w-full bg-airbnb-gold hover:bg-airbnb-gold/90 text-black"
+                        className="w-full bg-airbnb-gold hover:bg-airbnb-gold/90 text-black animate-none hover:animate-bounce active:scale-95 transform transition-transform duration-200"
                       >
                         Redeem Offer
                       </Button>
