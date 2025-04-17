@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Utensils } from 'lucide-react';
@@ -27,14 +28,11 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
         <div className="w-24 h-24 rounded-full bg-white dark:bg-airbnb-darkbrown flex items-center justify-center mb-4 shadow-lg border-2 border-airbnb-beige dark:border-airbnb-gold">
           <Utensils className="w-12 h-12 text-airbnb-gold dark:text-airbnb-gold" />
         </div>
-        <motion.h1 
-          className="text-white text-4xl font-bold mb-2"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          Hacha
-        </motion.h1>
+        <img 
+          src="/lovable-uploads/6a7081ed-4360-446d-88ca-eed6d851e169.png" 
+          alt="Ha Cha Logo" 
+          className="max-w-[250px] mb-4"
+        />
         <motion.p 
           className="text-white text-lg"
           initial={{ y: 20, opacity: 0 }}
