@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, User, Instagram, Award, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,19 +34,16 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   ];
 
   useEffect(() => {
-    // Check for the current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
     });
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
       }
     );
 
-    // Clean up subscription on unmount
     return () => subscription.unsubscribe();
   }, []);
 
@@ -81,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       <div className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
         <div className="container-padding mx-auto flex items-center justify-between py-4">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-airbnb-red cursor-pointer" onClick={() => navigate('/')}>Fine Dine</h1>
+            <h1 className="text-xl font-bold text-airbnb-red cursor-pointer" onClick={() => navigate('/')}>Hacha</h1>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">

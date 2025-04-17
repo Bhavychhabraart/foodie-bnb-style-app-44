@@ -22,7 +22,7 @@ const Hero: React.FC<{ scrollToBooking: () => void }> = ({ scrollToBooking }) =>
 
   return (
     <div className="container-padding mx-auto mt-4">
-      <h1 className="text-2xl md:text-3xl font-semibold mb-2">Fine Dine Restaurant</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold mb-2">Hacha Restaurant</h1>
       
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-1">

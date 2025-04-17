@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Utensils } from 'lucide-react';
@@ -34,7 +33,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Fine Dine
+          Hacha
         </motion.h1>
         <motion.p 
           className="text-white text-lg"

@@ -18,7 +18,7 @@ const About: React.FC = () => {
           ease: "easeOut"
         }}>
             <h2 className="text-3xl font-semibold mb-6 text-airbnb-darkbrown dark:text-airbnb-cream relative inline-block">
-              About Fine Dine
+              About Hacha
               <span className="absolute -bottom-2 left-0 w-1/3 h-0.5 bg-airbnb-gold"></span>
             </h2>
             

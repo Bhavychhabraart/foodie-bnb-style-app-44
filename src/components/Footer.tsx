@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -8,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="container-padding mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-semibold mb-4">Fine Dine</h3>
+            <h3 className="font-semibold mb-4">Hacha</h3>
             <p className="text-airbnb-light text-sm mb-4">
               An exquisite dining experience in the heart of Manhattan, featuring seasonal ingredients and expert craftsmanship.
             </p>
@@ -60,7 +59,7 @@ const Footer: React.FC = () => {
         
         <div className="border-t border-gray-200 pt-6 text-center">
           <p className="text-airbnb-light text-sm">
-            © {new Date().getFullYear()} Fine Dine Restaurant. All rights reserved.
+            © {new Date().getFullYear()} Hacha Restaurant. All rights reserved.
           </p>
         </div>
       </div>
