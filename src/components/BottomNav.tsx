@@ -41,7 +41,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       <div className="bottom-nav fixed bottom-0 left-0 right-0 bg-[#000000e6] border-t border-airbnb-gold/20 px-4 py-2 z-50">
         <div className="flex justify-between items-center max-w-2xl mx-auto">
           <div className="flex justify-between items-center w-full">
-            {tabs.map((tab, index) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 className={`flex-1 flex flex-col items-center justify-center ${

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -19,14 +20,16 @@ import {
   Cake,
   Camera,
   PartyPopper,
+  QrCode,
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { format } from 'date-fns';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import BookingConfirmation from '@/components/BookingConfirmation';
 import { cn } from '@/lib/utils';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -35,6 +38,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from "@/components/ui/checkbox";
+import { v4 as uuidv4 } from 'uuid';
 
 interface PrivatePartyFormProps {
   onBack: () => void;
@@ -48,7 +52,7 @@ const formSchema = z.object({
   date: z.date({
     required_error: "Please select a date",
   }),
-  time: z.string().min(1, "Please select a time"),
+  timeSlot: z.number().min(0).max(20),
   guestCount: z.coerce.number().min(1, "Must have at least 1 guest").max(100, "Maximum 100 guests allowed").default(10),
   occasionType: z.string().min(2, "Please select an occasion"),
   specialInstructions: z.string().optional(),
@@ -75,6 +79,7 @@ const occasionTypes = [
 const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) => {
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const [bookingId, setBookingId] = useState<string>("");
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -84,7 +89,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
       email: "",
       phone: "",
       date: undefined,
-      time: "",
+      timeSlot: 10, // Default to 5:00 PM (index 10)
       guestCount: 10,
       occasionType: "",
       specialInstructions: "",
@@ -102,26 +107,28 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
     return (
       <div className="flex justify-center mb-4">
         {[1, 2].map((i) => (
-          <div key={i} className="flex items-center">
-            <div 
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                i === step 
-                  ? 'bg-airbnb-red text-white' 
-                  : i < step 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {i < step ? '✓' : i}
-            </div>
-            {i < 2 && (
+          <React.Fragment key={i}>
+            <div className="flex items-center">
               <div 
-                className={`w-10 h-1 ${
-                  i < step ? 'bg-green-500' : 'bg-gray-200'
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  i === step 
+                    ? 'bg-airbnb-red text-white' 
+                    : i < step 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-200 text-gray-700'
                 }`}
-              />
-            )}
-          </div>
+              >
+                {i < step ? <Check className="h-4 w-4" /> : i}
+              </div>
+              {i < 2 && (
+                <div 
+                  className={`w-10 h-1 ${
+                    i < step ? 'bg-green-500' : 'bg-gray-200'
+                  }`}
+                />
+              )}
+            </div>
+          </React.Fragment>
         ))}
       </div>
     );
@@ -140,17 +147,21 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
       const { data: { user } } = await supabase.auth.getUser();
       
       const dateFormatted = format(values.date, 'yyyy-MM-dd');
+      const selectedTime = timeSlots[values.timeSlot];
+      const reservationId = uuidv4();
+      setBookingId(reservationId);
       
       const { data: reservationData, error: reservationError } = await supabase
         .from('reservations')
         .insert({
+          id: reservationId,
           user_id: user?.id || null,
           booking_type: 'private_party',
           name: values.name,
           email: values.email,
           phone: values.phone,
           date: dateFormatted,
-          time: values.time,
+          time: selectedTime,
           total_amount: values.guestCount * 2000,
           occasion_type: values.occasionType,
           special_requests: values.specialInstructions || null,
@@ -178,7 +189,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             email: values.email,
             name: values.name,
             date: format(values.date, 'MMMM dd, yyyy'),
-            time: values.time,
+            time: selectedTime,
             guests: values.guestCount.toString(),
             experienceTitle: `Private Party: ${values.occasionType}`,
             specialRequests: values.specialInstructions,
@@ -212,15 +223,58 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
     }
   };
 
+  const QRTicket = () => {
+    const selectedTime = timeSlots[form.getValues('timeSlot')];
+    
+    return (
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-3">Your Booking is Pending Confirmation</h2>
+          <p className="text-muted-foreground mb-6">
+            Our team will review your request and get back to you shortly.
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-xs mx-auto">
+          <div className="flex justify-center mb-3">
+            <QrCode className="w-32 h-32" />
+          </div>
+          
+          <div className="border-t border-dashed border-gray-300 my-3" />
+          
+          <div className="text-center">
+            <h3 className="font-semibold text-lg mb-1">{form.getValues('occasionType')}</h3>
+            <p className="text-sm mb-1">Booking ID: {bookingId.substring(0, 8).toUpperCase()}</p>
+            <p className="text-sm mb-1">
+              {form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
+            </p>
+            <p className="text-sm mb-1">{selectedTime}</p>
+            <p className="text-sm">{form.getValues('guestCount')} Guests</p>
+          </div>
+
+          <div className="border-t border-dashed border-gray-300 my-3" />
+          
+          <div className="text-xs text-center text-muted-foreground">
+            <p>Show this QR code at the entrance</p>
+            <p>BOOKING STATUS: PENDING</p>
+          </div>
+        </div>
+
+        <Button 
+          onClick={onClose} 
+          className="mt-6 bg-airbnb-red hover:bg-airbnb-red/90"
+        >
+          Done
+        </Button>
+      </div>
+    );
+  };
+
   if (isComplete) {
     return (
-      <BookingConfirmation
-        experienceTitle={`Private Party: ${form.getValues('occasionType')}`}
-        date={form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
-        time={form.getValues('time')}
-        guests={form.getValues('guestCount').toString()}
-        onClose={onClose}
-      />
+      <div className="p-4">
+        <QRTicket />
+      </div>
     );
   }
 
@@ -290,27 +344,30 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
               <FormField
                 control={form.control}
-                name="time"
+                name="timeSlot"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Time</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a time" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {timeSlots.map((time) => (
-                          <SelectItem key={time} value={time}>
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Time: {timeSlots[field.value]}</FormLabel>
+                    <FormControl>
+                      <div className="py-4">
+                        <Slider
+                          min={0}
+                          max={20}
+                          step={1}
+                          value={[field.value]}
+                          onValueChange={(value) => {
+                            field.onChange(value[0]);
+                          }}
+                          className="mt-2"
+                        />
+                      </div>
+                    </FormControl>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>12:00 PM</span>
+                      <span>4:00 PM</span>
+                      <span>8:00 PM</span>
+                      <span>10:00 PM</span>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -536,7 +593,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             )}
             
             <Button 
-              type="submit"
+              type={step === 2 ? "submit" : "button"}
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
               onClick={() => {
                 form.trigger().then((isValid) => {
