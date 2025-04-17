@@ -84,9 +84,10 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           <Button 
             onClick={handleBookNow} 
             disabled={isSoldOut} 
-            className="flex-1 text-white bg-airbnb-gold hover:bg-airbnb-gold/90"
+            className="flex-1 text-white bg-airbnb-gold hover:bg-airbnb-gold/90
+              animate-bounce-subtle group/reserve"
           >
-            <CalendarCheck className="mr-2 h-4 w-4" />
+            <CalendarCheck className="mr-2 h-4 w-4 group-hover/reserve:scale-110 transition-transform" />
             Book Now
           </Button>
         </div>

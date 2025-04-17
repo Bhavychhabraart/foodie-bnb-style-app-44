@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, Users, Star, ArrowRight, Tag } from 'lucide-react';
+import { Calendar, Clock, Users, Star, ArrowRight, Tag, CalendarCheck } from 'lucide-react';
 import { BookingDrawer } from './BookingDrawer';
 import FomoNotification from './FomoNotification';
 import { Input } from '@/components/ui/input';
@@ -153,12 +153,17 @@ const ExperienceDetailsDrawer: React.FC<ExperienceDetailsDrawerProps> = ({
                     </div>
                     
                     <Button 
-                      className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+                      className="bg-airbnb-red hover:bg-airbnb-red/90 text-white
+                        animate-bounce-subtle group/reserve"
                       onClick={handleBookNow}
                       disabled={experience.isSoldOut}
                     >
-                      {experience.isSoldOut ? "Sold Out" : "Book Now"}
-                      {!experience.isSoldOut && <ArrowRight className="ml-2 h-4 w-4" />}
+                      {experience.isSoldOut ? "Sold Out" : (
+                        <>
+                          Book Now
+                          <CalendarCheck className="ml-2 h-4 w-4 group-hover/reserve:scale-110 transition-transform" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>

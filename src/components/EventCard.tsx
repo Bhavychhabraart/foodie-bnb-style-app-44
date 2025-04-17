@@ -104,9 +104,10 @@ const EventCard: React.FC<EventCardProps> = ({
             <Button 
               onClick={handleBookNow} 
               disabled={isSoldOut} 
-              className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium"
+              className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium
+                animate-bounce-subtle group/reserve"
             >
-              <CalendarCheck className="mr-1 h-4 w-4" />
+              <CalendarCheck className="mr-1 h-4 w-4 group-hover/reserve:scale-110 transition-transform" />
               Book Now
             </Button>
           </div>
