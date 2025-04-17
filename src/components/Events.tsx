@@ -1,10 +1,11 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import EventCard from './EventCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import LoadingWrapper from './LoadingWrapper';
+import ErrorBoundary from './ErrorBoundary';
 
 interface EventsProps {
   category?: string;
@@ -32,13 +33,11 @@ interface Event {
 const Events: React.FC<EventsProps> = ({
   category = 'home'
 }) => {
-  // Fetch events from Supabase based on category
   const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['events', category],
     queryFn: async () => {
       console.log(`Fetching events for category: ${category}`);
       
-      // Get current date
       const today = new Date();
       console.log("Today's date:", today.toISOString());
       
@@ -59,9 +58,7 @@ const Events: React.FC<EventsProps> = ({
         return data as Event[];
       }
       
-      // For experiences/upcoming category, show all events with future dates across all categories
       if (category === 'experiences') {
-        // Fetch all events first
         const { data, error } = await query.order('date', { ascending: true });
         
         if (error) {
@@ -71,14 +68,11 @@ const Events: React.FC<EventsProps> = ({
         
         console.log("Raw events data:", data);
         
-        // Filter for upcoming events (today or later)
         const upcomingEvents = (data as Event[]).filter(event => {
           try {
-            // Parse the date string - handle different formats
-            const dateStr = event.date.replace(/(st|nd|rd|th)/, ''); // Remove ordinal suffixes
+            const dateStr = event.date.replace(/(st|nd|rd|th)/, '');
             const eventDate = new Date(dateStr);
             
-            // Skip dates that can't be parsed properly
             if (isNaN(eventDate.getTime())) {
               console.log(`Could not parse date for event: ${event.title}, date: ${event.date}`);
               return false;
@@ -97,7 +91,6 @@ const Events: React.FC<EventsProps> = ({
         return upcomingEvents;
       }
       
-      // Default case: just filter by the provided category
       const { data, error } = await query.eq('category', category).order('created_at', { ascending: false });
         
       if (error) {
@@ -109,76 +102,73 @@ const Events: React.FC<EventsProps> = ({
     }
   });
 
-  if (isLoading) {
-    return (
-      <div className="section-padding bg-airbnb-dark">
-        <div className="container-padding mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-semibold text-2xl text-airbnb-light">Loading Events...</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-64 bg-gray-800 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="section-padding bg-airbnb-dark">
-        <div className="container-padding mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-semibold text-2xl text-airbnb-light">Error</h2>
-          </div>
-          <p className="text-red-500">Failed to load events: {error.message}</p>
-        </div>
-      </div>
-    );
-  }
+  const filteredEvents = useMemo(() => {
+    if (!events.length) return [];
+    
+    const today = new Date();
+    return category === 'experiences' 
+      ? events.filter(event => {
+          try {
+            const dateStr = event.date.replace(/(st|nd|rd|th)/, '');
+            const eventDate = new Date(dateStr);
+            return !isNaN(eventDate.getTime()) && eventDate >= today;
+          } catch (e) {
+            console.error(`Error parsing date for event ${event.title}:`, e);
+            return false;
+          }
+        })
+      : events;
+  }, [events, category]);
 
   return (
-    <div className="section-padding bg-airbnb-dark">
-      <div className="container-padding mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-2xl text-airbnb-light">
-            {category === 'experiences' ? 'Upcoming Events' : 'Events'}
-          </h2>
-          <button className="flex items-center text-airbnb-gold hover:underline text-xs text-left">
-            <span className="mr-1">View all</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+    <ErrorBoundary>
+      <div className="section-padding bg-airbnb-dark">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl text-airbnb-light">
+              {category === 'experiences' ? 'Upcoming Events' : 'Events'}
+            </h2>
+            <button className="flex items-center text-airbnb-gold hover:underline text-xs text-left">
+              <span className="mr-1">View all</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          
+          <LoadingWrapper isLoading={isLoading}>
+            {error ? (
+              <p className="text-red-500">Failed to load events: {error.message}</p>
+            ) : filteredEvents.length === 0 ? (
+              <p className="text-airbnb-light/70">No events found for this category.</p>
+            ) : (
+              <Carousel className="w-full">
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {filteredEvents.map(event => (
+                    <CarouselItem 
+                      key={event.id} 
+                      className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/4"
+                    >
+                      <EventCard 
+                        imageUrl={event.image_url || '/placeholder.svg'} 
+                        title={event.title} 
+                        host={event.host} 
+                        price={event.price} 
+                        rating={event.rating} 
+                        reviews={event.reviews} 
+                        isSoldOut={event.is_sold_out} 
+                        venue={event.venue} 
+                        time={event.time} 
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselDots className="mt-4" />
+              </Carousel>
+            )}
+          </LoadingWrapper>
         </div>
-        
-        {events.length === 0 ? (
-          <p className="text-airbnb-light/70">No events found for this category.</p>
-        ) : (
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {events.map(event => (
-                <CarouselItem key={event.id} className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/4">
-                  <EventCard 
-                    imageUrl={event.image_url || '/placeholder.svg'} 
-                    title={event.title} 
-                    host={event.host} 
-                    price={event.price} 
-                    rating={event.rating} 
-                    reviews={event.reviews} 
-                    isSoldOut={event.is_sold_out} 
-                    venue={event.venue} 
-                    time={event.time} 
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselDots className="mt-4" />
-          </Carousel>
-        )}
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
-export default Events;
+export default React.memo(Events);

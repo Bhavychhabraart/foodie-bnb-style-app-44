@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, Suspense, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,52 +6,75 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
+import ErrorBoundary from "./components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminRoute from "./components/AdminRoute";
-import EditPanel from "./pages/EditPanel";
-import AdminSiteEditor from "./pages/AdminSiteEditor";
+import LoadingWrapper from "./components/LoadingWrapper";
 
-// Create QueryClient outside of the component
-const queryClient = new QueryClient();
+// Configure QueryClient with better defaults
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+      refetchOnWindowFocus: false
+    }
+  }
+});
 
-// Create the App component
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
-  const handleSplashFinish = () => {
+  const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
-  };
+  }, []);
 
-  // Return the app's JSX
   return (
-    <ThemeProvider defaultTheme="dark">
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          {showSplash ? (
-            <SplashScreen onFinish={handleSplashFinish} />
-          ) : (
-            <BrowserRouter>
-              <TooltipProvider>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                  <Route path="/edit-panel" element={<EditPanel />} />
-                  <Route path="/admin/site-editor" element={<AdminRoute><AdminSiteEditor /></AdminRoute>} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </TooltipProvider>
-            </BrowserRouter>
-          )}
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="dark">
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            {showSplash ? (
+              <SplashScreen onFinish={handleSplashFinish} />
+            ) : (
+              <BrowserRouter>
+                <TooltipProvider>
+                  <Suspense fallback={<LoadingWrapper isLoading={true} />}>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route 
+                        path="/admin" 
+                        element={
+                          <ErrorBoundary>
+                            <AdminRoute>
+                              <AdminDashboard />
+                            </AdminRoute>
+                          </ErrorBoundary>
+                        } 
+                      />
+                      <Route path="/edit-panel" element={<EditPanel />} />
+                      <Route 
+                        path="/admin/site-editor" 
+                        element={
+                          <ErrorBoundary>
+                            <AdminRoute>
+                              <AdminSiteEditor />
+                            </AdminRoute>
+                          </ErrorBoundary>
+                        } 
+                      />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </TooltipProvider>
+              </BrowserRouter>
+            )}
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 
