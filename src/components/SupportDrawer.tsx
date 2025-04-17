@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -45,12 +46,22 @@ const SupportDrawer: React.FC<SupportDrawerProps> = ({
                 <div>
                   <h3 className="font-medium text-lg text-white">Opening Hours</h3>
                   <div className="grid grid-cols-2 gap-2 mt-2">
-                    <p className="text-white/70">Monday - Friday:</p>
-                    <p className="text-white">12:00 PM - 11:00 PM</p>
-                    <p className="text-white/70">Saturday - Sunday:</p>
-                    <p className="text-white">11:00 AM - 11:30 PM</p>
+                    <p className="text-white/70">Monday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Tuesday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Wednesday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Thursday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Friday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Saturday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
+                    <p className="text-white/70">Sunday:</p>
+                    <p className="text-white">6 PM - 4 AM</p>
                     <p className="text-white/70">Last Order:</p>
-                    <p className="text-white">10:30 PM</p>
+                    <p className="text-white">3:30 AM</p>
                   </div>
                 </div>
               </div>
