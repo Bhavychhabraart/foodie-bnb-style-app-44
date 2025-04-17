@@ -133,8 +133,7 @@ const Spotlight: React.FC = () => {
                         
                         <Button 
                           className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium 
-                            animate-bounce-subtle group/reserve relative overflow-hidden
-                            transform transition-transform duration-300 hover:scale-105 active:scale-95"
+                            animate-bounce-subtle group/reserve"
                           onClick={(e) => handleBookNow(item, e)}
                         >
                           <CirclePlus className="mr-2 h-5 w-5 group-hover/reserve:scale-110 transition-transform" />
