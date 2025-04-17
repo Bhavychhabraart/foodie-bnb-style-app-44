@@ -1,13 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import BookingDrawer from "@/components/BookingDrawer";
+import ExperienceDetailsDrawer from '@/components/ExperienceDetailsDrawer';
 
 const Spotlight: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
+  
   const { data: spotlightItems = [], isLoading, error } = useQuery({
     queryKey: ['spotlightItems'],
     queryFn: async () => {
@@ -23,6 +29,17 @@ const Spotlight: React.FC = () => {
       return data;
     }
   });
+
+  const handleViewDetails = (item: any) => {
+    setSelectedItem(item);
+    setIsDetailsDrawerOpen(true);
+  };
+
+  const handleBookNow = (item: any, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering parent click events
+    setSelectedItem(item);
+    setIsBookingDrawerOpen(true);
+  };
 
   if (isLoading) return (
     <div className="section-padding bg-inherit flex justify-center items-center">
@@ -110,12 +127,14 @@ const Spotlight: React.FC = () => {
                         <Button 
                           variant="outline" 
                           className="flex-1 border-airbnb-gold/30 text-airbnb-gold hover:bg-airbnb-gold/10 transition-colors"
+                          onClick={() => handleViewDetails(item)}
                         >
                           View Details
                         </Button>
                         
                         <Button 
                           className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium"
+                          onClick={(e) => handleBookNow(item, e)}
                         >
                           Book Now
                         </Button>
@@ -129,6 +148,29 @@ const Spotlight: React.FC = () => {
           <CarouselDots className="mt-6" />
         </Carousel>
       </div>
+      
+      {/* Experience Details Drawer */}
+      {selectedItem && (
+        <ExperienceDetailsDrawer 
+          isOpen={isDetailsDrawerOpen}
+          onClose={() => setIsDetailsDrawerOpen(false)}
+          experience={{
+            imageUrl: selectedItem.image_url || '/placeholder.svg',
+            title: selectedItem.title,
+            host: selectedItem.host || 'Event Host',
+            price: selectedItem.price,
+            rating: selectedItem.rating,
+            reviews: selectedItem.reviews,
+            isSoldOut: selectedItem.is_sold_out || false
+          }}
+        />
+      )}
+
+      {/* Booking Drawer */}
+      <BookingDrawer 
+        open={isBookingDrawerOpen} 
+        onOpenChange={setIsBookingDrawerOpen} 
+      />
     </div>
   );
 };
