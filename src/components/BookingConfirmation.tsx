@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { Check, PartyPopper, Send } from 'lucide-react';
+import { Check, PartyPopper, Send, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import QRCode from 'qrcode.react';
 
 interface BookingConfirmationProps {
   experienceTitle: string;
@@ -22,6 +23,16 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   onClose
 }) => {
   const [showWhatsAppCard, setShowWhatsAppCard] = useState(false);
+  const [showQrCode, setShowQrCode] = useState(false);
+  
+  const bookingDetails = {
+    experience: experienceTitle,
+    date: date,
+    time: time,
+    guests: guests
+  };
+  
+  const bookingDetailsQR = JSON.stringify(bookingDetails);
   
   const handleWhatsAppShare = () => {
     // Format the message for WhatsApp
@@ -43,6 +54,22 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
   const closeWhatsAppCard = () => {
     setShowWhatsAppCard(false);
+  };
+  
+  const downloadQRCode = () => {
+    const canvas = document.getElementById('booking-qr-code') as HTMLCanvasElement;
+    if (canvas) {
+      const pngUrl = canvas
+        .toDataURL('image/png')
+        .replace('image/png', 'image/octet-stream');
+      
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${experienceTitle.replace(/\s+/g, '_')}_booking_qrcode.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
   };
 
   return (
@@ -119,6 +146,13 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       
       <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-center">
         <Button 
+          onClick={() => setShowQrCode(true)} 
+          className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-white"
+        >
+          View QR Ticket
+        </Button>
+        
+        <Button 
           onClick={openWhatsAppCard} 
           className="bg-green-600 hover:bg-green-700 text-white"
         >
@@ -133,6 +167,44 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           Done
         </Button>
       </div>
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQrCode} onOpenChange={setShowQrCode}>
+        <DialogContent className="sm:max-w-md">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Your Booking QR Ticket</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center">
+              <div className="p-4 bg-white rounded-lg">
+                <QRCode
+                  id="booking-qr-code"
+                  value={bookingDetailsQR}
+                  size={200}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-500 mb-1">Scan this code at the restaurant</p>
+                <p className="font-medium">{experienceTitle}</p>
+                <p className="text-sm mt-2">
+                  {date} • {time} • {guests} {parseInt(guests) === 1 ? 'person' : 'people'}
+                </p>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setShowQrCode(false)}>
+                Close
+              </Button>
+              <Button onClick={downloadQRCode} className="bg-airbnb-gold hover:bg-airbnb-gold/90">
+                <Download className="mr-2 h-4 w-4" />
+                Download QR
+              </Button>
+            </CardFooter>
+          </Card>
+        </DialogContent>
+      </Dialog>
 
       {/* WhatsApp Card Dialog */}
       <Dialog open={showWhatsAppCard} onOpenChange={setShowWhatsAppCard}>
