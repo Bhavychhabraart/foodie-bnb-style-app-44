@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
-import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
+import { 
+  DrawerHeader, 
+  DrawerTitle, 
+  DrawerDescription, 
+  DrawerFooter 
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, PartyPopper } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  Calendar as CalendarIcon, 
+  Clock, 
+  Users, 
+  Tag, 
+  Check, 
+  ChevronRight,
+  Music,
+  Cake,
+  Camera,
+  Confetti,
+} from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,8 +33,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PrivatePartyFormProps {
   onBack: () => void;
@@ -24,67 +42,34 @@ interface PrivatePartyFormProps {
 }
 
 const formSchema = z.object({
-  eventDate: z.date({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().min(10, "Please enter a valid phone number"),
+  date: z.date({
     required_error: "Please select a date",
   }),
-  startTime: z.string().min(1, "Please select a start time"),
-  endTime: z.string().min(1, "Please select an end time"),
-  guestCount: z.string().min(1, "Please select the number of guests"),
-  eventType: z.enum(["birthday", "anniversary", "kitty", "graduation", "other"], {
-    required_error: "Please select an event type",
-  }),
-  hostName: z.string().min(2, "Name must be at least 2 characters"),
-  hostEmail: z.string().email("Please enter a valid email"),
-  hostPhone: z.string().min(10, "Please enter a valid phone number"),
-  specialRequests: z.string().optional(),
-  partyAddOns: z.array(z.string()).optional(),
-  budget: z.string().min(1, "Please select a budget range"),
+  time: z.string().min(1, "Please select a time"),
+  guestCount: z.number().min(1, "Must have at least 1 guest").max(100, "Maximum 100 guests allowed").default(10),
+  occasionType: z.string().min(2, "Please select an occasion"),
+  specialInstructions: z.string().optional(),
+  amenities: z.object({
+    dj: z.boolean().default(false),
+    decorations: z.boolean().default(false),
+    cake: z.boolean().default(false),
+    photographer: z.boolean().default(false),
+  }).default({}),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const timeSlots = [
-  "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", 
-  "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", 
-  "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", 
-  "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM",
-  "10:00 PM", "10:30 PM", "11:00 PM"
+  "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM",
+  "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM",
+  "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM"
 ];
 
-const partyAddOnItems = [
-  {
-    id: "decorations",
-    label: "Special Decorations",
-  },
-  {
-    id: "cake",
-    label: "Celebration Cake",
-  },
-  {
-    id: "dj",
-    label: "DJ/Music",
-  },
-  {
-    id: "photographer",
-    label: "Photographer",
-  },
-  {
-    id: "privateBar",
-    label: "Private Bar Service",
-  },
-  {
-    id: "specialMenu",
-    label: "Custom Menu",
-  },
-];
-
-const budgetRanges = [
-  "₹10,000 - ₹20,000",
-  "₹20,000 - ₹30,000",
-  "₹30,000 - ₹50,000",
-  "₹50,000 - ₹75,000",
-  "₹75,000 - ₹100,000",
-  "₹100,000+"
+const occasionTypes = [
+  "Birthday Party", "Anniversary", "Corporate Celebration", "Kitty Party", "Other"
 ];
 
 const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) => {
@@ -95,69 +80,28 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      startTime: "",
-      endTime: "",
-      guestCount: "",
-      eventType: "birthday",
-      hostName: "",
-      hostEmail: "",
-      hostPhone: "",
-      specialRequests: "",
-      partyAddOns: [],
-      budget: "",
+      name: "",
+      email: "",
+      phone: "",
+      date: undefined,
+      time: "",
+      guestCount: 10,
+      occasionType: "",
+      specialInstructions: "",
+      amenities: {
+        dj: false,
+        decorations: false,
+        cake: false,
+        photographer: false,
+      },
     },
     mode: "onChange",
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log("Form submitted with values:", values);
-    
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      console.log("Booking complete!");
-      setIsComplete(true);
-    }
-  };
-
-  const handleManualContinue = () => {
-    console.log("Manual continue button clicked");
-    const currentStepFields: Record<number, (keyof FormValues)[]> = {
-      1: ["eventDate", "startTime", "endTime", "guestCount", "eventType"],
-      2: ["hostName", "hostEmail", "hostPhone", "budget"],
-      3: [],
-    };
-
-    // Get the fields to validate for the current step
-    const fieldsToValidate = currentStepFields[step] || [];
-    
-    // Trigger validation for the current step's fields
-    form.trigger(fieldsToValidate).then((isValid) => {
-      console.log("Form validation result:", isValid);
-      
-      if (isValid) {
-        if (step < 3) {
-          setStep(step + 1);
-        } else {
-          // For the final step, we'll submit the entire form
-          form.handleSubmit(onSubmit)();
-        }
-      }
-    });
-  };
-
-  const handlePrevious = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    } else {
-      onBack();
-    }
-  };
-
   const renderStepIndicator = () => {
     return (
       <div className="flex justify-center mb-4">
-        {[1, 2, 3].map((i) => (
+        {[1, 2].map((i) => (
           <div key={i} className="flex items-center">
             <div 
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -170,7 +114,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             >
               {i < step ? '✓' : i}
             </div>
-            {i < 3 && (
+            {i < 2 && (
               <div 
                 className={`w-10 h-1 ${
                   i < step ? 'bg-green-500' : 'bg-gray-200'
@@ -183,13 +127,64 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
     );
   };
 
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    } else {
+      onBack();
+    }
+  };
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Convert date to ISO format for storage
+      const dateFormatted = format(values.date, 'yyyy-MM-dd');
+      
+      const { data: reservationData, error: reservationError } = await supabase
+        .from('reservations')
+        .insert({
+          user_id: user?.id || null,
+          booking_type: 'private_party',
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          date: dateFormatted,
+          time: values.time,
+          total_amount: values.guestCount * 2000, // Example pricing
+          occasion_type: values.occasionType,
+          special_requests: values.specialInstructions || null,
+          guest_count: values.guestCount,
+          status: 'pending'
+        })
+        .select('id')
+        .single();
+
+      if (reservationError) throw reservationError;
+
+      setIsComplete(true);
+      toast({
+        title: "Private Party Booked Successfully",
+        description: `Your ${values.occasionType} party for ${values.guestCount} guests is scheduled for ${format(values.date, 'PPP')}.`,
+      });
+    } catch (error) {
+      console.error('Reservation error:', error);
+      toast({
+        title: "Reservation Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (isComplete) {
     return (
       <BookingConfirmation
-        experienceTitle="Private Party Booking"
-        date={form.getValues('eventDate') ? format(form.getValues('eventDate'), 'MMMM dd, yyyy') : ''}
-        time={`${form.getValues('startTime')} - ${form.getValues('endTime')}`}
-        guests={form.getValues('guestCount')}
+        experienceTitle={`Private Party: ${form.getValues('occasionType')}`}
+        date={form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
+        time={form.getValues('time')}
+        guests={form.getValues('guestCount').toString()}
         onClose={onClose}
       />
     );
@@ -206,14 +201,12 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <DrawerTitle className="text-center pt-2">Host a Private Party</DrawerTitle>
+        <DrawerTitle className="text-center pt-2">Book a Private Party</DrawerTitle>
         <DrawerDescription className="text-center">
-          {step === 1 ? "Event Details" : 
-           step === 2 ? "Host Information" : 
-           "Customize Your Party"}
+          {step === 1 ? "Tell us about your party" : "Contact Information"}
         </DrawerDescription>
       </DrawerHeader>
-
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 px-6">
           {renderStepIndicator()}
@@ -222,10 +215,10 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             <>
               <FormField
                 control={form.control}
-                name="eventDate"
+                name="date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Event Date</FormLabel>
+                    <FormLabel>Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -239,7 +232,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
                             {field.value ? (
                               format(field.value, "PPP")
                             ) : (
-                              <span>Select event date</span>
+                              <span>Select a date</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -261,83 +254,25 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="startTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Time</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Start time" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {timeSlots.map((time) => (
-                            <SelectItem key={`start-${time}`} value={time}>
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="endTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Time</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="End time" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {timeSlots.map((time) => (
-                            <SelectItem key={`end-${time}`} value={time}>
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               <FormField
                 control={form.control}
-                name="guestCount"
+                name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Number of Guests</FormLabel>
+                    <FormLabel>Time</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select number of guests" />
+                          <SelectValue placeholder="Select a time" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {[10, 15, 20, 30, 40, 50, 60, 75, 100, 150, 200].map((num) => (
-                          <SelectItem key={num} value={num.toString()}>
-                            {num} guests
+                        {timeSlots.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -349,52 +284,137 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
               <FormField
                 control={form.control}
-                name="eventType"
+                name="guestCount"
                 render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Event Type</FormLabel>
+                  <FormItem>
+                    <FormLabel>Number of Guests</FormLabel>
                     <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="birthday" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Birthday Celebration</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="anniversary" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Anniversary Party</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="kitty" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Kitty Party</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="graduation" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Graduation/Achievement</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="other" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Other Celebration</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
+                      <Input 
+                        type="number"
+                        placeholder="Enter number of guests"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="occasionType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type of Occasion</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select occasion" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {occasionTypes.map((occasion) => (
+                          <SelectItem key={occasion} value={occasion}>
+                            {occasion}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="border rounded-lg p-4 space-y-4">
+                <h3 className="font-medium">Optional Amenities</h3>
+                
+                <FormField
+                  control={form.control}
+                  name="amenities.dj"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="flex items-center"><Music className="mr-2 h-4 w-4" /> DJ Setup</FormLabel>
+                        <FormDescription>
+                          Professional DJ with sound system
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="amenities.decorations"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="flex items-center"><Confetti className="mr-2 h-4 w-4" /> Special Decorations</FormLabel>
+                        <FormDescription>
+                          Custom decorations based on your theme
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="amenities.cake"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="flex items-center"><Cake className="mr-2 h-4 w-4" /> Celebration Cake</FormLabel>
+                        <FormDescription>
+                          Custom cake for your special occasion
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="amenities.photographer"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="flex items-center"><Camera className="mr-2 h-4 w-4" /> Professional Photographer</FormLabel>
+                        <FormDescription>
+                          Capture memories with a professional photographer
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </>
           )}
 
@@ -402,7 +422,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             <>
               <FormField
                 control={form.control}
-                name="hostName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Your Name</FormLabel>
@@ -416,7 +436,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
               <FormField
                 control={form.control}
-                name="hostEmail"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
@@ -430,7 +450,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
               <FormField
                 control={form.control}
-                name="hostPhone"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
@@ -444,139 +464,18 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
 
               <FormField
                 control={form.control}
-                name="budget"
+                name="specialInstructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Budget Range</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select your budget range" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {budgetRanges.map((range) => (
-                          <SelectItem key={range} value={range}>
-                            {range}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      This helps us tailor our offerings to match your expectations
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <div className="bg-[#1E1E1E] border border-airbnb-gold/20 p-4 rounded-lg mb-6 text-white">
-                <h3 className="font-medium text-lg mb-4">Party Details</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Date:</span>
-                    <span className="font-medium">
-                      {form.getValues('eventDate') ? format(form.getValues('eventDate'), 'MMMM dd, yyyy') : ''}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Time:</span>
-                    <span className="font-medium">
-                      {form.getValues('startTime')} - {form.getValues('endTime')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Guests:</span>
-                    <span className="font-medium">{form.getValues('guestCount')}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Event Type:</span>
-                    <span className="font-medium">
-                      {form.getValues('eventType')?.charAt(0).toUpperCase() + form.getValues('eventType')?.slice(1)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Host:</span>
-                    <span className="font-medium">{form.getValues('hostName')}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Budget:</span>
-                    <span className="font-medium">{form.getValues('budget')}</span>
-                  </div>
-                </div>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="partyAddOns"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-base">Party Add-ons</FormLabel>
-                      <FormDescription>
-                        Select any additional services you'd like for your party
-                      </FormDescription>
-                    </div>
-                    {partyAddOnItems.map((item) => (
-                      <FormField
-                        key={item.id}
-                        control={form.control}
-                        name="partyAddOns"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={item.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value || [], item.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== item.id
-                                          )
-                                        )
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {item.label}
-                              </FormLabel>
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    ))}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="specialRequests"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Special Requests</FormLabel>
+                    <FormLabel>Special Instructions (Optional)</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Any specific theme, preferences, or requirements for your party?" 
-                        className="min-h-[100px]"
+                        placeholder="Any special requirements or instructions?" 
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Let us know any other details to make your celebration special
+                      Let us know if you have any special requirements
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -597,12 +496,22 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             )}
             
             <Button 
-              type="button" 
-              onClick={handleManualContinue}
+              type="submit"
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+              onClick={() => {
+                form.trigger().then((isValid) => {
+                  if (isValid) {
+                    if (step < 2) {
+                      setStep(step + 1);
+                    } else {
+                      form.handleSubmit(onSubmit)();
+                    }
+                  }
+                });
+              }}
             >
-              {step === 3 ? 'Confirm Booking' : 'Continue'} 
-              {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+              {step === 2 ? 'Confirm Booking' : 'Continue'} 
+              {step < 2 && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           </div>
         </form>

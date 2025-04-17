@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/lib/supabase';
 
 interface CorporateEventFormProps {
   onBack: () => void;
@@ -76,8 +76,8 @@ const requirementItems = [
   {
     id: "catering",
     label: "Catering Services",
-  },
-]
+  }
+];
 
 const CorporateEventForm: React.FC<CorporateEventFormProps> = ({ onBack, onClose }) => {
   const [step, setStep] = useState(1);
@@ -101,14 +101,49 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({ onBack, onClose
     mode: "onChange",
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log("Form submitted with values:", values);
-    
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      console.log("Booking complete!");
-      setIsComplete(true);
+  const onSubmit = async (values: FormValues) => {
+    try {
+      console.log("Form submitted with values:", values);
+      
+      if (step < 3) {
+        setStep(step + 1);
+      } else {
+        console.log("Booking complete!");
+        
+        // After successful booking, send confirmation email
+        try {
+          const { data, error } = await supabase.functions.invoke('send-booking-confirmation', {
+            body: {
+              email: values.contactEmail,
+              name: values.companyName,
+              date: format(values.eventDate, 'MMMM dd, yyyy'),
+              time: values.startTime,
+              guests: values.attendees.toString(),
+              experienceTitle: "Corporate Event Booking",
+              specialRequests: values.requirements
+            }
+          });
+
+          if (error) {
+            console.error("Error sending confirmation email:", error);
+            // Don't block booking completion if email fails
+          } else {
+            console.log("Email confirmation sent successfully");
+          }
+        } catch (emailError) {
+          console.error("Exception sending confirmation email:", emailError);
+          // Don't block booking completion if email fails
+        }
+
+        setIsComplete(true);
+        
+        toast({
+          title: "Corporate Event Booked Successfully",
+          description: `Your event for ${values.attendees} attendees is scheduled for ${format(values.eventDate, 'PPP')} at ${values.startTime}. A confirmation email has been sent to your inbox.`,
+        });
+      }
+    } catch (error) {
+      console.error("Form validation error:", error);
     }
   };
 

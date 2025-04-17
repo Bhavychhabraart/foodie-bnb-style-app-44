@@ -264,6 +264,53 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         if (guestsError) throw guestsError;
       }
 
+      // Prepare add-ons for email
+      const addOnsList = [];
+      if (values.addOns.skipQueue) addOnsList.push("Queue Skip");
+      if (values.addOns.discount) addOnsList.push("15% Discount for Next 5 Visits");
+      if (values.addOns.dessert) addOnsList.push("Complimentary Dessert");
+
+      // Get table number if available
+      let tableNumber;
+      if (selectedTableId) {
+        const { data: tableData } = await supabase
+          .from('restaurant_tables')
+          .select('table_number')
+          .eq('id', selectedTableId)
+          .single();
+        
+        if (tableData) {
+          tableNumber = tableData.table_number.toString();
+        }
+      }
+
+      // Send email confirmation
+      try {
+        const { data, error } = await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            email: values.email,
+            name: values.name,
+            date: format(values.date, 'MMMM dd, yyyy'),
+            time: values.time,
+            guests: totalGuests.toString(),
+            experienceTitle: "Standard Table Booking",
+            tableNumber: tableNumber,
+            specialRequests: values.specialRequests,
+            addOns: addOnsList
+          }
+        });
+
+        if (error) {
+          console.error("Error sending confirmation email:", error);
+          // Don't block booking completion if email fails
+        } else {
+          console.log("Email confirmation sent successfully");
+        }
+      } catch (emailError) {
+        console.error("Exception sending confirmation email:", emailError);
+        // Don't block booking completion if email fails
+      }
+
       setIsComplete(true);
       
       let confirmationMessage = `Your table for ${totalGuests} guests is reserved for ${format(values.date, 'MMMM dd, yyyy')} at ${values.time}.`;
@@ -282,7 +329,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       
       toast({
         title: "Reservation Successful",
-        description: confirmationMessage,
+        description: confirmationMessage + " A confirmation email has been sent to your inbox.",
       });
 
     } catch (error) {
