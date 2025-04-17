@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, PartyPopper, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface BookingConfirmationProps {
   experienceTitle: string;
@@ -19,6 +21,8 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   guests,
   onClose
 }) => {
+  const [showWhatsAppCard, setShowWhatsAppCard] = useState(false);
+  
   const handleWhatsAppShare = () => {
     // Format the message for WhatsApp
     const message = `Booking Confirmed!\n\n${experienceTitle}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
@@ -31,6 +35,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     
     // Open in a new tab
     window.open(whatsappUrl, '_blank');
+  };
+
+  const openWhatsAppCard = () => {
+    setShowWhatsAppCard(true);
+  };
+
+  const closeWhatsAppCard = () => {
+    setShowWhatsAppCard(false);
   };
 
   return (
@@ -107,7 +119,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       
       <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-center">
         <Button 
-          onClick={handleWhatsAppShare} 
+          onClick={openWhatsAppCard} 
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           <Send className="mr-2 h-4 w-4" />
@@ -121,6 +133,42 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           Done
         </Button>
       </div>
+
+      {/* WhatsApp Card Dialog */}
+      <Dialog open={showWhatsAppCard} onOpenChange={setShowWhatsAppCard}>
+        <DialogContent className="sm:max-w-md">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Share on WhatsApp</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <p>Send your booking details to WhatsApp</p>
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="font-medium">{experienceTitle}</p>
+                  <div className="grid grid-cols-2 gap-1 text-sm mt-2">
+                    <div className="text-gray-500">Date:</div>
+                    <div>{date}</div>
+                    <div className="text-gray-500">Time:</div>
+                    <div>{time}</div>
+                    <div className="text-gray-500">Guests:</div>
+                    <div>{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={closeWhatsAppCard}>
+                Cancel
+              </Button>
+              <Button className="bg-green-600 hover:bg-green-700" onClick={handleWhatsAppShare}>
+                <Send className="mr-2 h-4 w-4" />
+                Send on WhatsApp
+              </Button>
+            </CardFooter>
+          </Card>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
