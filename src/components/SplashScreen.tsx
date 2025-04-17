@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Phone } from 'lucide-react';
@@ -46,15 +45,25 @@ const SplashScreen: React.FC<{
     setLoading(true);
     
     try {
-      // Normalize phone number - ensure it has country code
-      const normalizedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+      // Normalize phone number - ensure it has country code for India
+      let normalizedPhone = phone;
+      if (!phone.startsWith('+')) {
+        if (phone.startsWith('0')) {
+          normalizedPhone = `+91${phone.substring(1)}`;
+        } else if (phone.length === 10) {
+          normalizedPhone = `+91${phone}`;
+        } else {
+          normalizedPhone = `+${phone}`;
+        }
+      }
       
       // Generate a random 6-digit password
       const password = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Create a valid email using a hashed version of the phone number
-      const hashedPhone = normalizedPhone.replace(/[+]/g, '');
-      const emailAddress = `user_${hashedPhone}@hacha.guest`;
+      // Create a valid email using a cleaned version of the phone number
+      // Remove all non-alphanumeric characters
+      const cleanedPhone = normalizedPhone.replace(/[^0-9]/g, '');
+      const emailAddress = `user_${cleanedPhone}@hacha.guest`;
       
       // First check if user exists by this email
       const { data: userSignIn, error: signInError } = await supabase.auth.signInWithPassword({
@@ -68,16 +77,22 @@ const SplashScreen: React.FC<{
           title: "Welcome back!",
           description: "Login successful",
         });
+        
+        // Update user's profile if their name has changed
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            full_name: name 
+          })
+          .eq('id', userSignIn.user.id);
+          
+        if (updateError) {
+          console.error('Error updating profile:', updateError);
+        }
+        
         onFinish();
         return;
       }
-      
-      // Check if user exists in profiles table
-      const { data: existingProfiles } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .eq('email', emailAddress)
-        .limit(1);
       
       // Create new user
       const { error: signUpError, data } = await supabase.auth.signUp({
@@ -94,12 +109,19 @@ const SplashScreen: React.FC<{
       
       // Update profile with phone number
       if (data?.user) {
-        await supabase
+        // SQL update that matches the structure of the profiles table
+        const { error: profileError } = await supabase
           .from('profiles')
           .update({ 
-            phone: normalizedPhone 
+            full_name: name,
+            phone: normalizedPhone
           })
           .eq('id', data.user.id);
+          
+        if (profileError) {
+          console.error('Error updating profile with phone:', profileError);
+          // Proceed anyway, as this is just additional data
+        }
       }
       
       toast({
@@ -173,7 +195,7 @@ const SplashScreen: React.FC<{
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="tel"
-                    placeholder="Phone Number (e.g. +91XXXXXXXXXX)"
+                    placeholder="Phone Number (e.g. 9XXXXXXXXX)"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="pl-10 bg-white/90 border-none text-black placeholder:text-gray-500"
