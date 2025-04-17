@@ -18,10 +18,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
+
 interface CorporateEventFormProps {
   onBack: () => void;
   onClose: () => void;
 }
+
 const formSchema = z.object({
   eventDate: z.date({
     required_error: "Please select a date"
@@ -39,8 +41,11 @@ const formSchema = z.object({
   requirements: z.array(z.string()).optional(),
   additionalInfo: z.string().optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const timeSlots = ["8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM"];
+
 const requirementItems = [{
   id: "projector",
   label: "Projector & Screen"
@@ -60,15 +65,18 @@ const requirementItems = [{
   id: "catering",
   label: "Catering Services"
 }];
+
 const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
   onBack,
   onClose
 }) => {
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     toast
   } = useToast();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -85,50 +93,64 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
     },
     mode: "onChange"
   });
+
   const onSubmit = async (values: FormValues) => {
+    if (isSubmitting) return;
+
     try {
+      setIsSubmitting(true);
       console.log("Form submitted with values:", values);
+
       if (step < 3) {
         setStep(step + 1);
-      } else {
-        console.log("Booking complete!");
-
-        // After successful booking, send confirmation email
-        try {
-          const {
-            data,
-            error
-          } = await supabase.functions.invoke('send-booking-confirmation', {
-            body: {
-              email: values.contactEmail,
-              name: values.companyName,
-              date: format(values.eventDate, 'MMMM dd, yyyy'),
-              time: values.startTime,
-              guests: values.attendees.toString(),
-              experienceTitle: "Corporate Event Booking",
-              specialRequests: values.requirements
-            }
-          });
-          if (error) {
-            console.error("Error sending confirmation email:", error);
-            // Don't block booking completion if email fails
-          } else {
-            console.log("Email confirmation sent successfully");
-          }
-        } catch (emailError) {
-          console.error("Exception sending confirmation email:", emailError);
-          // Don't block booking completion if email fails
-        }
-        setIsComplete(true);
-        toast({
-          title: "Corporate Event Booked Successfully",
-          description: `Your event for ${values.attendees} attendees is scheduled for ${format(values.eventDate, 'PPP')} at ${values.startTime}. A confirmation email has been sent to your inbox.`
-        });
+        return;
       }
+
+      console.log("Booking complete!");
+
+      try {
+        const {
+          data,
+          error
+        } = await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            email: values.contactEmail,
+            name: values.companyName,
+            date: format(values.eventDate, 'MMMM dd, yyyy'),
+            time: values.startTime,
+            guests: values.attendees.toString(),
+            experienceTitle: "Corporate Event Booking",
+            specialRequests: values.requirements
+          }
+        });
+        if (error) {
+          console.error("Error sending confirmation email:", error);
+          // Don't block booking completion if email fails
+        } else {
+          console.log("Email confirmation sent successfully");
+        }
+      } catch (emailError) {
+        console.error("Exception sending confirmation email:", emailError);
+        // Don't block booking completion if email fails
+      }
+
+      setIsComplete(true);
+      toast({
+        title: "Corporate Event Booked Successfully",
+        description: `Your event for ${values.attendees} attendees is scheduled for ${format(values.eventDate, 'PPP')} at ${values.startTime}. A confirmation email has been sent to your inbox.`
+      });
     } catch (error) {
       console.error("Form validation error:", error);
+      toast({
+        title: "Booking Failed",
+        description: "There was an error processing your booking. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   const handleManualContinue = () => {
     console.log("Manual continue button clicked");
     const currentStepFields: Record<number, (keyof FormValues)[]> = {
@@ -137,22 +159,20 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
       3: []
     };
 
-    // Get the fields to validate for the current step
     const fieldsToValidate = currentStepFields[step] || [];
 
-    // Trigger validation for the current step's fields
     form.trigger(fieldsToValidate).then(isValid => {
       console.log("Form validation result:", isValid);
       if (isValid) {
         if (step < 3) {
           setStep(step + 1);
         } else {
-          // For the final step, we'll submit the entire form
           form.handleSubmit(onSubmit)();
         }
       }
     });
   };
+
   const handlePrevious = () => {
     if (step > 1) {
       setStep(step - 1);
@@ -160,6 +180,7 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
       onBack();
     }
   };
+
   const renderStepIndicator = () => {
     return <div className="flex justify-center mb-4">
         {[1, 2, 3].map(i => <div key={i} className="flex items-center">
@@ -170,9 +191,11 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
           </div>)}
       </div>;
   };
+
   if (isComplete) {
     return <BookingConfirmation experienceTitle="Corporate Event Booking" date={form.getValues('eventDate') ? format(form.getValues('eventDate'), 'MMMM dd, yyyy') : ''} time={`${form.getValues('startTime')} - ${form.getValues('endTime')}`} guests={form.getValues('attendees')} onClose={onClose} />;
   }
+
   return <div className="pb-6">
       <DrawerHeader>
         <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={handlePrevious}>
@@ -425,13 +448,23 @@ const CorporateEventForm: React.FC<CorporateEventFormProps> = ({
                 Cancel
               </Button>}
             
-            <Button type="button" onClick={handleManualContinue} className="bg-airbnb-red hover:bg-airbnb-red/90 text-white">
-              {step === 3 ? 'Confirm Booking' : 'Continue'} 
-              {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+            <Button type="button" onClick={handleManualContinue} className="bg-airbnb-red hover:bg-airbnb-red/90 text-white" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {step === 3 ? 'Processing...' : 'Please wait...'}
+                </>
+              ) : (
+                <>
+                  {step === 3 ? 'Confirm Booking' : 'Continue'} 
+                  {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+                </>
+              )}
             </Button>
           </div>
         </form>
       </Form>
     </div>;
 };
+
 export default CorporateEventForm;

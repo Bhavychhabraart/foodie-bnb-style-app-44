@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -79,6 +78,7 @@ const occasionTypes = [
 const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) => {
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingId, setBookingId] = useState<string>("");
   const { toast } = useToast();
 
@@ -143,7 +143,10 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
   };
 
   const onSubmit = async (values: FormValues) => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     try {
+      setIsSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
       
       const dateFormatted = format(values.date, 'yyyy-MM-dd');
@@ -220,6 +223,8 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -595,6 +600,7 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
             <Button 
               type={step === 2 ? "submit" : "button"}
               className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+              disabled={isSubmitting}
               onClick={() => {
                 form.trigger().then((isValid) => {
                   if (isValid) {
@@ -607,8 +613,17 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
                 });
               }}
             >
-              {step === 2 ? 'Confirm Booking' : 'Continue'} 
-              {step < 2 && <ArrowRight className="ml-2 h-4 w-4" />}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {step === 2 ? 'Processing...' : 'Please wait...'}
+                </>
+              ) : (
+                <>
+                  {step === 2 ? 'Confirm Booking' : 'Continue'} 
+                  {step < 2 && <ArrowRight className="ml-2 h-4 w-4" />}
+                </>
+              )}
             </Button>
           </div>
         </form>
