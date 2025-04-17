@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChefHat, Star, Sparkles } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -6,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
 interface ChefSpecial {
   id: string;
   title: string;
@@ -18,24 +16,24 @@ interface ChefSpecial {
   is_new: boolean;
   is_popular: boolean;
 }
-
 const ChefsSpecials: React.FC = () => {
   const [chefsSpecials, setChefsSpecials] = useState<ChefSpecial[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     const fetchChefsSpecials = async () => {
       try {
-        const { data, error } = await supabase
-          .from('chefs_specials')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
+        const {
+          data,
+          error
+        } = await supabase.from('chefs_specials').select('*').order('created_at', {
+          ascending: false
+        });
         if (error) {
           throw error;
         }
-        
         if (data) {
           setChefsSpecials(data);
         }
@@ -44,18 +42,15 @@ const ChefsSpecials: React.FC = () => {
         toast({
           title: "Error",
           description: "Failed to load chef's specials",
-          variant: "destructive",
+          variant: "destructive"
         });
       } finally {
         setLoading(false);
       }
     };
-
     fetchChefsSpecials();
   }, [toast]);
-
-  return (
-    <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
+  return <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-2">
@@ -68,48 +63,36 @@ const ChefsSpecials: React.FC = () => {
           </button>
         </div>
         
-        {loading ? (
-          <div className="flex justify-center py-12">
+        {loading ? <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-airbnb-gold"></div>
-          </div>
-        ) : chefsSpecials.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          </div> : chefsSpecials.length === 0 ? <div className="text-center py-12 text-gray-500">
             <ChefHat className="w-12 h-12 mx-auto mb-4 opacity-30" />
             <p>No chef's specials available at the moment.</p>
-          </div>
-        ) : (
-          <Carousel className="w-full">
+          </div> : <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
-              {chefsSpecials.map(special => (
-                <CarouselItem key={special.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                  <motion.div 
-                    whileHover={{ y: -5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
+              {chefsSpecials.map(special => <CarouselItem key={special.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <motion.div whileHover={{
+              y: -5
+            }} transition={{
+              type: "spring",
+              stiffness: 300
+            }}>
                     <Card className="border-none overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                       <CardContent className="p-0">
                         <div className="relative">
                           <div className="h-64 relative overflow-hidden">
-                            <img 
-                              src={special.image_url || 'https://via.placeholder.com/400x300?text=No+Image'} 
-                              alt={special.title} 
-                              className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" 
-                            />
+                            <img src={special.image_url || 'https://via.placeholder.com/400x300?text=No+Image'} alt={special.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
                           </div>
                           
-                          {special.is_new && (
-                            <div className="absolute top-3 right-3 bg-airbnb-gold text-black text-xs font-semibold px-3 py-1 rounded-full transform rotate-3 shadow-md flex items-center gap-1">
+                          {special.is_new && <div className="absolute top-3 right-3 bg-airbnb-gold text-black text-xs font-semibold px-3 py-1 rounded-full transform rotate-3 shadow-md flex items-center gap-1">
                               <Sparkles className="h-3 w-3" />
                               <span>New</span>
-                            </div>
-                          )}
+                            </div>}
 
-                          {special.is_popular && (
-                            <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full transform -rotate-1 shadow-md">
+                          {special.is_popular && <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full transform -rotate-1 shadow-md">
                               Popular
-                            </div>
-                          )}
+                            </div>}
 
                           {/* Rating */}
                           <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-sm px-2 py-1 rounded-lg flex items-center">
@@ -134,23 +117,17 @@ const ChefsSpecials: React.FC = () => {
                         <div className="p-4 bg-zinc-900">
                           <div className="flex justify-between items-center">
                             <div className="font-medium text-airbnb-gold">{special.price}</div>
-                            <button className="text-sm text-white bg-airbnb-gold hover:bg-airbnb-gold/90 px-3 py-1 rounded-full transition-colors">
-                              Order now
-                            </button>
+                            
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   </motion.div>
-                </CarouselItem>
-              ))}
+                </CarouselItem>)}
             </CarouselContent>
             <CarouselDots className="mt-6" />
-          </Carousel>
-        )}
+          </Carousel>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ChefsSpecials;
