@@ -52,15 +52,17 @@ const SplashScreen: React.FC<{
       // Generate a random 6-digit password
       const password = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // First check if user exists by email (phone number as email)
-      const emailAddress = `${normalizedPhone}@hacha.guest`;
+      // Create a valid email using a hashed version of the phone number
+      const hashedPhone = normalizedPhone.replace(/[+]/g, '');
+      const emailAddress = `user_${hashedPhone}@hacha.guest`;
       
-      const { data: existingUserAuth } = await supabase.auth.signInWithPassword({
+      // First check if user exists by this email
+      const { data: userSignIn, error: signInError } = await supabase.auth.signInWithPassword({
         email: emailAddress,
         password: password,
-      }).catch(() => ({ data: null })); // Catch error and continue
+      }).catch(() => ({ data: null, error: { message: "Login failed" } }));
       
-      if (existingUserAuth?.user) {
+      if (userSignIn?.user) {
         // User exists and password matches, we're good to go
         toast({
           title: "Welcome back!",
@@ -77,47 +79,27 @@ const SplashScreen: React.FC<{
         .eq('email', emailAddress)
         .limit(1);
       
-      if (existingProfiles && existingProfiles.length > 0) {
-        // User exists in profiles, but password might be wrong or changed
-        // Reset password for existing user
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(emailAddress);
-        if (resetError) {
-          // If reset fails, try creating new login
-          const { error: signUpError, data } = await supabase.auth.signUp({
-            email: emailAddress,
-            password: password,
-            options: {
-              data: {
-                full_name: name
-              }
-            }
-          });
-          
-          if (signUpError) throw signUpError;
-        } else {
-          toast({
-            title: "Welcome back!",
-            description: "We've reset your access. Please try logging in again.",
-          });
-          setLoading(false);
-          return;
-        }
-      } else {
-        // Create new user
-        const { error: signUpError, data } = await supabase.auth.signUp({
-          email: emailAddress,
-          password: password,
-          options: {
-            data: {
-              full_name: name
-            }
+      // Create new user
+      const { error: signUpError, data } = await supabase.auth.signUp({
+        email: emailAddress,
+        password: password,
+        options: {
+          data: {
+            full_name: name
           }
-        });
-        
-        if (signUpError) throw signUpError;
-        
-        // Profile will be created automatically via trigger in Supabase
-        // No need to update the profile here
+        }
+      });
+      
+      if (signUpError) throw signUpError;
+      
+      // Update profile with phone number
+      if (data?.user) {
+        await supabase
+          .from('profiles')
+          .update({ 
+            phone: normalizedPhone 
+          })
+          .eq('id', data.user.id);
       }
       
       toast({
@@ -191,7 +173,7 @@ const SplashScreen: React.FC<{
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="tel"
-                    placeholder="Phone Number (with country code)"
+                    placeholder="Phone Number (e.g. +91XXXXXXXXXX)"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="pl-10 bg-white/90 border-none text-black placeholder:text-gray-500"

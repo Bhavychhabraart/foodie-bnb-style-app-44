@@ -90,7 +90,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
             </div>
           )}
           
-          {profile.email && profile.email.indexOf('@hacha.guest') === -1 && (
+          {profile.email && !profile.email.includes('@hacha.guest') && (
             <div className="flex items-center">
               <Mail className="h-4 w-4 mr-2 text-airbnb-gold" />
               <span className="text-sm">{profile.email}</span>

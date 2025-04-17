@@ -60,6 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           id: data.id,
           full_name: data.full_name,
           email: data.email,
+          phone: data.phone,
           avatar_url: data.avatar_url,
           is_admin: data.is_admin || false,
         };
