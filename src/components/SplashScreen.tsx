@@ -30,9 +30,7 @@ const SplashScreen: React.FC<{
       delay: 0.2,
       duration: 0.5
     }} className="flex flex-col items-center">
-        <div className="w-24 h-24 rounded-full bg-white dark:bg-airbnb-darkbrown flex items-center justify-center mb-4 shadow-lg border-2 border-airbnb-beige dark:border-airbnb-gold">
-          
-        </div>
+        
         <img src="/lovable-uploads/6a7081ed-4360-446d-88ca-eed6d851e169.png" alt="Ha Cha Logo" className="max-w-[250px] mb-4" />
         <motion.p className="text-white text-lg" initial={{
         y: 20,
