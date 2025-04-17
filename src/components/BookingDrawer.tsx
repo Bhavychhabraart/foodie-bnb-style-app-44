@@ -42,41 +42,41 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
         <div className="flex-1 px-6 pb-8 space-y-6">
           <Button
             variant="outline"
-            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E]"
+            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E] group/reserve"
             onClick={() => handleBookingOptionSelect('standard')}
           >
-            <Utensils className="h-8 w-8 text-airbnb-gold mr-4" />
+            <Utensils className="h-8 w-8 text-airbnb-gold mr-4 group-hover/reserve:scale-110 transition-transform" />
             <div className="text-left flex-1">
               <h3 className="font-medium text-lg text-white">Standard Table</h3>
               <p className="text-sm text-white/70 mt-1">Reserve a table for your group</p>
             </div>
-            <div className="text-airbnb-gold text-xl">→</div>
+            <div className="text-airbnb-gold text-xl group-hover/reserve:translate-x-1 transition-transform">→</div>
           </Button>
 
           <Button
             variant="outline"
-            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E]"
+            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E] group/reserve"
             onClick={() => handleBookingOptionSelect('corporate')}
           >
-            <Briefcase className="h-8 w-8 text-airbnb-gold mr-4" />
+            <Briefcase className="h-8 w-8 text-airbnb-gold mr-4 group-hover/reserve:scale-110 transition-transform" />
             <div className="text-left flex-1">
               <h3 className="font-medium text-lg text-white">Corporate Event</h3>
               <p className="text-sm text-white/70 mt-1">Organize a business lunch or meeting</p>
             </div>
-            <div className="text-airbnb-gold text-xl">→</div>
+            <div className="text-airbnb-gold text-xl group-hover/reserve:translate-x-1 transition-transform">→</div>
           </Button>
 
           <Button
             variant="outline"
-            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E]"
+            className="flex items-center justify-start border-2 border-airbnb-gold/20 h-28 w-full relative p-4 rounded-xl hover:border-airbnb-gold/50 hover:bg-airbnb-gold/5 transition-all bg-[#1E1E1E] group/reserve"
             onClick={() => handleBookingOptionSelect('party')}
           >
-            <PartyPopper className="h-8 w-8 text-airbnb-gold mr-4" />
+            <PartyPopper className="h-8 w-8 text-airbnb-gold mr-4 group-hover/reserve:scale-110 transition-transform" />
             <div className="text-left flex-1">
               <h3 className="font-medium text-lg text-white">Private Party</h3>
               <p className="text-sm text-white/70 mt-1">Host a celebration or kitty party</p>
             </div>
-            <div className="text-airbnb-gold text-xl">→</div>
+            <div className="text-airbnb-gold text-xl group-hover/reserve:translate-x-1 transition-transform">→</div>
           </Button>
         </div>
       </div>
