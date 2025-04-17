@@ -60,8 +60,8 @@ const FlipBook: React.FC = () => {
                     </div>
                     <div className="h-[calc(90vh-70px)] w-full px-4 overflow-y-auto">
                       <iframe 
-                        src="https://heyzine.com/flip-book/44253fcd19.html" 
-                        title="Restaurant Digital Menu"
+                        src="https://heyzine.com/flip-book/d97986850b.html" 
+                        title="Restaurant Food Menu"
                         className="w-full h-[75vh] border-0 rounded-lg shadow-lg mt-4"
                         allow="fullscreen"
                       />
@@ -125,186 +125,12 @@ const FlipBook: React.FC = () => {
                       </DrawerClose>
                     </div>
                     <div className="h-[calc(90vh-70px)] w-full px-4 overflow-y-auto">
-                      <Tabs defaultValue="cocktails" className="w-full mt-6">
-                        <TabsList className="grid w-full grid-cols-3 bg-airbnb-dark/50 border border-airbnb-gold/20">
-                          <TabsTrigger value="cocktails">Cocktails</TabsTrigger>
-                          <TabsTrigger value="wines">Wines</TabsTrigger>
-                          <TabsTrigger value="spirits">Spirits</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="cocktails" className="pt-6">
-                          <div className="space-y-6">
-                            {["Signature", "Classics", "Mocktails"].map((category) => (
-                              <div key={category} className="mb-8">
-                                <h3 className="text-xl font-medium text-airbnb-gold mb-4 border-b border-airbnb-gold/20 pb-2">{category} Cocktails</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {Array.from({length: 4}).map((_, i) => (
-                                    <div key={i} className="border-b border-airbnb-gold/10 pb-4">
-                                      <div className="flex justify-between items-start">
-                                        <div>
-                                          <h4 className="text-airbnb-light font-medium">
-                                            {category === "Signature" ? [
-                                              "Gold Fashioned",
-                                              "Velvet Sour",
-                                              "Midnight Bloom",
-                                              "Amber Spice"
-                                            ][i] : category === "Classics" ? [
-                                              "Old Fashioned",
-                                              "Negroni",
-                                              "Whiskey Sour",
-                                              "Mojito"
-                                            ][i] : [
-                                              "Virgin Sunrise",
-                                              "Berry Bliss",
-                                              "Citrus Fizz",
-                                              "Spiced Apple"
-                                            ][i]}
-                                          </h4>
-                                          <p className="text-sm text-gray-400 mt-1">{
-                                            category === "Signature" ? [
-                                              "Aged whiskey, orange bitters, gold flake",
-                                              "Premium gin, egg white, elderflower",
-                                              "Vodka, blackberry, lavender syrup",
-                                              "Rum, ginger, cardamom, cinnamon"
-                                            ][i] : category === "Classics" ? [
-                                              "Bourbon, Angostura bitters, sugar",
-                                              "Gin, Campari, sweet vermouth",
-                                              "Bourbon, lemon juice, simple syrup, egg white",
-                                              "White rum, lime, mint, soda"
-                                            ][i] : [
-                                              "Orange juice, grenadine, soda",
-                                              "Mixed berries, lemon, honey",
-                                              "Fresh citrus blend, mint, sparkling water",
-                                              "Apple juice, cinnamon, star anise"
-                                            ][i]
-                                          }</p>
-                                        </div>
-                                        <span className="text-airbnb-gold font-medium">{
-                                          category === "Mocktails" ? "₹350" : i % 2 === 0 ? "₹550" : "₹650"
-                                        }</span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="wines" className="pt-6">
-                          <div className="space-y-6">
-                            {["Red", "White", "Sparkling"].map((category) => (
-                              <div key={category} className="mb-8">
-                                <h3 className="text-xl font-medium text-airbnb-gold mb-4 border-b border-airbnb-gold/20 pb-2">{category} Wines</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {Array.from({length: 3}).map((_, i) => (
-                                    <div key={i} className="border-b border-airbnb-gold/10 pb-4">
-                                      <div className="flex justify-between items-start">
-                                        <div>
-                                          <h4 className="text-airbnb-light font-medium">
-                                            {category === "Red" ? [
-                                              "Cabernet Sauvignon",
-                                              "Pinot Noir",
-                                              "Merlot"
-                                            ][i] : category === "White" ? [
-                                              "Chardonnay",
-                                              "Sauvignon Blanc",
-                                              "Pinot Grigio"
-                                            ][i] : [
-                                              "Champagne Brut",
-                                              "Prosecco",
-                                              "Rosé Champagne"
-                                            ][i]}
-                                          </h4>
-                                          <p className="text-sm text-gray-400 mt-1">
-                                            {category === "Red" ? [
-                                              "France, 2016",
-                                              "Italy, 2018",
-                                              "California, 2017"
-                                            ][i] : category === "White" ? [
-                                              "California, 2019",
-                                              "New Zealand, 2020",
-                                              "Italy, 2021"
-                                            ][i] : [
-                                              "France",
-                                              "Italy",
-                                              "France"
-                                            ][i]}
-                                          </p>
-                                        </div>
-                                        <div className="text-right">
-                                          <div className="text-airbnb-gold font-medium">{
-                                            i === 0 ? "₹950 / ₹6,500" : i === 1 ? "₹850 / ₹5,500" : "₹750 / ₹4,800"
-                                          }</div>
-                                          <div className="text-xs text-gray-400">Glass / Bottle</div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="spirits" className="pt-6">
-                          <div className="space-y-6">
-                            {["Whiskey", "Vodka", "Gin", "Rum"].map((category) => (
-                              <div key={category} className="mb-8">
-                                <h3 className="text-xl font-medium text-airbnb-gold mb-4 border-b border-airbnb-gold/20 pb-2">{category}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {Array.from({length: 3}).map((_, i) => (
-                                    <div key={i} className="border-b border-airbnb-gold/10 pb-4">
-                                      <div className="flex justify-between items-start">
-                                        <div>
-                                          <h4 className="text-airbnb-light font-medium">
-                                            {category === "Whiskey" ? [
-                                              "Macallan 12",
-                                              "Glenfiddich 15",
-                                              "Johnnie Walker Blue"
-                                            ][i] : category === "Vodka" ? [
-                                              "Grey Goose",
-                                              "Belvedere",
-                                              "Ketel One"
-                                            ][i] : category === "Gin" ? [
-                                              "Hendrick's",
-                                              "Monkey 47",
-                                              "Tanqueray"
-                                            ][i] : [
-                                              "Diplomatico",
-                                              "Zacapa XO",
-                                              "Plantation XO"
-                                            ][i]}
-                                          </h4>
-                                          <p className="text-sm text-gray-400 mt-1">
-                                            {category === "Whiskey" ? [
-                                              "Single Malt, Scotland",
-                                              "Single Malt, Scotland",
-                                              "Blended Scotch"
-                                            ][i] : category === "Vodka" ? [
-                                              "France",
-                                              "Poland",
-                                              "Netherlands"
-                                            ][i] : category === "Gin" ? [
-                                              "Scotland",
-                                              "Germany",
-                                              "England"
-                                            ][i] : [
-                                              "Venezuela",
-                                              "Guatemala",
-                                              "Barbados"
-                                            ][i]}
-                                          </p>
-                                        </div>
-                                        <span className="text-airbnb-gold font-medium">{
-                                          i === 0 ? "₹850" : i === 1 ? "₹950" : "₹1250"
-                                        }</span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </TabsContent>
-                      </Tabs>
+                      <iframe 
+                        src="https://heyzine.com/flip-book/63a72633a7.html" 
+                        title="Restaurant Drinks Menu"
+                        className="w-full h-[75vh] border-0 rounded-lg shadow-lg mt-4"
+                        allow="fullscreen"
+                      />
                     </div>
                     <div className="flex justify-center pb-6">
                       <Button 
