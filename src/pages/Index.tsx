@@ -14,6 +14,7 @@ import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
+import UpcomingExperiences from '@/components/UpcomingExperiences';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
 
@@ -43,7 +44,12 @@ const Index = () => {
           <About />
           <Highlights />
           <Testimonials />
-        </div> : activeCategory === 'experiences' ? <Events category="experiences" /> : activeCategory === 'menu' ? <div>
+        </div> : activeCategory === 'experiences' ? (
+          <>
+            <UpcomingExperiences />
+            <Events category="experiences" />
+          </>
+        ) : activeCategory === 'menu' ? <div>
           <FlipBook />
         </div> : activeCategory === 'offers' ? <div>
           <OngoingOffers />

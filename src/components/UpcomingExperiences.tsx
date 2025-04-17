@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-import ExperienceCard from './ExperienceCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,8 +24,11 @@ const UpcomingExperiences: React.FC = () => {
   const { data: experiences = [], isLoading, error } = useQuery({
     queryKey: ['upcoming-experiences'],
     queryFn: async () => {
-      // Get current date in YYYY-MM-DD format
+      console.log("Fetching upcoming experiences");
+      
+      // Get current date
       const today = new Date();
+      console.log("Today's date:", today.toISOString());
       
       // Fetch events from the events table
       const { data, error } = await supabase
@@ -39,14 +41,28 @@ const UpcomingExperiences: React.FC = () => {
         throw new Error(error.message);
       }
       
+      console.log("Raw events data:", data);
+      
       // Filter for upcoming events (today or later)
-      return (data as Experience[]).filter(event => {
+      const filteredEvents = (data as Experience[]).filter(event => {
         // Parse event date (assuming format like "25th April, 2025" or similar)
-        const eventDate = new Date(event.date);
-        return !isNaN(eventDate.getTime()) && eventDate >= today;
-      }).slice(0, 3); // Limit to 3 experiences
+        try {
+          const eventDate = new Date(event.date);
+          const isUpcoming = !isNaN(eventDate.getTime()) && eventDate >= today;
+          console.log(`Event: ${event.title}, Date: ${event.date}, Parsed Date: ${eventDate}, Is Upcoming: ${isUpcoming}`);
+          return isUpcoming;
+        } catch (e) {
+          console.error(`Error parsing date for event ${event.title}:`, e);
+          return false;
+        }
+      });
+      
+      console.log("Filtered upcoming events:", filteredEvents);
+      return filteredEvents.slice(0, 3); // Limit to 3 experiences
     }
   });
+
+  console.log("Rendered experiences:", experiences);
 
   if (isLoading) {
     return (
@@ -65,8 +81,31 @@ const UpcomingExperiences: React.FC = () => {
     );
   }
 
-  if (error || experiences.length === 0) {
-    return null; // Don't show this section if there's an error or no upcoming experiences
+  if (error) {
+    console.error("Error in UpcomingExperiences:", error);
+    return (
+      <div className="section-padding">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl">Error Loading Experiences</h2>
+          </div>
+          <p className="text-red-500">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (experiences.length === 0) {
+    return (
+      <div className="section-padding">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl">Upcoming Experiences</h2>
+          </div>
+          <p className="text-gray-400">No upcoming experiences found.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
