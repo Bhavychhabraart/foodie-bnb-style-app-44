@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface BookingConfirmationProps {
   experienceTitle: string;
@@ -177,7 +177,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <div className="p-4 bg-white rounded-lg">
-                <QRCode
+                <QRCodeSVG
                   id="booking-qr-code"
                   value={bookingDetailsQR}
                   size={200}
