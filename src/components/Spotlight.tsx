@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users, CirclePlus } from 'lucide-react';
+import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users, CirclePlus, CalendarCheck } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -136,8 +137,8 @@ const Spotlight: React.FC = () => {
                             animate-bounce-subtle group/reserve"
                           onClick={(e) => handleBookNow(item, e)}
                         >
-                          <CirclePlus className="mr-2 h-5 w-5 group-hover/reserve:scale-110 transition-transform" />
-                          Get Reserve
+                          <CalendarCheck className="mr-2 h-5 w-5 group-hover/reserve:scale-110 transition-transform" />
+                          Book Now
                         </Button>
                       </div>
                     </div>
