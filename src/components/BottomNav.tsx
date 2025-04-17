@@ -5,10 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import BookingDrawer from './BookingDrawer';
 import SupportDrawer from './SupportDrawer';
 import InfluencerDrawer from './InfluencerDrawer';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import UserProfile from './UserProfile';
-import { useAuth } from '@/providers/AuthProvider';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface BottomNavProps {
   activeTab: string;
@@ -19,9 +15,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
   const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
-  const { profile } = useAuth();
   
   const tabs = [
     { id: 'influencer', icon: Instagram },
@@ -39,21 +33,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
       setIsInfluencerDrawerOpen(true);
     } else if (tabId === 'booking') {
       setIsBookingDrawerOpen(true);
-    } else if (tabId === 'profile') {
-      setIsProfileOpen(true);
     }
-  };
-
-  // Get initials for avatar
-  const getInitials = () => {
-    if (!profile?.full_name) return "G";
-    
-    return profile.full_name
-      .split(' ')
-      .map(name => name[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
   };
 
   return (
@@ -75,10 +55,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
                   <div className="bg-airbnb-gold text-white rounded-full p-4 shadow-lg">
                     <tab.icon className="h-7 w-7" />
                   </div>
-                ) : tab.id === 'profile' && profile ? (
-                  <Avatar className="h-6 w-6 bg-airbnb-gold text-white">
-                    <AvatarFallback className="text-xs">{getInitials()}</AvatarFallback>
-                  </Avatar>
                 ) : (
                   <tab.icon className="w-6 h-6" />
                 )}
@@ -102,17 +78,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
         open={isInfluencerDrawerOpen}
         onOpenChange={setIsInfluencerDrawerOpen}
       />
-
-      <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-        <SheetContent className="sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle>User Profile</SheetTitle>
-          </SheetHeader>
-          <div className="py-4">
-            <UserProfile onClose={() => setIsProfileOpen(false)} />
-          </div>
-        </SheetContent>
-      </Sheet>
     </>
   );
 };

@@ -1,20 +1,11 @@
+
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 
-interface UserProfile {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  is_admin: boolean;
-}
-
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: UserProfile | null;
   isLoading: boolean;
   isAdmin: boolean;
 }
@@ -22,7 +13,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  profile: null,
   isLoading: true,
   isAdmin: false,
 });
@@ -36,39 +26,29 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const fetchUserProfile = async (userId: string) => {
+  const checkAdminStatus = async (userId: string) => {
+    if (!userId) return;
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('is_admin')
         .eq('id', userId)
         .single();
       
       if (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
         return;
       }
       
-      if (data) {
-        // Create a UserProfile from the data
-        const userProfile: UserProfile = {
-          id: data.id,
-          full_name: data.full_name,
-          email: data.email,
-          phone: data.phone,
-          avatar_url: data.avatar_url,
-          is_admin: data.is_admin || false,
-        };
-        
-        setProfile(userProfile);
-        setIsAdmin(data.is_admin || false);
-      }
+      setIsAdmin(data?.is_admin || false);
     } catch (error) {
-      console.error('Exception fetching user profile:', error);
+      console.error('Exception checking admin status:', error);
+      setIsAdmin(false);
     }
   };
 
@@ -79,12 +59,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Check admin status when user changes
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserProfile(session.user.id);
-          }, 0);
+          await checkAdminStatus(session.user.id);
         } else {
-          setProfile(null);
           setIsAdmin(false);
         }
         
@@ -97,8 +75,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
+      // Check admin status for current session
       if (session?.user) {
-        await fetchUserProfile(session.user.id);
+        await checkAdminStatus(session.user.id);
       }
       
       setIsLoading(false);
@@ -109,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, isLoading, isAdmin }}>
+    <AuthContext.Provider value={{ user, session, isLoading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
