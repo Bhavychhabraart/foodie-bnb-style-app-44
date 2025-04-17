@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, User, Instagram, Award, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,9 @@ import SupportDrawer from './SupportDrawer';
 import InfluencerDrawer from './InfluencerDrawer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import UserProfile from './UserProfile';
 
 interface NavbarProps {
   activeTab: string;
@@ -21,9 +25,10 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile } = useAuth();
   const [isSupportDrawerOpen, setIsSupportDrawerOpen] = useState(false);
   const [isInfluencerDrawerOpen, setIsInfluencerDrawerOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   
   const navItems = [
     { id: 'about', label: 'About' },
@@ -33,26 +38,14 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'location', label: 'Location' },
   ];
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     if (tabId === 'support') {
       setIsSupportDrawerOpen(true);
     } else if (tabId === 'influencer') {
       setIsInfluencerDrawerOpen(true);
+    } else if (tabId === 'profile') {
+      setIsProfileOpen(true);
     }
   };
 
@@ -70,6 +63,18 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         description: "You have been successfully signed out",
       });
     }
+  };
+
+  // Get initials for profile button
+  const getInitials = () => {
+    if (!profile?.full_name) return "G";
+    
+    return profile.full_name
+      .split(' ')
+      .map(name => name[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   return (
@@ -99,16 +104,25 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           <div className="flex items-center space-x-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="rounded-full p-2">
-                  <Menu size={20} className="mr-2 md:hidden" />
-                  <User size={20} className="hidden md:block" />
+                <Button variant="outline" className={`rounded-full ${profile ? 'bg-airbnb-gold text-white hover:bg-airbnb-gold/90 border-airbnb-gold' : ''} p-2`}>
+                  {profile ? (
+                    <span className="font-medium">{getInitials()}</span>
+                  ) : (
+                    <>
+                      <Menu size={20} className="mr-2 md:hidden" />
+                      <User size={20} className="hidden md:block" />
+                    </>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white">
-                {user ? (
+                {profile ? (
                   <>
                     <DropdownMenuItem className="cursor-default text-sm font-medium">
-                      {user.email}
+                      {profile.full_name}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer text-sm" onClick={() => handleTabClick('profile')}>
+                      <User className="h-4 w-4 mr-2" /> View Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer text-sm" onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" /> Sign out
@@ -154,6 +168,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         open={isInfluencerDrawerOpen}
         onOpenChange={setIsInfluencerDrawerOpen}
       />
+
+      <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>User Profile</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <UserProfile onClose={() => setIsProfileOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };
