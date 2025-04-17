@@ -29,6 +29,12 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
     setSelectedOption(null);
   };
 
+  const handleClose = () => {
+    // Reset the state and close the drawer
+    setSelectedOption(null);
+    onOpenChange(false);
+  };
+
   const renderBookingOptions = () => {
     return (
       <div className="flex flex-col h-full bg-[#121212] text-white">
@@ -86,11 +92,11 @@ export const BookingDrawer: React.FC<BookingDrawerProps> = ({ open, onOpenChange
   const renderSelectedForm = () => {
     switch (selectedOption) {
       case 'standard':
-        return <StandardBookingForm onBack={handleBack} onClose={() => onOpenChange(false)} />;
+        return <StandardBookingForm onBack={handleBack} onClose={handleClose} />;
       case 'corporate':
-        return <CorporateEventForm onBack={handleBack} onClose={() => onOpenChange(false)} />;
+        return <CorporateEventForm onBack={handleBack} onClose={handleClose} />;
       case 'party':
-        return <PrivatePartyForm onBack={handleBack} onClose={() => onOpenChange(false)} />;
+        return <PrivatePartyForm onBack={handleBack} onClose={handleClose} />;
       default:
         return renderBookingOptions();
     }

@@ -62,9 +62,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
   const [isLoadingTables, setIsLoadingTables] = useState(false);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const [bookingData, setBookingData] = useState<Record<string, any> | null>(null);
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -279,6 +278,19 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
         }
       }
 
+      // Save summary data before sending confirmation email
+      setBookingData({
+        email: values.email,
+        name: values.name,
+        date: format(values.date, 'MMMM dd, yyyy'),
+        time: values.time,
+        guests: totalGuests,
+        experienceTitle: "Standard Table Booking",
+        tableNumber: tableNumber,
+        specialRequests: values.specialRequests,
+        addOns: addOnsList
+      });
+
       // Send email confirmation
       try {
         const { data, error } = await supabase.functions.invoke('send-booking-confirmation', {
@@ -306,7 +318,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
         // Don't block booking completion if email fails
       }
       
-      // Add a small delay to prevent accidental double clicks
+      // Wait for state updates to complete before transitioning
       await new Promise(resolve => setTimeout(resolve, 500));
       
       setIsComplete(true);
@@ -511,13 +523,14 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
     );
   };
 
-  if (isComplete) {
+  // Fix: Check if we have booking data available for the confirmation screen
+  if (isComplete && bookingData) {
     return (
       <BookingConfirmation
-        experienceTitle="Standard Table Booking"
-        date={form.getValues('date') ? format(form.getValues('date'), 'MMMM dd, yyyy') : ''}
-        time={form.getValues('time')}
-        guests={totalGuests.toString()}
+        experienceTitle={bookingData.experienceTitle}
+        date={bookingData.date}
+        time={bookingData.time}
+        guests={bookingData.guests.toString()}
         onClose={onClose}
       />
     );

@@ -12,6 +12,7 @@ import { Calendar as CalendarIcon, Users, Tag, Phone, Loader2 } from 'lucide-rea
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/providers/AuthProvider';
 import BookingConfirmation from '@/components/BookingConfirmation';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define restaurant opening hours
 const openingHours = {
@@ -36,7 +37,8 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
   const [discountApplied, setDiscountApplied] = useState(false);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Add loading state
+  const [bookingData, setBookingData] = useState<Record<string, any> | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useAuth();
 
@@ -108,12 +110,67 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
     }
 
     try {
-      setIsSubmitting(true); // Start loading state
+      setIsSubmitting(true);
       
-      // Simulate API call or processing delay (replace with actual booking logic)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data: { user } } = await supabase.auth.getUser();
+      const dateFormatted = format(date, 'yyyy-MM-dd');
+      const guestCount = parseInt(guests, 10);
+      const totalAmount = guestCount * 1000; // ₹1000 per guest
+      
+      // Create the reservation record
+      const { data: reservationData, error: reservationError } = await supabase
+        .from('reservations')
+        .insert({
+          user_id: user?.id || null,
+          booking_type: 'standard',
+          name: name,
+          email: email,
+          phone: phone,
+          date: dateFormatted,
+          time: time,
+          total_amount: totalAmount,
+          special_requests: '',
+          status: 'pending'
+        })
+        .select('id')
+        .single();
+        
+      if (reservationError) throw reservationError;
+      
+      // Add guests
+      if (guestCount > 0) {
+        const guests = Array(guestCount).fill({
+          reservation_id: reservationData.id,
+          name: 'Guest',
+          gender: 'not_specified',
+          cover_charge: 1000
+        });
+        
+        const { error: guestsError } = await supabase
+          .from('reservation_guests')
+          .insert(guests);
+          
+        if (guestsError) throw guestsError;
+      }
+      
+      // Store booking data for confirmation screen
+      setBookingData({
+        experienceTitle: "Table Reservation",
+        date: date ? format(date, "MMMM dd, yyyy") : "",
+        time: time || "",
+        guests: guests,
+        name: name,
+        phone: phone
+      });
       
       setShowConfirmation(true);
+      
+      // Notify the user
+      toast({
+        title: "Reservation Successful",
+        description: `Your table for ${guests} guests is reserved for ${format(date, 'MMMM dd, yyyy')} at ${time}.`
+      });
+      
     } catch (error) {
       console.error("Booking error:", error);
       toast({
@@ -122,7 +179,7 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false); // End loading state regardless of outcome
+      setIsSubmitting(false);
     }
   };
   
@@ -138,18 +195,19 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
     setPhone(userProfile?.phone || "");
     setCouponCode("");
     setDiscountApplied(false);
+    setBookingData(null);
   };
 
   return (
     <div id={id} className="section-padding bg-airbnb-gray">
-      {showConfirmation ? (
+      {showConfirmation && bookingData ? (
         <BookingConfirmation
-          experienceTitle="Table Reservation"
-          date={date ? format(date, "MMMM dd, yyyy") : ""}
-          time={time || ""}
-          guests={guests}
-          name={name}
-          phone={phone}
+          experienceTitle={bookingData.experienceTitle}
+          date={bookingData.date}
+          time={bookingData.time}
+          guests={bookingData.guests}
+          name={bookingData.name}
+          phone={bookingData.phone}
           onClose={handleCloseConfirmation}
         />
       ) : (
