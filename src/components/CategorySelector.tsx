@@ -16,7 +16,7 @@ const CategorySelector: React.FC<CategoryProps> = ({
     icon: Home
   }, {
     id: 'experiences',
-    label: 'Events',
+    label: 'Upcoming',
     icon: Calendar
   }, {
     id: 'menu',

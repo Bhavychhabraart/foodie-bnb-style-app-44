@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -15,14 +16,15 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
+
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const [bookingOpen, setBookingOpen] = useState(false);
   const upcomingEvents = ["Soulful Sufi Night - 16th April", "Our World with Raja Kikkat - 17th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
+  
   return <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        
         <ThemeToggle />
       </div>
       
@@ -52,4 +54,5 @@ const Index = () => {
       <BookingDrawer open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>;
 };
+
 export default Index;

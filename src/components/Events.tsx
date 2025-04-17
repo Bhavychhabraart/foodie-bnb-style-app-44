@@ -44,14 +44,37 @@ const Events: React.FC<EventsProps> = ({
         query = query.eq('category', category);
       }
       
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching events:', error);
-        throw new Error(error.message);
+      // For experiences category, show only upcoming events
+      if (category === 'experiences') {
+        // Get current date in YYYY-MM-DD format
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        
+        // Filter events by comparing dates
+        // This is a simple implementation that assumes dates are in a comparable format
+        const { data, error } = await query.order('date', { ascending: true });
+        
+        if (error) {
+          console.error('Error fetching events:', error);
+          throw new Error(error.message);
+        }
+        
+        // Filter for upcoming events (today or later)
+        return (data as Event[]).filter(event => {
+          // Parse event date (assuming format like "25th April, 2025" or similar)
+          const eventDate = new Date(event.date);
+          return !isNaN(eventDate.getTime()) && eventDate >= today;
+        });
+      } else {
+        const { data, error } = await query.order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching events:', error);
+          throw new Error(error.message);
+        }
+        
+        return data as Event[];
       }
-      
-      return data as Event[];
     }
   });
 
@@ -90,7 +113,7 @@ const Events: React.FC<EventsProps> = ({
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-semibold text-2xl text-airbnb-light">
-            {category === 'experiences' ? 'Past Events' : 'Events'}
+            {category === 'experiences' ? 'Upcoming Events' : 'Events'}
           </h2>
           <button className="flex items-center text-airbnb-gold hover:underline text-xs text-left">
             <span className="mr-1">View all</span>
