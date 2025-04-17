@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag, Check, ChevronRight, User as MaleIcon, UserCircle2 as FemaleIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, Users, Tag, Check, ChevronRight, User as MaleIcon, UserCircle2 as FemaleIcon, Loader2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -55,6 +55,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
   const [availableTables, setAvailableTables] = useState<any[]>([]);
   const [isLoadingTables, setIsLoadingTables] = useState(false);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const {
     toast
   } = useToast();
@@ -150,7 +151,12 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
     }
   };
   const onSubmit = async (values: FormValues) => {
+    // Prevent multiple submissions
+    if (isProcessing) return;
+    
     try {
+      setIsProcessing(true);
+      
       if (values.maleCount > 0 && values.femaleCount > 0) {
         if (values.maleCount > values.femaleCount * 2) {
           toast({
@@ -158,6 +164,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
             description: "Maximum 2 males per female allowed.",
             variant: "destructive"
           });
+          setIsProcessing(false);
           return;
         }
       }
@@ -261,6 +268,10 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
         console.error("Exception sending confirmation email:", emailError);
         // Don't block booking completion if email fails
       }
+      
+      // Add a small delay to prevent accidental double clicks
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       setIsComplete(true);
       let confirmationMessage = `Your table for ${totalGuests} guests is reserved for ${format(values.date, 'MMMM dd, yyyy')} at ${values.time}.`;
       if (values.addOns.skipQueue) {
@@ -283,6 +294,8 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive"
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
   const renderStepIndicator = () => {
@@ -319,11 +332,17 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
     }
   };
   const handleManualContinue = () => {
+    // Prevent multiple clicks
+    if (isProcessing) return;
+    
     const currentStepFields: Record<number, (keyof FormValues)[]> = {
       1: ["date", "time", "maleCount", "femaleCount"],
       2: ["name", "email", "phone"],
       3: [] // No specific validations for add-ons step
     };
+    
+    setIsProcessing(true);
+    
     const fieldsToValidate = currentStepFields[step] || [];
     if (step === 1) {
       const totalGuests = form.getValues('maleCount') + form.getValues('femaleCount');
@@ -333,6 +352,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
           description: "Please add at least one guest",
           variant: "destructive"
         });
+        setIsProcessing(false);
         return;
       }
       const maleCount = form.getValues('maleCount');
@@ -344,6 +364,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
             description: "Maximum 2 males per female allowed.",
             variant: "destructive"
           });
+          setIsProcessing(false);
           return;
         }
       }
@@ -352,9 +373,13 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
       if (isValid) {
         if (step < 3) {
           setStep(step + 1);
+          setIsProcessing(false);
         } else {
           form.handleSubmit(onSubmit)();
+          // Don't reset isProcessing here, it will be reset in onSubmit
         }
+      } else {
+        setIsProcessing(false);
       }
     });
   };
@@ -718,9 +743,23 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
                 Cancel
               </Button>}
             
-            <Button type="button" onClick={handleManualContinue} className="bg-airbnb-red hover:bg-airbnb-red/90 text-white" disabled={step === 1 && availableTables.length > 0 && !selectedTableId}>
-              {step === 3 ? 'Confirm Booking' : 'Continue'} 
-              {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+            <Button 
+              type="button" 
+              onClick={handleManualContinue} 
+              className="bg-airbnb-red hover:bg-airbnb-red/90 text-white" 
+              disabled={isProcessing || (step === 1 && availableTables.length > 0 && !selectedTableId)}
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {step === 3 ? 'Processing...' : 'Please wait...'}
+                </>
+              ) : (
+                <>
+                  {step === 3 ? 'Confirm Booking' : 'Continue'} 
+                  {step < 3 && <ArrowRight className="ml-2 h-4 w-4" />}
+                </>
+              )}
             </Button>
           </div>
         </form>
