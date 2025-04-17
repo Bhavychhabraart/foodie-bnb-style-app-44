@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Check, PartyPopper, Send, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -68,12 +69,12 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-8 px-4 text-center bg-[#1A1F2C]">
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6"
+        className="w-20 h-20 bg-[#8B5CF6] rounded-full flex items-center justify-center mb-6"
       >
         <Check className="w-10 h-10 text-white" />
       </motion.div>
@@ -83,21 +84,21 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.5 }}
       >
-        <h2 className="text-2xl font-bold mb-2">Booking Confirmed!</h2>
+        <h2 className="text-2xl font-bold mb-2 text-white">Booking Confirmed!</h2>
         
         <div className="mb-6">
-          <p className="text-lg mb-1">Thank you for your reservation</p>
-          <p className="text-sm text-gray-500">A confirmation has been sent to your email</p>
+          <p className="text-lg mb-1 text-[#D6BCFA]">Thank you for your reservation</p>
+          <p className="text-sm text-[#8E9196]">A confirmation has been sent to your email</p>
         </div>
         
-        <div className="bg-zinc-900 rounded-lg p-4 mb-6 border border-airbnb-gold/20 shadow-lg">
+        <div className="bg-[#6E59A5] rounded-lg p-4 mb-6 border border-[#9b87f5]/20 shadow-lg">
           <h3 className="font-medium mb-2 text-white">{experienceTitle}</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-gray-400">Date:</div>
+            <div className="text-[#D6BCFA]">Date:</div>
             <div className="text-white">{date}</div>
-            <div className="text-gray-400">Time:</div>
+            <div className="text-[#D6BCFA]">Time:</div>
             <div className="text-white">{time}</div>
-            <div className="text-gray-400">Guests:</div>
+            <div className="text-[#D6BCFA]">Guests:</div>
             <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
           </div>
         </div>
@@ -142,14 +143,14 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-center">
         <Button 
           onClick={() => setShowQrCode(true)} 
-          className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-white"
+          className="bg-[#9b87f5] hover:bg-[#8B5CF6] text-white"
         >
           View QR Ticket
         </Button>
         
         <Button 
           onClick={openWhatsAppCard} 
-          className="bg-green-600 hover:bg-green-700 text-white"
+          className="bg-[#7E69AB] hover:bg-[#6E59A5] text-white"
         >
           <Send className="mr-2 h-4 w-4" />
           Send on WhatsApp
@@ -157,7 +158,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         
         <Button 
           onClick={onClose} 
-          className="bg-airbnb-red hover:bg-airbnb-red/90 text-white"
+          className="bg-[#8B5CF6] hover:bg-[#6E59A5] text-white"
         >
           Done
         </Button>
@@ -165,7 +166,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
       <Dialog open={showQrCode} onOpenChange={setShowQrCode}>
         <DialogContent className="sm:max-w-md">
-          <Card className="bg-zinc-900 border-airbnb-gold/20">
+          <Card className="bg-[#1A1F2C] border-[#9b87f5]/20">
             <CardHeader>
               <CardTitle className="text-center text-white">Your Booking QR Ticket</CardTitle>
             </CardHeader>
@@ -176,24 +177,24 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
                   value={bookingDetailsQR}
                   size={200}
                   level="H"
-                  fgColor="#8B5CF6"
+                  fgColor="#6E59A5"
                   bgColor="#FFFFFF"
                   includeMargin={true}
                 />
               </div>
               <div className="mt-4 text-center">
-                <p className="text-sm text-gray-400 mb-1">Scan this code at the restaurant</p>
+                <p className="text-sm text-[#8E9196] mb-1">Scan this code at the restaurant</p>
                 <p className="font-medium text-white">{experienceTitle}</p>
-                <p className="text-sm mt-2 text-gray-300">
+                <p className="text-sm mt-2 text-[#D6BCFA]">
                   {date} • {time} • {guests} {parseInt(guests) === 1 ? 'person' : 'people'}
                 </p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => setShowQrCode(false)} className="text-white border-airbnb-gold/50">
+              <Button variant="outline" onClick={() => setShowQrCode(false)} className="text-white border-[#9b87f5]/50">
                 Close
               </Button>
-              <Button onClick={downloadQRCode} className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-white">
+              <Button onClick={downloadQRCode} className="bg-[#9b87f5] hover:bg-[#8B5CF6] text-white">
                 <Download className="mr-2 h-4 w-4" />
                 Download QR
               </Button>
@@ -204,31 +205,31 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
       <Dialog open={showWhatsAppCard} onOpenChange={setShowWhatsAppCard}>
         <DialogContent className="sm:max-w-md">
-          <Card className="bg-zinc-900 border-airbnb-gold/20">
+          <Card className="bg-[#1A1F2C] border-[#9b87f5]/20">
             <CardHeader>
               <CardTitle className="text-center text-white">Share on WhatsApp</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <p className="text-white">Send your booking details to WhatsApp</p>
-                <div className="bg-zinc-800 p-3 rounded-md">
+                <div className="bg-[#6E59A5] p-3 rounded-md">
                   <p className="font-medium text-white">{experienceTitle}</p>
                   <div className="grid grid-cols-2 gap-1 text-sm mt-2">
-                    <div className="text-gray-400">Date:</div>
+                    <div className="text-[#D6BCFA]">Date:</div>
                     <div className="text-white">{date}</div>
-                    <div className="text-gray-400">Time:</div>
+                    <div className="text-[#D6BCFA]">Time:</div>
                     <div className="text-white">{time}</div>
-                    <div className="text-gray-400">Guests:</div>
+                    <div className="text-[#D6BCFA]">Guests:</div>
                     <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
                   </div>
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={closeWhatsAppCard} className="text-white border-airbnb-gold/50">
+              <Button variant="outline" onClick={closeWhatsAppCard} className="text-white border-[#9b87f5]/50">
                 Cancel
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleWhatsAppShare}>
+              <Button className="bg-[#7E69AB] hover:bg-[#6E59A5] text-white" onClick={handleWhatsAppShare}>
                 <Send className="mr-2 h-4 w-4" />
                 Send on WhatsApp
               </Button>
@@ -241,3 +242,4 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 };
 
 export default BookingConfirmation;
+
