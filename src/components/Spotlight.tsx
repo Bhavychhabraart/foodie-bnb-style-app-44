@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users } from 'lucide-react';
+import { Sparkles, ChevronRight, Calendar, Star, Clock, MapPin, Users, CirclePlus } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -133,10 +132,12 @@ const Spotlight: React.FC = () => {
                         </Button>
                         
                         <Button 
-                          className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium"
+                          className="flex-1 bg-airbnb-gold hover:bg-airbnb-gold/90 text-black font-medium 
+                            animate-bounce-subtle group/reserve"
                           onClick={(e) => handleBookNow(item, e)}
                         >
-                          Book Now
+                          <CirclePlus className="mr-2 h-5 w-5 group-hover/reserve:scale-110 transition-transform" />
+                          Get Reserve
                         </Button>
                       </div>
                     </div>
@@ -149,7 +150,6 @@ const Spotlight: React.FC = () => {
         </Carousel>
       </div>
       
-      {/* Experience Details Drawer */}
       {selectedItem && (
         <ExperienceDetailsDrawer 
           isOpen={isDetailsDrawerOpen}
@@ -166,7 +166,6 @@ const Spotlight: React.FC = () => {
         />
       )}
 
-      {/* Booking Drawer */}
       <BookingDrawer 
         open={isBookingDrawerOpen} 
         onOpenChange={setIsBookingDrawerOpen} 
