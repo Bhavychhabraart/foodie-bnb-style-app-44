@@ -22,11 +22,7 @@ const About: React.FC = () => {
               <span className="absolute -bottom-2 left-0 w-1/3 h-0.5 bg-airbnb-gold"></span>
             </h2>
             
-            <p className="text-airbnb-darkbrown/90 dark:text-airbnb-beige mb-6 leading-relaxed">
-              Fine Dine is an exquisite culinary destination nestled in the heart of Manhattan. 
-              Our restaurant brings together the finest ingredients, masterful techniques, and 
-              elegant ambiance to create an unforgettable dining experience.
-            </p>
+            <p className="text-airbnb-darkbrown/90 dark:text-airbnb-beige mb-6 leading-relaxed"> HACHA, the ultimate BYOB destination where aesthetics meet wild parties and culinary excellence!</p>
             
             <div className="grid grid-cols-2 gap-6 mt-8 bg-zinc-900">
               <motion.div whileHover={{
