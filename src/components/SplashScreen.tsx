@@ -61,9 +61,10 @@ const SplashScreen: React.FC<{
         
       if (existingUsers && existingUsers.length > 0) {
         // User exists, log them in with their existing email
+        const existingPassword = existingUsers[0].password || password;
         const { error } = await supabase.auth.signInWithPassword({
           email: `${normalizedPhone}@hacha.guest`,
-          password: existingUsers[0].password || password
+          password: existingPassword
         });
         
         if (error) throw error;
@@ -83,13 +84,15 @@ const SplashScreen: React.FC<{
         if (signUpError) throw signUpError;
         
         // Update the profile with phone and generated password
-        await supabase
-          .from('profiles')
-          .update({ 
-            phone: normalizedPhone,
-            password
-          })
-          .eq('id', data.user?.id);
+        if (data.user) {
+          await supabase
+            .from('profiles')
+            .update({ 
+              phone: normalizedPhone,
+              password
+            })
+            .eq('id', data.user.id);
+        }
       }
       
       toast({

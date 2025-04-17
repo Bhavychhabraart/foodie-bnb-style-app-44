@@ -10,6 +10,7 @@ interface UserProfile {
   phone: string | null;
   avatar_url: string | null;
   is_admin: boolean;
+  password?: string;  // Added password field
 }
 
 interface AuthContextType {
@@ -55,7 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       if (data) {
-        setProfile(data as UserProfile);
+        // Type assertion to match our UserProfile interface
+        setProfile(data as unknown as UserProfile);
         setIsAdmin(data.is_admin || false);
       }
     } catch (error) {

@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -16,12 +16,12 @@ type ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
 
-export function ThemeProvider({
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
   defaultTheme = "system",
   storageKey = "theme",
   ...props
-}: ThemeProviderProps) {
+}) => {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
@@ -55,7 +55,7 @@ export function ThemeProvider({
       {children}
     </ThemeProviderContext.Provider>
   );
-}
+};
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
