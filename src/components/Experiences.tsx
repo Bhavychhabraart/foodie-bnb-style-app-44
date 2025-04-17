@@ -1,109 +1,97 @@
+
 import React from 'react';
 import ExperienceCard from './ExperienceCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
 interface ExperiencesProps {
   category?: string;
 }
 
 // Define a consistent interface for all experience objects
 interface Experience {
-  id: number;
-  imageUrl: string;
+  id: string;
   title: string;
   host: string;
   price: string;
-  rating?: number;
-  reviews?: number;
-  isSoldOut?: boolean;
+  rating: number;
+  reviews: number;
+  is_sold_out: boolean;
+  venue: string;
+  time: string;
+  image_url: string;
+  date: string;
+  category: string;
+  description: string | null;
+  featured: boolean;
+  capacity: string | null;
 }
-const experiencesByCategory: Record<string, Experience[]> = {
-  menu: [{
-    id: 1,
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Fine Dine Restaurant Experience",
-    host: "Chef Marcus",
-    price: "₹2,500 per person",
-    rating: 4.92,
-    reviews: 286,
-    isSoldOut: false
-  }, {
-    id: 2,
-    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Farm to Table Dinner",
-    host: "Maria",
-    price: "₹3,200 per person",
-    rating: 4.78,
-    reviews: 124,
-    isSoldOut: false
-  }],
-  experiences: [{
-    id: 3,
-    imageUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Train for Gladiator II glory",
-    host: "Lucius",
-    price: "₹7,039 per night",
-    isSoldOut: true
-  }, {
-    id: 4,
-    imageUrl: "https://images.unsplash.com/photo-1485833077593-4278bba3f11f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Connect with your heart in this magical place",
-    host: "Joel",
-    price: "₹35,198 for 5 nights",
-    rating: 4.86,
-    reviews: 468,
-    isSoldOut: false
-  }],
-  offers: [{
-    id: 5,
-    imageUrl: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "25% Off Weekend Brunch",
-    host: "Fine Dine",
-    price: "Valid until May 31",
-    rating: 4.96,
-    reviews: 352,
-    isSoldOut: false
-  }, {
-    id: 6,
-    imageUrl: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Chef's Special Tasting Menu",
-    host: "Chef Alessandro",
-    price: "₹6,000 per person",
-    rating: 4.91,
-    reviews: 208,
-    isSoldOut: false
-  }],
-  home: [{
-    id: 7,
-    imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Farm to Table Dinner",
-    host: "May 25, 2025",
-    price: "₹3,200 per person",
-    rating: 4.92,
-    reviews: 48
-  }, {
-    id: 8,
-    imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    title: "Wine Tasting Evening",
-    host: "June 3, 2025",
-    price: "₹1,800 per person",
-    rating: 4.85,
-    reviews: 32
-  }, {
-    id: 9,
-    imageUrl: "https://images.unsplash.com/photo-1556761223-4c4282c73f77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1165&q=80",
-    title: "Pasta Making Class",
-    host: "June 12, 2025",
-    price: "₹2,500 per person",
-    rating: 4.78,
-    reviews: 28
-  }]
-};
+
 const Experiences: React.FC<ExperiencesProps> = ({
   category = 'home'
 }) => {
-  const experiencesToShow = experiencesByCategory[category] || experiencesByCategory.home;
-  return <div className="section-padding bg-zinc-900">
+  // Fetch experiences from Supabase based on category
+  const { data: experiences = [], isLoading, error } = useQuery({
+    queryKey: ['experiences', category],
+    queryFn: async () => {
+      let query = supabase
+        .from('events')
+        .select('*');
+        
+      if (category !== 'all') {
+        query = query.eq('category', category);
+      }
+      
+      // For menu category, we may want to show specific events
+      if (category === 'menu') {
+        query = query.eq('category', 'menu');
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching experiences:', error);
+        throw new Error(error.message);
+      }
+      
+      return data as Experience[];
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="section-padding bg-zinc-900">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl">Loading Experiences...</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-64 bg-gray-800 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="section-padding bg-zinc-900">
+        <div className="container-padding mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-2xl">Error</h2>
+          </div>
+          <p className="text-red-500">Failed to load experiences: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="section-padding bg-zinc-900">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-semibold text-2xl">
@@ -115,15 +103,31 @@ const Experiences: React.FC<ExperiencesProps> = ({
           </button>
         </div>
         
-        <Carousel className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {experiencesToShow.map(experience => <CarouselItem key={experience.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <ExperienceCard imageUrl={experience.imageUrl} title={experience.title} host={experience.host} price={experience.price} rating={experience.rating} reviews={experience.reviews} isSoldOut={experience.isSoldOut} />
-              </CarouselItem>)}
-          </CarouselContent>
-          <CarouselDots className="mt-4" />
-        </Carousel>
+        {experiences.length === 0 ? (
+          <p className="text-gray-400">No experiences found for this category.</p>
+        ) : (
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {experiences.map(experience => (
+                <CarouselItem key={experience.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <ExperienceCard
+                    imageUrl={experience.image_url || '/placeholder.svg'}
+                    title={experience.title}
+                    host={experience.host}
+                    price={experience.price}
+                    rating={experience.rating}
+                    reviews={experience.reviews}
+                    isSoldOut={experience.is_sold_out}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselDots className="mt-4" />
+          </Carousel>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Experiences;
