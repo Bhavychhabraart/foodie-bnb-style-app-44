@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -967,3 +968,27 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({
             <Button 
               type="button" 
               onClick={handleManualContinue}
+              disabled={isProcessing}
+              className="bg-airbnb-red hover:bg-airbnb-red/90"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : step < 3 ? (
+                <>
+                  Continue <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              ) : (
+                'Complete Booking'
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default StandardBookingForm;
