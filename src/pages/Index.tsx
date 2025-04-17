@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -16,29 +15,14 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
-
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const [bookingOpen, setBookingOpen] = useState(false);
-  const upcomingEvents = [
-    "Soulful Sufi Night - 16th April", 
-    "Our World with Raja Kikkat - 17th April", 
-    "Thursday Gin & Groove - 17th April", 
-    "Back to 90s - 18th April", 
-    "Bollywood Night - 20th April"
-  ];
-  
-  return (
-    <div className="pb-16 bg-airbnb-dark">
+  const upcomingEvents = ["Soulful Sufi Night - 16th April", "Our World with Raja Kikkat - 17th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
+  return <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <Button 
-          onClick={() => setBookingOpen(true)}
-          className="bg-airbnb-gold text-black font-medium hover:bg-airbnb-gold/90 flex items-center gap-2 rounded-full"
-          size="sm"
-        >
-          <Calendar className="w-4 h-4" /> Book Now
-        </Button>
+        
         <ThemeToggle />
       </div>
       
@@ -48,8 +32,7 @@ const Index = () => {
         <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       </div>
       
-      {activeCategory === 'home' ? (
-        <div className="space-y-2 bg-airbnb-dark">
+      {activeCategory === 'home' ? <div className="space-y-2 bg-airbnb-dark">
           <Spotlight />
           <Events category="home" />
           <ChefsSpecials />
@@ -58,24 +41,15 @@ const Index = () => {
           <About />
           <Highlights />
           <Testimonials />
-        </div>
-      ) : activeCategory === 'experiences' ? (
-        <Events category="experiences" />
-      ) : activeCategory === 'menu' ? (
-        <div>
+        </div> : activeCategory === 'experiences' ? <Events category="experiences" /> : activeCategory === 'menu' ? <div>
           <FlipBook />
-        </div>
-      ) : activeCategory === 'offers' ? (
-        <div>
+        </div> : activeCategory === 'offers' ? <div>
           <OngoingOffers />
-        </div>
-      ) : null}
+        </div> : null}
       
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <BookingDrawer open={bookingOpen} onOpenChange={setBookingOpen} />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
