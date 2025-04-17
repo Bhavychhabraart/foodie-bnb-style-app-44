@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Check, PartyPopper, Send, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -51,13 +50,10 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     guests: guests
   };
   
-  // Pre-stringify the booking details to avoid repeated computation
   const bookingDetailsQR = JSON.stringify(bookingDetails);
   
-  // Effect to manage QR code loading state
   useEffect(() => {
     if (showQrCode) {
-      // Small timeout to ensure smooth dialog transition
       const timer = setTimeout(() => {
         setQrCodeLoaded(true);
       }, 100);
@@ -93,8 +89,9 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     try {
       const canvas = document.getElementById('booking-qr-code');
       if (canvas) {
-        // Convert SVG to canvas for download
-        const svgData = new XMLSerializer().serializeToString(canvas as SVGElement);
+        const svgElement = canvas as unknown as SVGElement;
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        
         const img = new Image();
         img.onload = () => {
           const tempCanvas = document.createElement('canvas');
@@ -106,7 +103,6 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
             ctx.drawImage(img, 0, 0);
             
-            // Create download link
             const downloadLink = document.createElement('a');
             downloadLink.href = tempCanvas.toDataURL('image/png');
             downloadLink.download = `${experienceTitle.replace(/\s+/g, '_')}_booking_qrcode.png`;
@@ -234,7 +230,6 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <div className="p-4 bg-white rounded-lg shadow-xl" ref={qrCanvasRef}>
-                {/* Lazy load the QR code only when dialog is shown */}
                 {showQrCode && <BookingQRCode bookingData={bookingDetailsQR} />}
               </div>
               <div className="mt-4 text-center">
