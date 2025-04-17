@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -71,8 +70,8 @@ const SupportDrawer: React.FC<SupportDrawerProps> = ({
                 <div>
                   <h3 className="font-medium text-lg text-white">Location</h3>
                   <p className="text-white/70 mb-2">Find us at:</p>
-                  <p className="text-white">42 Gourmet Avenue, Culinary District</p>
-                  <p className="text-white">Mumbai, Maharashtra 400001</p>
+                  <p className="text-white">C333+V8, Rosewood City, Ghasola, Sector 49, Gurugram, Haryana 122018</p>
+                  <p className="text-white"></p>
                   <Button variant="outline" className="mt-3 text-airbnb-gold border-airbnb-gold/20 hover:bg-airbnb-gold/5" onClick={() => window.open('https://maps.google.com', '_blank')}>
                     Get Directions
                   </Button>
