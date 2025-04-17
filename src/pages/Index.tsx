@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -37,7 +36,7 @@ const Index = () => {
       {activeCategory === 'home' ? <div className="space-y-2 bg-airbnb-dark">
           <Spotlight />
           <Events category="home" />
-          <ChefsSpecials />
+          <ChefsSpecials setActiveCategory={setActiveCategory} />
           <OngoingOffers />
           <PhotoGallery />
           <About />

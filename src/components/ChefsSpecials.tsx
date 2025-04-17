@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
 interface ChefSpecial {
   id: string;
   title: string;
@@ -16,12 +17,18 @@ interface ChefSpecial {
   is_new: boolean;
   is_popular: boolean;
 }
-const ChefsSpecials: React.FC = () => {
+
+interface ChefsSpecialsProps {
+  setActiveCategory: (category: string) => void;
+}
+
+const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ setActiveCategory }) => {
   const [chefsSpecials, setChefsSpecials] = useState<ChefSpecial[]>([]);
   const [loading, setLoading] = useState(true);
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const fetchChefsSpecials = async () => {
       try {
@@ -50,6 +57,7 @@ const ChefsSpecials: React.FC = () => {
     };
     fetchChefsSpecials();
   }, [toast]);
+
   return <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
       <div className="container-padding mx-auto">
         <div className="flex justify-between items-center mb-8">
@@ -57,7 +65,10 @@ const ChefsSpecials: React.FC = () => {
             <h2 className="text-2xl font-semibold text-airbnb-darkbrown dark:text-airbnb-cream">Chef's Specials</h2>
             <ChefHat className="w-5 h-5 text-airbnb-gold" />
           </div>
-          <button className="flex items-center text-airbnb-gold hover:underline group">
+          <button 
+            className="flex items-center text-airbnb-gold hover:underline group"
+            onClick={() => setActiveCategory('menu')}
+          >
             <span className="mr-1 group-hover:mr-2 transition-all">View menu</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
@@ -130,4 +141,5 @@ const ChefsSpecials: React.FC = () => {
       </div>
     </div>;
 };
+
 export default ChefsSpecials;
