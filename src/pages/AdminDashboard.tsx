@@ -2,9 +2,8 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, PenSquare, Users, Calendar, Table } from 'lucide-react';
+import { ArrowLeft, PenSquare, Users, Calendar, Table, DollarSign, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/providers/AuthProvider';
 import BookingsManagement from '@/components/admin/BookingsManagement';
 import TablesManagement from '@/components/admin/TablesManagement';
@@ -18,13 +17,16 @@ const AdminDashboard: React.FC = () => {
   const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const [reservationsResult, tablesResult] = await Promise.all([
+      const [reservationsResult, tablesResult, guestsResult] = await Promise.all([
         supabase
           .from('reservations')
           .select('*', { count: 'exact' }),
         supabase
           .from('restaurant_tables')
-          .select('*', { count: 'exact' })
+          .select('*', { count: 'exact' }),
+        supabase
+          .from('reservation_guests')
+          .select('cover_charge')
       ]);
 
       const last30Days = new Date();
@@ -44,11 +46,18 @@ const AdminDashboard: React.FC = () => {
           .gte('created_at', last7Days.toISOString())
       ]);
 
+      // Calculate total sales from cover charges
+      const totalSales = (guestsResult.data || []).reduce((sum, guest) => 
+        sum + (guest.cover_charge || 1000), 0
+      );
+
       return {
         totalReservations: reservationsResult.count || 0,
         totalTables: tablesResult.count || 0,
         last30Days: last30DaysResult.count || 0,
-        last7Days: last7DaysResult.count || 0
+        last7Days: last7DaysResult.count || 0,
+        totalSales,
+        totalGuests: (guestsResult.data || []).length
       };
     }
   });
@@ -79,10 +88,17 @@ const AdminDashboard: React.FC = () => {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <DashboardCard 
             icon={<Users className="h-6 w-6" />}
-            title="Customers" 
-            value={stats?.last30Days.toString() || '0'} 
+            title="Total Guests" 
+            value={stats?.totalGuests?.toString() || '0'} 
             change={`${((stats?.last30Days || 0) - (stats?.last7Days || 0)).toString()}%`} 
             duration="Last 30 days"
+          />
+          <DashboardCard 
+            icon={<DollarSign className="h-6 w-6" />}
+            title="Total Sales" 
+            value={`₹${(stats?.totalSales || 0).toLocaleString()}`} 
+            change={`+₹${((stats?.last7Days || 0) * 1000).toLocaleString()}`} 
+            duration="Cover charges"
           />
           <DashboardCard 
             icon={<Calendar className="h-6 w-6" />}
@@ -97,13 +113,6 @@ const AdminDashboard: React.FC = () => {
             value={stats?.totalTables.toString() || '0'} 
             change="Current" 
             duration="Capacity"
-          />
-          <DashboardCard 
-            icon={<PenSquare className="h-6 w-6" />}
-            title="Website" 
-            value="Edit" 
-            change="" 
-            action={() => navigate('/admin/site-editor')}
           />
         </section>
 

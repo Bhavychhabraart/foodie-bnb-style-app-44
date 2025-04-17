@@ -4,14 +4,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
+interface Booking {
+  id: string;
+  name: string;
+  email: string;
+  date: string;
+  time: string;
+  booking_type: string;
+  status: string;
+  special_requests?: string;
+}
+
 const BookingsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['admin-bookings'],
@@ -45,6 +60,16 @@ const BookingsManagement = () => {
       case 'completed': return 'bg-blue-500/20 text-blue-500';
       default: return 'bg-gray-500/20 text-gray-500';
     }
+  };
+
+  const handleView = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleEdit = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -123,6 +148,7 @@ const BookingsManagement = () => {
                       variant="outline" 
                       size="sm" 
                       className="border-airbnb-gold/20 text-airbnb-light hover:bg-airbnb-gold/10 mr-2"
+                      onClick={() => handleView(booking)}
                     >
                       View
                     </Button>
@@ -130,6 +156,7 @@ const BookingsManagement = () => {
                       variant="outline" 
                       size="sm" 
                       className="border-airbnb-gold/20 text-airbnb-light hover:bg-airbnb-gold/10"
+                      onClick={() => handleEdit(booking)}
                     >
                       Edit
                     </Button>
@@ -140,6 +167,85 @@ const BookingsManagement = () => {
           </Table>
         </div>
       )}
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="bg-airbnb-dark border border-airbnb-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-airbnb-light">Booking Details</DialogTitle>
+            <DialogDescription className="text-airbnb-light/70">
+              Viewing booking information for {selectedBooking?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-airbnb-light">
+            <div>
+              <p className="font-semibold">Booking ID</p>
+              <p className="text-airbnb-light/70">{selectedBooking?.id}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Contact Information</p>
+              <p className="text-airbnb-light/70">{selectedBooking?.email}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Date & Time</p>
+              <p className="text-airbnb-light/70">
+                {selectedBooking?.date && format(new Date(selectedBooking.date), 'MMM dd, yyyy')} at {selectedBooking?.time}
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">Booking Type</p>
+              <p className="text-airbnb-light/70">{selectedBooking?.booking_type}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Status</p>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedBooking?.status || '')}`}>
+                {selectedBooking?.status.charAt(0).toUpperCase() + selectedBooking?.status.slice(1)}
+              </span>
+            </div>
+            {selectedBooking?.special_requests && (
+              <div>
+                <p className="font-semibold">Special Requests</p>
+                <p className="text-airbnb-light/70">{selectedBooking.special_requests}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="bg-airbnb-dark border border-airbnb-gold/20">
+          <DialogHeader>
+            <DialogTitle className="text-airbnb-light">Edit Booking</DialogTitle>
+            <DialogDescription className="text-airbnb-light/70">
+              Update booking information for {selectedBooking?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Select
+              value={selectedBooking?.status}
+              onValueChange={(value) => setSelectedBooking(prev => ({ ...prev!, status: value }))}
+            >
+              <SelectTrigger className="w-full bg-[#1E1E1E] border-airbnb-gold/20">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              className="w-full bg-airbnb-gold text-airbnb-dark hover:bg-airbnb-gold/90"
+              onClick={() => {
+                // Handle update logic here
+                setIsEditDialogOpen(false);
+              }}
+            >
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
