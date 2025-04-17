@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,7 +90,6 @@ const BookingsManagement: React.FC = () => {
       }
 
       if (data) {
-        // Get guest counts for each reservation
         const bookingsWithCounts = await Promise.all(
           data.map(async (booking) => {
             const { count } = await supabase
@@ -124,7 +122,6 @@ const BookingsManagement: React.FC = () => {
   const filterBookings = () => {
     let filtered = [...bookings];
     
-    // Apply search filter
     if (searchTerm) {
       const lowercaseSearch = searchTerm.toLowerCase();
       filtered = filtered.filter(booking => 
@@ -134,15 +131,12 @@ const BookingsManagement: React.FC = () => {
       );
     }
     
-    // Apply status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(booking => booking.status === statusFilter);
     }
     
-    // Update total pages based on filtered results
     setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     
-    // Apply pagination
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginatedBookings = filtered.slice(startIndex, startIndex + itemsPerPage);
     
@@ -175,7 +169,6 @@ const BookingsManagement: React.FC = () => {
     try {
       setIsProcessing(true);
       
-      // Get detailed information about this booking
       const [guestsResult, tablesResult] = await Promise.all([
         supabase
           .from('reservation_guests')
@@ -251,14 +244,12 @@ const BookingsManagement: React.FC = () => {
       
       if (error) throw error;
       
-      // Update local state
       setBookings(bookings.map(booking => 
         booking.id === selectedBooking.id 
           ? { ...booking, status: editStatus } 
           : booking
       ));
       
-      // Close the dialog
       setEditDialogOpen(false);
       
       toast({
@@ -284,7 +275,6 @@ const BookingsManagement: React.FC = () => {
     try {
       setIsProcessing(true);
       
-      // Delete related records first
       await Promise.all([
         supabase
           .from('reservation_guests')
@@ -296,7 +286,6 @@ const BookingsManagement: React.FC = () => {
           .eq('reservation_id', selectedBooking.id)
       ]);
       
-      // Then delete the booking
       const { error } = await supabase
         .from('reservations')
         .delete()
@@ -304,10 +293,8 @@ const BookingsManagement: React.FC = () => {
       
       if (error) throw error;
       
-      // Update local state
       setBookings(bookings.filter(booking => booking.id !== selectedBooking.id));
       
-      // Close the dialog
       setDeleteDialogOpen(false);
       
       toast({
@@ -477,7 +464,6 @@ const BookingsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* View Booking Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className="sm:max-w-[600px] bg-airbnb-dark border-airbnb-gold/30 text-airbnb-light">
           <DialogHeader>
@@ -534,7 +520,7 @@ const BookingsManagement: React.FC = () => {
               {selectedBooking.tables.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center">
-                    <Tables className="h-4 w-4 mr-2 text-airbnb-gold" />
+                    <FileText className="h-4 w-4 mr-2 text-airbnb-gold" />
                     <span className="font-medium">Table Information</span>
                   </div>
                   <div className="pl-6 space-y-1">
@@ -574,7 +560,6 @@ const BookingsManagement: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Booking Status Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px] bg-airbnb-dark border-airbnb-gold/30 text-airbnb-light">
           <DialogHeader>
@@ -651,7 +636,6 @@ const BookingsManagement: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[500px] bg-airbnb-dark border-airbnb-gold/30 text-airbnb-light">
           <DialogHeader>
