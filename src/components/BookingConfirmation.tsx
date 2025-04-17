@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Check, PartyPopper, Send, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -35,16 +34,12 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const bookingDetailsQR = JSON.stringify(bookingDetails);
   
   const handleWhatsAppShare = () => {
-    // Format the message for WhatsApp
     const message = `Booking Confirmed!\n\n${experienceTitle}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
     
-    // Phone number with the country code
-    const phoneNumber = "919220829369"; // 91 is India's country code followed by the number
+    const phoneNumber = "919220829369";
     
-    // Create the WhatsApp URL 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
-    // Open in a new tab
     window.open(whatsappUrl, '_blank');
   };
 
@@ -95,15 +90,15 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           <p className="text-sm text-gray-500">A confirmation has been sent to your email</p>
         </div>
         
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-medium mb-2">{experienceTitle}</h3>
+        <div className="bg-zinc-900 rounded-lg p-4 mb-6 border border-airbnb-gold/20 shadow-lg">
+          <h3 className="font-medium mb-2 text-white">{experienceTitle}</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-gray-500">Date:</div>
-            <div>{date}</div>
-            <div className="text-gray-500">Time:</div>
-            <div>{time}</div>
-            <div className="text-gray-500">Guests:</div>
-            <div>{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
+            <div className="text-gray-400">Date:</div>
+            <div className="text-white">{date}</div>
+            <div className="text-gray-400">Time:</div>
+            <div className="text-white">{time}</div>
+            <div className="text-gray-400">Guests:</div>
+            <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
           </div>
         </div>
       </motion.div>
@@ -168,36 +163,37 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         </Button>
       </div>
 
-      {/* QR Code Dialog */}
       <Dialog open={showQrCode} onOpenChange={setShowQrCode}>
         <DialogContent className="sm:max-w-md">
-          <Card>
+          <Card className="bg-zinc-900 border-airbnb-gold/20">
             <CardHeader>
-              <CardTitle className="text-center">Your Booking QR Ticket</CardTitle>
+              <CardTitle className="text-center text-white">Your Booking QR Ticket</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <div className="p-4 bg-white rounded-lg">
+              <div className="p-4 bg-white rounded-lg shadow-xl">
                 <QRCodeSVG
                   id="booking-qr-code"
                   value={bookingDetailsQR}
                   size={200}
                   level="H"
+                  fgColor="#8B5CF6"
+                  bgColor="#FFFFFF"
                   includeMargin={true}
                 />
               </div>
               <div className="mt-4 text-center">
-                <p className="text-sm text-gray-500 mb-1">Scan this code at the restaurant</p>
-                <p className="font-medium">{experienceTitle}</p>
-                <p className="text-sm mt-2">
+                <p className="text-sm text-gray-400 mb-1">Scan this code at the restaurant</p>
+                <p className="font-medium text-white">{experienceTitle}</p>
+                <p className="text-sm mt-2 text-gray-300">
                   {date} • {time} • {guests} {parseInt(guests) === 1 ? 'person' : 'people'}
                 </p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => setShowQrCode(false)}>
+              <Button variant="outline" onClick={() => setShowQrCode(false)} className="text-white border-airbnb-gold/50">
                 Close
               </Button>
-              <Button onClick={downloadQRCode} className="bg-airbnb-gold hover:bg-airbnb-gold/90">
+              <Button onClick={downloadQRCode} className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-white">
                 <Download className="mr-2 h-4 w-4" />
                 Download QR
               </Button>
@@ -206,34 +202,33 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* WhatsApp Card Dialog */}
       <Dialog open={showWhatsAppCard} onOpenChange={setShowWhatsAppCard}>
         <DialogContent className="sm:max-w-md">
-          <Card>
+          <Card className="bg-zinc-900 border-airbnb-gold/20">
             <CardHeader>
-              <CardTitle className="text-center">Share on WhatsApp</CardTitle>
+              <CardTitle className="text-center text-white">Share on WhatsApp</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <p>Send your booking details to WhatsApp</p>
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <p className="font-medium">{experienceTitle}</p>
+                <p className="text-white">Send your booking details to WhatsApp</p>
+                <div className="bg-zinc-800 p-3 rounded-md">
+                  <p className="font-medium text-white">{experienceTitle}</p>
                   <div className="grid grid-cols-2 gap-1 text-sm mt-2">
-                    <div className="text-gray-500">Date:</div>
-                    <div>{date}</div>
-                    <div className="text-gray-500">Time:</div>
-                    <div>{time}</div>
-                    <div className="text-gray-500">Guests:</div>
-                    <div>{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
+                    <div className="text-gray-400">Date:</div>
+                    <div className="text-white">{date}</div>
+                    <div className="text-gray-400">Time:</div>
+                    <div className="text-white">{time}</div>
+                    <div className="text-gray-400">Guests:</div>
+                    <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
                   </div>
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={closeWhatsAppCard}>
+              <Button variant="outline" onClick={closeWhatsAppCard} className="text-white border-airbnb-gold/50">
                 Cancel
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700" onClick={handleWhatsAppShare}>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleWhatsAppShare}>
                 <Send className="mr-2 h-4 w-4" />
                 Send on WhatsApp
               </Button>
