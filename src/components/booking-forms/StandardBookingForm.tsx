@@ -133,7 +133,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       const { data: reservationData, error: reservationError } = await supabase
         .from('reservations')
         .insert({
-          user_id: user.id,
+          user_id: user?.id || null,
           booking_type: 'standard',
           name: values.name,
           email: values.email,
