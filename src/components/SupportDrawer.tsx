@@ -1,32 +1,31 @@
-
 import React from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Phone, Clock, MapPin, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 interface SupportDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const SupportDrawer: React.FC<SupportDrawerProps> = ({ open, onOpenChange }) => {
-  const { toast } = useToast();
-
+const SupportDrawer: React.FC<SupportDrawerProps> = ({
+  open,
+  onOpenChange
+}) => {
+  const {
+    toast
+  } = useToast();
   const handleWhatsAppClick = () => {
     window.open('https://wa.me/919876543210', '_blank');
     toast({
-      description: "Opening WhatsApp...",
+      description: "Opening WhatsApp..."
     });
   };
-
-  return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+  return <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh] rounded-t-xl bg-[#121212] border-airbnb-gold/20">
         <div className="max-h-[85vh] overflow-y-auto">
           <div className="px-6 py-8 space-y-6">
             <DrawerHeader className="text-center mb-6">
-              <DrawerTitle className="text-2xl font-bold text-white">Fine Dine</DrawerTitle>
+              <DrawerTitle className="text-2xl font-bold text-white">Ha Cha</DrawerTitle>
               <DrawerDescription className="text-white/70">Support & Contact Information</DrawerDescription>
             </DrawerHeader>
 
@@ -63,21 +62,14 @@ const SupportDrawer: React.FC<SupportDrawerProps> = ({ open, onOpenChange }) => 
                   <p className="text-white/70 mb-2">Find us at:</p>
                   <p className="text-white">42 Gourmet Avenue, Culinary District</p>
                   <p className="text-white">Mumbai, Maharashtra 400001</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-3 text-airbnb-gold border-airbnb-gold/20 hover:bg-airbnb-gold/5"
-                    onClick={() => window.open('https://maps.google.com', '_blank')}
-                  >
+                  <Button variant="outline" className="mt-3 text-airbnb-gold border-airbnb-gold/20 hover:bg-airbnb-gold/5" onClick={() => window.open('https://maps.google.com', '_blank')}>
                     Get Directions
                   </Button>
                 </div>
               </div>
 
               <div className="mt-6 pb-6">
-                <Button 
-                  className="w-full bg-airbnb-gold hover:bg-airbnb-gold/90 text-white py-6 flex items-center justify-center gap-2"
-                  onClick={handleWhatsAppClick}
-                >
+                <Button className="w-full bg-airbnb-gold hover:bg-airbnb-gold/90 text-white py-6 flex items-center justify-center gap-2" onClick={handleWhatsAppClick}>
                   <MessageSquare className="h-5 w-5" />
                   Chat with us on WhatsApp
                 </Button>
@@ -86,8 +78,6 @@ const SupportDrawer: React.FC<SupportDrawerProps> = ({ open, onOpenChange }) => 
           </div>
         </div>
       </DrawerContent>
-    </Drawer>
-  );
+    </Drawer>;
 };
-
 export default SupportDrawer;
