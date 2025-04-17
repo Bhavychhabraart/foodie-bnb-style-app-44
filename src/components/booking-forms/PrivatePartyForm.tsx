@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   DrawerHeader, 
@@ -50,7 +49,7 @@ const formSchema = z.object({
     required_error: "Please select a date",
   }),
   time: z.string().min(1, "Please select a time"),
-  guestCount: z.number().min(1, "Must have at least 1 guest").max(100, "Maximum 100 guests allowed").default(10),
+  guestCount: z.coerce.number().min(1, "Must have at least 1 guest").max(100, "Maximum 100 guests allowed").default(10),
   occasionType: z.string().min(2, "Please select an occasion"),
   specialInstructions: z.string().optional(),
   amenities: z.object({
@@ -327,7 +326,13 @@ const PrivatePartyForm: React.FC<PrivatePartyFormProps> = ({ onBack, onClose }) 
                       <Input 
                         type="number"
                         placeholder="Enter number of guests"
-                        {...field}
+                        value={field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                          field.onChange(value);
+                        }}
+                        min={1}
+                        max={100}
                       />
                     </FormControl>
                     <FormMessage />
