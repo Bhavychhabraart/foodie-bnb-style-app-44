@@ -8,10 +8,50 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/providers/AuthProvider';
 import BookingsManagement from '@/components/admin/BookingsManagement';
 import TablesManagement from '@/components/admin/TablesManagement';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const { data: stats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      const [reservationsResult, tablesResult] = await Promise.all([
+        supabase
+          .from('reservations')
+          .select('*', { count: 'exact' }),
+        supabase
+          .from('restaurant_tables')
+          .select('*', { count: 'exact' })
+      ]);
+
+      const last30Days = new Date();
+      last30Days.setDate(last30Days.getDate() - 30);
+
+      const last7Days = new Date();
+      last7Days.setDate(last7Days.getDate() - 7);
+
+      const [last30DaysResult, last7DaysResult] = await Promise.all([
+        supabase
+          .from('reservations')
+          .select('*', { count: 'exact' })
+          .gte('created_at', last30Days.toISOString()),
+        supabase
+          .from('reservations')
+          .select('*', { count: 'exact' })
+          .gte('created_at', last7Days.toISOString())
+      ]);
+
+      return {
+        totalReservations: reservationsResult.count || 0,
+        totalTables: tablesResult.count || 0,
+        last30Days: last30DaysResult.count || 0,
+        last7Days: last7DaysResult.count || 0
+      };
+    }
+  });
   
   return (
     <div className="min-h-screen bg-airbnb-dark">
@@ -39,23 +79,23 @@ const AdminDashboard: React.FC = () => {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <DashboardCard 
             icon={<Users className="h-6 w-6" />}
-            title="Users" 
-            value="563" 
-            change="+6%" 
+            title="Customers" 
+            value={stats?.last30Days.toString() || '0'} 
+            change={`${((stats?.last30Days || 0) - (stats?.last7Days || 0)).toString()}%`} 
             duration="Last 30 days"
           />
           <DashboardCard 
             icon={<Calendar className="h-6 w-6" />}
             title="Bookings" 
-            value="128" 
-            change="+12%" 
+            value={stats?.totalReservations.toString() || '0'} 
+            change={`+${stats?.last7Days || 0}`} 
             duration="Last 7 days"
           />
           <DashboardCard 
             icon={<Table className="h-6 w-6" />}
             title="Tables" 
-            value="24" 
-            change="100%" 
+            value={stats?.totalTables.toString() || '0'} 
+            change="Current" 
             duration="Capacity"
           />
           <DashboardCard 
