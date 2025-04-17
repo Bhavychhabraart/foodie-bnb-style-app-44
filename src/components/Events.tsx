@@ -36,36 +36,19 @@ const Events: React.FC<EventsProps> = ({
   const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['events', category],
     queryFn: async () => {
+      console.log(`Fetching events for category: ${category}`);
+      
+      // Get current date
+      const today = new Date();
+      console.log("Today's date:", today.toISOString());
+      
       let query = supabase
         .from('events')
         .select('*');
         
-      if (category !== 'all') {
-        query = query.eq('category', category);
-      }
-      
-      // For experiences category, show only upcoming events
-      if (category === 'experiences') {
-        // Get current date in YYYY-MM-DD format
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
+      if (category === 'home') {
+        query = query.eq('category', 'home');
         
-        // Filter events by comparing dates
-        // This is a simple implementation that assumes dates are in a comparable format
-        const { data, error } = await query.order('date', { ascending: true });
-        
-        if (error) {
-          console.error('Error fetching events:', error);
-          throw new Error(error.message);
-        }
-        
-        // Filter for upcoming events (today or later)
-        return (data as Event[]).filter(event => {
-          // Parse event date (assuming format like "25th April, 2025" or similar)
-          const eventDate = new Date(event.date);
-          return !isNaN(eventDate.getTime()) && eventDate >= today;
-        });
-      } else {
         const { data, error } = await query.order('created_at', { ascending: false });
         
         if (error) {
@@ -75,6 +58,54 @@ const Events: React.FC<EventsProps> = ({
         
         return data as Event[];
       }
+      
+      // For experiences/upcoming category, show all events with future dates across all categories
+      if (category === 'experiences') {
+        // Fetch all events first
+        const { data, error } = await query.order('date', { ascending: true });
+        
+        if (error) {
+          console.error('Error fetching upcoming events:', error);
+          throw new Error(error.message);
+        }
+        
+        console.log("Raw events data:", data);
+        
+        // Filter for upcoming events (today or later)
+        const upcomingEvents = (data as Event[]).filter(event => {
+          try {
+            // Parse the date string - handle different formats
+            const dateStr = event.date.replace(/(st|nd|rd|th)/, ''); // Remove ordinal suffixes
+            const eventDate = new Date(dateStr);
+            
+            // Skip dates that can't be parsed properly
+            if (isNaN(eventDate.getTime())) {
+              console.log(`Could not parse date for event: ${event.title}, date: ${event.date}`);
+              return false;
+            }
+            
+            const isUpcoming = eventDate >= today;
+            console.log(`Event: ${event.title}, Date: ${event.date}, Parsed Date: ${eventDate}, Is Upcoming: ${isUpcoming}`);
+            return isUpcoming;
+          } catch (e) {
+            console.error(`Error parsing date for event ${event.title}:`, e);
+            return false;
+          }
+        });
+        
+        console.log("Filtered upcoming events:", upcomingEvents);
+        return upcomingEvents;
+      }
+      
+      // Default case: just filter by the provided category
+      const { data, error } = await query.eq('category', category).order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw new Error(error.message);
+      }
+      
+      return data as Event[];
     }
   });
 
