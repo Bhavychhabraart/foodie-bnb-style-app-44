@@ -9,20 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 import BookingDrawer from "@/components/BookingDrawer";
 import ExperienceDetailsDrawer from '@/components/ExperienceDetailsDrawer';
 
-interface SpotlightProps {
-  tableName?: 'spotlight' | 'makhna_spotlight';
-}
-
-const Spotlight: React.FC<SpotlightProps> = ({ tableName = 'spotlight' }) => {
+const Spotlight: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   
   const { data: spotlightItems = [], isLoading, error } = useQuery({
-    queryKey: ['spotlightItems', tableName],
+    queryKey: ['spotlightItems'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableName)
+        .from('spotlight')
         .select('*')
         .order('created_at', { ascending: false });
       

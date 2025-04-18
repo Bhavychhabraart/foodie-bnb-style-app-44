@@ -14,54 +14,47 @@ type GalleryPhoto = {
   alt_text?: string;
   caption?: string;
 };
-
-interface PhotoGalleryProps {
-  bucketName?: string;
-}
-
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({
-  bucketName = 'gallery'
-}) => {
+const PhotoGallery: React.FC = () => {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
-
   useEffect(() => {
     const fetchPhotos = async () => {
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .list('', {
-          limit: 10,
-          sortBy: { column: 'created_at', order: 'desc' }
-        });
-
+      const {
+        data,
+        error
+      } = await supabase.storage.from('gallery').list('', {
+        limit: 10,
+        sortBy: {
+          column: 'created_at',
+          order: 'desc'
+        }
+      });
       if (error) {
         console.error('Error fetching gallery photos:', error);
         return;
       }
 
+      // Transform Supabase storage objects into our GalleryPhoto type
       const galleryPhotos: GalleryPhoto[] = data.map((photo, index) => ({
         id: photo.name,
-        image_url: supabase.storage.from(bucketName).getPublicUrl(photo.name).data.publicUrl,
+        image_url: supabase.storage.from('gallery').getPublicUrl(photo.name).data.publicUrl,
         alt_text: `Gallery image ${index + 1}`,
         caption: `Photo ${index + 1}`
       }));
       setPhotos(galleryPhotos);
     };
     fetchPhotos();
-  }, [bucketName]);
-
+  }, []);
   const nextPhoto = (e: React.MouseEvent) => {
     e.stopPropagation();
     setCurrentPhotoIndex(prev => (prev + 1) % photos.length);
   };
-
   const prevPhoto = (e: React.MouseEvent) => {
     e.stopPropagation();
     setCurrentPhotoIndex(prev => (prev - 1 + photos.length) % photos.length);
   };
-
   return <div id="photos" className="section-padding bg-airbnb-dark">
       <div className="container-padding mx-auto">
         <div className="flex items-center justify-between mb-8">
@@ -146,5 +139,4 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
       </div>
     </div>;
 };
-
 export default PhotoGallery;

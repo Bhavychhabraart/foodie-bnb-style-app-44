@@ -1,3 +1,4 @@
+
 import { useState, Suspense, useCallback, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -11,7 +12,6 @@ import LoadingWrapper from "./components/LoadingWrapper";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
-const MakhnaIndex = lazy(() => import("./pages/MakhnaIndex"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const EditPanel = lazy(() => import("./pages/EditPanel"));
@@ -50,7 +50,6 @@ const App = () => {
                 <Suspense fallback={<LoadingWrapper isLoading={true}>Loading...</LoadingWrapper>}>
                   <Routes>
                     <Route path="/" element={<Index />} />
-                    <Route path="/makhna" element={<MakhnaIndex />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/edit-panel" element={<EditPanel />} />

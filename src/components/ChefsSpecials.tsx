@@ -19,26 +19,25 @@ interface ChefSpecial {
 }
 
 interface ChefsSpecialsProps {
-  tableName?: 'chefs_specials' | 'makhna_chefs_specials';
   setActiveCategory: (category: string) => void;
 }
 
-const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ 
-  tableName = 'chefs_specials',
-  setActiveCategory 
-}) => {
+const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ setActiveCategory }) => {
   const [chefsSpecials, setChefsSpecials] = useState<ChefSpecial[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   useEffect(() => {
     const fetchChefsSpecials = async () => {
       try {
-        const { data, error } = await supabase
-          .from(tableName)
-          .select('*')
-          .order('created_at', { ascending: false });
-        
+        const {
+          data,
+          error
+        } = await supabase.from('chefs_specials').select('*').order('created_at', {
+          ascending: false
+        });
         if (error) {
           throw error;
         }
@@ -57,7 +56,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({
       }
     };
     fetchChefsSpecials();
-  }, [tableName, toast]);
+  }, [toast]);
 
   return <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
       <div className="container-padding mx-auto">
