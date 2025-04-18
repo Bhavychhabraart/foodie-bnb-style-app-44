@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Calendar, Users, Clock, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { FormControl, FormLabel, FormItem } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
@@ -108,11 +108,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         throw error;
       }
       
-      // Create guest records
+      // Create guest records with correct gender value
       const guestEntries = Array.from({ length: guests }, () => ({
         reservation_id: reservation.id,
         name: 'Guest',
-        gender: 'not_specified',
+        gender: 'not_specified', // This value must match the check constraint in the database
         cover_charge: basePrice
       }));
       
@@ -121,6 +121,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         .insert(guestEntries);
         
       if (guestsError) {
+        console.error('Error creating guest entries:', guestsError);
         throw guestsError;
       }
       
