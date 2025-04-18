@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Tag, Sparkles, Clock } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -17,7 +16,13 @@ interface Offer {
   coupon_code: string;
 }
 
-const OngoingOffers: React.FC = () => {
+interface OngoingOffersProps {
+  tableName?: string;
+}
+
+const OngoingOffers: React.FC<OngoingOffersProps> = ({
+  tableName = 'offers'
+}) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -28,7 +33,7 @@ const OngoingOffers: React.FC = () => {
     const fetchOffers = async () => {
       try {
         const { data, error } = await supabase
-          .from('offers')
+          .from(tableName)
           .select('*')
           .order('created_at', { ascending: false });
         
@@ -51,14 +56,13 @@ const OngoingOffers: React.FC = () => {
     };
 
     fetchOffers();
-  }, [toast]);
+  }, [tableName, toast]);
   
   const handleAvailNow = (offer: Offer) => {
     setSelectedOffer(offer);
     setDrawerOpen(true);
   };
 
-  // If no offers are available yet and still loading, show placeholder
   if (loading) {
     return (
       <div className="section-padding">
@@ -88,7 +92,6 @@ const OngoingOffers: React.FC = () => {
     );
   }
 
-  // If there are no offers and we're not loading anymore, provide a way to add offers
   if (offers.length === 0 && !loading) {
     return (
       <div className="section-padding">
@@ -137,7 +140,6 @@ const OngoingOffers: React.FC = () => {
             variant="ghost" 
             className="text-airbnb-gold hover:underline flex items-center group animate-none hover:animate-bounce active:scale-95 transform transition-transform duration-200"
             onClick={() => {
-              // Navigate to the offers page when clicked
               window.document.dispatchEvent(
                 new CustomEvent("category-change", { detail: "offers" })
               );
@@ -154,7 +156,6 @@ const OngoingOffers: React.FC = () => {
               <CarouselItem key={offer.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <Card className="border-none rounded-xl overflow-hidden transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
                   <CardContent className="p-0 relative">
-                    {/* Voucher Top Part with Image */}
                     <div className="relative h-[180px] overflow-hidden">
                       <img 
                         src={offer.image_url || '/placeholder.svg'} 
@@ -167,12 +168,10 @@ const OngoingOffers: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                       
-                      {/* Decorative Elements */}
                       <div className="absolute top-3 left-3 bg-airbnb-gold/90 text-black text-xs font-bold px-3 py-1 rounded-full">
                         EXCLUSIVE
                       </div>
                       
-                      {/* Perforated Line Effect */}
                       <div className="absolute -bottom-2 left-0 right-0 flex justify-between px-6">
                         <div className="h-4 w-4 bg-zinc-900 rounded-full"></div>
                         <div className="border-t-2 border-dashed border-zinc-900 flex-grow my-auto mx-1"></div>
@@ -180,7 +179,6 @@ const OngoingOffers: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Voucher Content */}
                     <div className="p-5 bg-zinc-900 border border-airbnb-gold/20 border-t-0 rounded-b-xl">
                       <div className="text-center mb-4">
                         <h3 className="font-semibold text-xl text-airbnb-gold">{offer.title}</h3>

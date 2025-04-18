@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -63,18 +62,18 @@ const MakhnaIndex = () => {
       
       {activeCategory === 'home' ? (
         <div className="space-y-2 bg-airbnb-dark">
-          <Spotlight />
-          <Events category="makhna" />
-          <ChefsSpecials setActiveCategory={setActiveCategory} />
-          <OngoingOffers />
-          <PhotoGallery />
+          <Spotlight tableName="makhna_spotlight" />
+          <Events tableName="makhna_events" />
+          <ChefsSpecials tableName="makhna_chefs_specials" setActiveCategory={setActiveCategory} />
+          <OngoingOffers tableName="makhna_offers" />
+          <PhotoGallery bucketName="makhna" />
           <About />
           <Highlights />
           <Testimonials />
         </div>
       ) : activeCategory === 'experiences' ? (
         <div className="space-y-2 bg-airbnb-dark">
-          <Events category="experiences" />
+          <Events tableName="makhna_events" category="experiences" />
         </div>
       ) : activeCategory === 'menu' ? (
         <div>
@@ -82,7 +81,7 @@ const MakhnaIndex = () => {
         </div>
       ) : activeCategory === 'offers' ? (
         <div>
-          <OngoingOffers />
+          <OngoingOffers tableName="makhna_offers" />
         </div>
       ) : null}
       

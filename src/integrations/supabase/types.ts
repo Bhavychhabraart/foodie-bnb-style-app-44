@@ -111,6 +111,189 @@ export type Database = {
         }
         Relationships: []
       }
+      makhna_chefs_specials: {
+        Row: {
+          chef: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_new: boolean
+          is_popular: boolean
+          price: string
+          rating: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chef: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_new?: boolean
+          is_popular?: boolean
+          price: string
+          rating?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chef?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_new?: boolean
+          is_popular?: boolean
+          price?: string
+          rating?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      makhna_events: {
+        Row: {
+          capacity: string | null
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          featured: boolean
+          host: string
+          id: string
+          image_url: string | null
+          is_sold_out: boolean
+          price: string
+          rating: number
+          reviews: number
+          time: string
+          title: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          date: string
+          description?: string | null
+          featured?: boolean
+          host: string
+          id?: string
+          image_url?: string | null
+          is_sold_out?: boolean
+          price: string
+          rating?: number
+          reviews?: number
+          time: string
+          title: string
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          featured?: boolean
+          host?: string
+          id?: string
+          image_url?: string | null
+          is_sold_out?: boolean
+          price?: string
+          rating?: number
+          reviews?: number
+          time?: string
+          title?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      makhna_offers: {
+        Row: {
+          coupon_code: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          title: string
+          updated_at: string
+          valid_until: string
+        }
+        Insert: {
+          coupon_code: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          title: string
+          updated_at?: string
+          valid_until: string
+        }
+        Update: {
+          coupon_code?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          title?: string
+          updated_at?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
+      makhna_spotlight: {
+        Row: {
+          capacity: string
+          created_at: string
+          date: string
+          description: string
+          featured: boolean
+          id: string
+          image_url: string | null
+          price: string
+          rating: number
+          reviews: number
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity: string
+          created_at?: string
+          date: string
+          description: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          price: string
+          rating?: number
+          reviews?: number
+          time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: string
+          created_at?: string
+          date?: string
+          description?: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          price?: string
+          rating?: number
+          reviews?: number
+          time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           coupon_code: string
