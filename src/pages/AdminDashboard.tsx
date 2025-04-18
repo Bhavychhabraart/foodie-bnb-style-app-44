@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, PenSquare, Users, Calendar, Table, DollarSign, TrendingUp } from 'lucide-react';
+import { ArrowLeft, PenSquare, Users, Calendar, Table, DollarSign, TrendingUp, BadgeDollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import BookingsManagement from '@/components/admin/BookingsManagement';
@@ -51,12 +51,16 @@ const AdminDashboard: React.FC = () => {
         sum + (guest.cover_charge || 1000), 0
       );
 
+      // Calculate commission (6% of total sales)
+      const commission = totalSales * 0.06;
+
       return {
         totalReservations: reservationsResult.count || 0,
         totalTables: tablesResult.count || 0,
         last30Days: last30DaysResult.count || 0,
         last7Days: last7DaysResult.count || 0,
         totalSales,
+        commission,
         totalGuests: (guestsResult.data || []).length
       };
     }
@@ -101,18 +105,18 @@ const AdminDashboard: React.FC = () => {
             duration="Cover charges"
           />
           <DashboardCard 
+            icon={<BadgeDollarSign className="h-6 w-6" />}
+            title="Commission (6%)" 
+            value={`₹${(stats?.commission || 0).toLocaleString()}`} 
+            change={`+₹${((stats?.last7Days || 0) * 60).toLocaleString()}`} 
+            duration="Total earnings"
+          />
+          <DashboardCard 
             icon={<Calendar className="h-6 w-6" />}
             title="Bookings" 
             value={stats?.totalReservations.toString() || '0'} 
             change={`+${stats?.last7Days || 0}`} 
             duration="Last 7 days"
-          />
-          <DashboardCard 
-            icon={<Table className="h-6 w-6" />}
-            title="Tables" 
-            value={stats?.totalTables.toString() || '0'} 
-            change="Current" 
-            duration="Capacity"
           />
         </section>
 
