@@ -9,9 +9,10 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
 import LoadingWrapper from "./components/LoadingWrapper";
+import AdminRoute from "./components/AdminRoute";
 
 // Lazy load pages for better performance
-const Index = lazy(() => import("./pages/Index"));
+const Hacha = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const EditPanel = lazy(() => import("./pages/EditPanel"));
@@ -49,11 +50,23 @@ const App = () => {
               <TooltipProvider>
                 <Suspense fallback={<LoadingWrapper isLoading={true}>Loading...</LoadingWrapper>}>
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<Hacha />} />
                     <Route path="/auth" element={<Auth />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/edit-panel" element={<EditPanel />} />
-                    <Route path="/admin/site-editor" element={<AdminSiteEditor />} />
+                    <Route path="/admin" element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    } />
+                    <Route path="/edit-panel" element={
+                      <AdminRoute>
+                        <EditPanel />
+                      </AdminRoute>
+                    } />
+                    <Route path="/admin/site-editor" element={
+                      <AdminRoute>
+                        <AdminSiteEditor />
+                      </AdminRoute>
+                    } />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
