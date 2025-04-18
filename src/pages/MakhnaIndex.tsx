@@ -48,7 +48,7 @@ const MakhnaIndex = () => {
   }, []);
   
   return (
-    <div className="pb-16 bg-[#1A1F2C]">
+    <div className="pb-16 bg-airbnb-dark">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
         <ThemeToggle />
       </div>
@@ -62,7 +62,7 @@ const MakhnaIndex = () => {
       <MakhnaHero />
       
       {activeCategory === 'home' ? (
-        <div className="space-y-2 bg-[#1A1F2C]">
+        <div className="space-y-2 bg-airbnb-dark">
           <Spotlight />
           <Events category="makhna" />
           <ChefsSpecials setActiveCategory={setActiveCategory} />
@@ -73,7 +73,7 @@ const MakhnaIndex = () => {
           <Testimonials />
         </div>
       ) : activeCategory === 'experiences' ? (
-        <div className="space-y-2 bg-[#1A1F2C]">
+        <div className="space-y-2 bg-airbnb-dark">
           <Events category="experiences" />
         </div>
       ) : activeCategory === 'menu' ? (
