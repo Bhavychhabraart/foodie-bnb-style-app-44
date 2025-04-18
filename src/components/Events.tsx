@@ -9,7 +9,7 @@ import LoadingWrapper from './LoadingWrapper';
 import ErrorBoundary from './ErrorBoundary';
 
 interface EventsProps {
-  tableName?: 'events' | 'makhna_events';
+  tableName?: 'events' | 'makhna_events' | 'slique_events';
   category?: string;
 }
 

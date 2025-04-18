@@ -10,7 +10,7 @@ import BookingDrawer from "@/components/BookingDrawer";
 import ExperienceDetailsDrawer from '@/components/ExperienceDetailsDrawer';
 
 interface SpotlightProps {
-  tableName?: 'spotlight' | 'makhna_spotlight';
+  tableName?: 'spotlight' | 'makhna_spotlight' | 'slique_spotlight';
 }
 
 const Spotlight: React.FC<SpotlightProps> = ({ tableName = 'spotlight' }) => {

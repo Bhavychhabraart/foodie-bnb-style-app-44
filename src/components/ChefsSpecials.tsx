@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ChefHat, Star, Sparkles } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,8 +20,8 @@ interface ChefSpecial {
 }
 
 interface ChefsSpecialsProps {
-  tableName?: 'chefs_specials' | 'makhna_chefs_specials';
-  setActiveCategory: (category: string) => void;
+  tableName?: 'chefs_specials' | 'makhna_chefs_specials' | 'slique_chefs_specials';
+  setActiveCategory?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ 

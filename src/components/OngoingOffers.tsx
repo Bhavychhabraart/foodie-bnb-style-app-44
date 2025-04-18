@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Tag, Sparkles, Clock } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -18,7 +17,7 @@ interface Offer {
 }
 
 interface OngoingOffersProps {
-  tableName?: 'offers' | 'makhna_offers';
+  tableName?: 'offers' | 'makhna_offers' | 'slique_offers';
 }
 
 const OngoingOffers: React.FC<OngoingOffersProps> = ({
