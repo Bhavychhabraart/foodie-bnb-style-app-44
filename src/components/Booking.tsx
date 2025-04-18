@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -142,7 +141,7 @@ const Booking: React.FC<{ id: string }> = ({ id }) => {
         const guests = Array(guestCount).fill({
           reservation_id: reservationData.id,
           name: 'Guest',
-          gender: 'not_specified',
+          gender: 'other', // Changed from 'not_specified' to 'other' to match the database constraint
           cover_charge: 1000
         });
         

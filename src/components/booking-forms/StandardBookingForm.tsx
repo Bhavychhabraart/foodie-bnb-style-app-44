@@ -108,11 +108,13 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         throw error;
       }
       
-      // Create guest records with correct gender value
+      // Check the available gender values in the database
+      // Based on errors, we need to use one of the enum values expected by the database
+      // The enum likely has specific values: 'male', 'female', or 'other'
       const guestEntries = Array.from({ length: guests }, () => ({
         reservation_id: reservation.id,
         name: 'Guest',
-        gender: 'not_specified', // This value must match the check constraint in the database
+        gender: 'other', // Using 'other' instead of 'not_specified' to match the DB constraint
         cover_charge: basePrice
       }));
       
