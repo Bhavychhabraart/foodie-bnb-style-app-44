@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -62,6 +63,15 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   };
   
   const bookingDetailsQR = JSON.stringify(bookingDetails);
+  
+  // Make sure the Thank You message shows first
+  useEffect(() => {
+    // Set a timeout to ensure the animation plays properly
+    const timer = setTimeout(() => {
+      setShowThankYou(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
   
   useEffect(() => {
     if (showQrCode) {
@@ -145,7 +155,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         transition={{ duration: 0.5 }}
         className="w-20 h-20 bg-airbnb-gold rounded-full flex items-center justify-center mx-auto mb-4"
       >
-        <Check className="w-10 h-10 text-airbnb-dark" />
+        <PartyPopper className="w-10 h-10 text-airbnb-dark" />
       </motion.div>
       
       <h2 className="text-2xl font-bold mb-2 text-white">Thank You!</h2>
@@ -158,16 +168,26 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         We will share the confirmation details on your email shortly
       </p>
       
-      <Button 
-        onClick={() => {
-          setShowWhatsAppCard(true);
-          setShowThankYou(false);
-        }} 
-        className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-airbnb-dark"
-      >
-        <Send className="mr-2 h-4 w-4" />
-        Share on WhatsApp
-      </Button>
+      <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 sm:justify-center">
+        <Button 
+          onClick={() => {
+            setShowWhatsAppCard(true);
+            setShowThankYou(false);
+          }} 
+          className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-airbnb-dark"
+        >
+          <Send className="mr-2 h-4 w-4" />
+          Share on WhatsApp
+        </Button>
+        
+        <Button 
+          onClick={() => setShowThankYou(false)} 
+          className="border border-airbnb-gold/50 hover:bg-airbnb-gold/10 text-white"
+          variant="outline"
+        >
+          View Details
+        </Button>
+      </div>
     </div>
   );
 
@@ -270,10 +290,11 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             </Button>
             
             <Button 
-              onClick={onClose} 
-              className="bg-airbnb-gold hover:bg-airbnb-gold/90 text-airbnb-dark"
+              onClick={() => setShowThankYou(true)} 
+              className="border border-airbnb-gold/50 hover:bg-airbnb-gold/10 text-white"
+              variant="outline"
             >
-              Done
+              Back
             </Button>
           </div>
 
