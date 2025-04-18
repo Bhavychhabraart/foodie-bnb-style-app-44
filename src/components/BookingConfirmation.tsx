@@ -148,10 +148,10 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         <PartyPopper className="w-10 h-10 text-airbnb-dark" />
       </motion.div>
       
-      <h2 className="text-2xl font-bold mb-2 text-white">Thank You!</h2>
+      <h2 className="text-2xl font-bold mb-2 text-white">Reservation Confirmed!</h2>
       
       <p className="text-lg mb-4 text-airbnb-gold/80">
-        Your reservation has been confirmed
+        Thank you for choosing to dine with us
       </p>
       
       <p className="text-sm text-white/60 mb-6">
