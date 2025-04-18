@@ -1,6 +1,4 @@
-
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChefHat, Star, Sparkles } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,31 +19,30 @@ interface ChefSpecial {
 }
 
 interface ChefsSpecialsProps {
-  tableName?: string;
-  setActiveCategory?: React.Dispatch<React.SetStateAction<string>>;
+  setActiveCategory: (category: string) => void;
 }
 
-const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ 
-  tableName = 'chefs_specials',
-  setActiveCategory 
-}) => {
+const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ setActiveCategory }) => {
   const [chefsSpecials, setChefsSpecials] = useState<ChefSpecial[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   useEffect(() => {
     const fetchChefsSpecials = async () => {
       try {
-        const { data, error } = await supabase
-          .from(tableName)
-          .select('*')
-          .order('created_at', { ascending: false });
-        
+        const {
+          data,
+          error
+        } = await supabase.from('chefs_specials').select('*').order('created_at', {
+          ascending: false
+        });
         if (error) {
           throw error;
         }
         if (data) {
-          setChefsSpecials(data as ChefSpecial[]);
+          setChefsSpecials(data);
         }
       } catch (error) {
         console.error('Error fetching chef specials:', error);
@@ -59,7 +56,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({
       }
     };
     fetchChefsSpecials();
-  }, [tableName, toast]);
+  }, [toast]);
 
   return <div className="section-padding bg-airbnb-cream/10 dark:bg-airbnb-darkbrown">
       <div className="container-padding mx-auto">
@@ -70,7 +67,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({
           </div>
           <button 
             className="flex items-center text-airbnb-gold hover:underline group"
-            onClick={() => setActiveCategory && setActiveCategory('menu')}
+            onClick={() => setActiveCategory('menu')}
           >
             <span className="mr-1 group-hover:mr-2 transition-all">View menu</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

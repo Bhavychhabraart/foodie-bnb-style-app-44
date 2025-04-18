@@ -9,38 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 import BookingDrawer from "@/components/BookingDrawer";
 import ExperienceDetailsDrawer from '@/components/ExperienceDetailsDrawer';
 
-interface SpotlightProps {
-  tableName?: string;
-}
-
-interface SpotlightItem {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  capacity: string;
-  price: string;
-  rating: number;
-  reviews: number;
-  featured: boolean;
-  image_url: string | null;
-  created_at: string;
-  updated_at: string;
-  host?: string;
-  is_sold_out?: boolean;
-}
-
-const Spotlight: React.FC<SpotlightProps> = ({ tableName = 'spotlight' }) => {
-  const [selectedItem, setSelectedItem] = useState<SpotlightItem | null>(null);
+const Spotlight: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   
   const { data: spotlightItems = [], isLoading, error } = useQuery({
-    queryKey: ['spotlightItems', tableName],
+    queryKey: ['spotlightItems'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableName)
+        .from('spotlight')
         .select('*')
         .order('created_at', { ascending: false });
       
@@ -48,16 +26,16 @@ const Spotlight: React.FC<SpotlightProps> = ({ tableName = 'spotlight' }) => {
         throw error;
       }
       
-      return data as SpotlightItem[];
+      return data;
     }
   });
 
-  const handleViewDetails = (item: SpotlightItem) => {
+  const handleViewDetails = (item: any) => {
     setSelectedItem(item);
     setIsDetailsDrawerOpen(true);
   };
 
-  const handleBookNow = (item: SpotlightItem, e: React.MouseEvent) => {
+  const handleBookNow = (item: any, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering parent click events
     setSelectedItem(item);
     setIsBookingDrawerOpen(true);
