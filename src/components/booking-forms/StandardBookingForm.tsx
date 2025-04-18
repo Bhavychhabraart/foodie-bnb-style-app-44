@@ -84,8 +84,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
     return true;
   };
 
-  const handleGenderCountChange = (male: number, female: number) => {
-    setGenderCounts({ male, female });
+  const handleGenderCountChange = (gender: 'male' | 'female', value: number) => {
+    setGenderCounts(prev => ({
+      ...prev,
+      [gender]: value
+    }));
     setGenderError('');
   };
 
