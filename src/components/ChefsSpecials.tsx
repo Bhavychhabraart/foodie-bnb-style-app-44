@@ -125,12 +125,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({ setActiveCategory }) => {
                         </div>
                         
                         {/* Price tag */}
-                        <div className="p-4 bg-zinc-900">
-                          <div className="flex justify-between items-center">
-                            <div className="font-medium text-airbnb-gold">{special.price}</div>
-                            
-                          </div>
-                        </div>
+                        
                       </CardContent>
                     </Card>
                   </motion.div>
