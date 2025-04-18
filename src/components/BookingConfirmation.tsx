@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users, MessageCircle, WhatsappIcon } from 'lucide-react';
+import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users, MessageCircle, WhatsApp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
