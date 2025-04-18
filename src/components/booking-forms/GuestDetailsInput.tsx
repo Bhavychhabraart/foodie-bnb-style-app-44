@@ -19,6 +19,11 @@ const GuestDetailsInput: React.FC<GuestDetailsInputProps> = ({
 }) => {
   return (
     <div className="space-y-4">
+      <h3 className="text-lg font-medium">Guest Gender Distribution</h3>
+      <p className="text-sm text-airbnb-light">
+        For security reasons, we maintain a balanced guest ratio. Male stags cannot exceed the number of couples.
+      </p>
+      
       <div>
         <FormItem>
           <Label>Male Guests</Label>
@@ -56,9 +61,20 @@ const GuestDetailsInput: React.FC<GuestDetailsInputProps> = ({
           </Select>
         </FormItem>
       </div>
+      
+      <div className="flex items-center justify-between px-1">
+        <span className="text-sm">Total guests selected:</span>
+        <span className="font-medium">{genderCounts.male + genderCounts.female} / {guestCount}</span>
+      </div>
 
       {error && (
         <p className="text-sm text-red-500 mt-2">{error}</p>
+      )}
+
+      {genderCounts.male + genderCounts.female !== guestCount && !error && (
+        <p className="text-sm text-amber-500 mt-2">
+          Total number of male and female guests must equal {guestCount}
+        </p>
       )}
     </div>
   );

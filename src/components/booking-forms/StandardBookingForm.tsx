@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,7 @@ import { ArrowLeft, Calendar, Users, Clock, MapPin, ArrowRight, Loader2 } from '
 import { FormControl, FormLabel, FormItem } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
 import GuestDetailsInput from './GuestDetailsInput';
+import { BookingSteps } from './BookingSteps';
 
 interface StandardBookingFormProps {
   onBack: () => void;
@@ -29,6 +31,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0 });
   const [genderError, setGenderError] = useState<string>('');
+  const [tablePreference, setTablePreference] = useState<string>('ground');
   
   const { toast } = useToast();
 
@@ -54,12 +57,22 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         return;
       }
       setStep(2);
+    } else if (step === 2) {
+      if (!name || !email || !phone) {
+        toast({
+          title: "Please fill all fields",
+          description: "All fields are required to proceed",
+          variant: "destructive",
+        });
+        return;
+      }
+      setStep(3);
     }
   };
 
   const handleBack = () => {
-    if (step === 2) {
-      setStep(1);
+    if (step > 1) {
+      setStep(step - 1);
     } else {
       onBack();
     }
@@ -162,7 +175,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       
       toast({
         title: "Reservation Submitted!",
-        description: `Your table for ${guests} has been reserved.`,
+        description: "We have received your reservation and will share confirmation on your email.",
       });
       
       onClose();
@@ -232,19 +245,9 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         </Select>
       </div>
 
-      {guests > 0 && (
-        <GuestDetailsInput
-          guestCount={guests}
-          genderCounts={genderCounts}
-          onGenderCountChange={handleGenderCountChange}
-          error={genderError}
-        />
-      )}
-
       <Button 
         onClick={handleNext} 
         className="w-full mt-4 bg-airbnb-red hover:bg-airbnb-red/90"
-        disabled={!!genderError || genderCounts.male + genderCounts.female !== guests}
       >
         Next
         <ArrowRight className="ml-2 h-4 w-4" />
@@ -253,7 +256,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   );
 
   const renderStep2 = () => (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <Input 
@@ -290,6 +293,51 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
           placeholder="Your phone number"
           required
         />
+      </div>
+
+      <div className="flex space-x-4 mt-6">
+        <Button 
+          type="button"
+          onClick={handleBack} 
+          variant="outline" 
+          className="w-1/2 border-airbnb-gold/20 hover:bg-airbnb-gold/5"
+        >
+          Back
+        </Button>
+        <Button 
+          type="button"
+          onClick={handleNext}
+          className="w-1/2 bg-airbnb-red hover:bg-airbnb-red/90"
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderStep3 = () => (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {guests > 0 && (
+        <GuestDetailsInput
+          guestCount={guests}
+          genderCounts={genderCounts}
+          onGenderCountChange={handleGenderCountChange}
+          error={genderError}
+        />
+      )}
+
+      <div className="space-y-2">
+        <Label>Table Preference</Label>
+        <Select value={tablePreference} onValueChange={setTablePreference}>
+          <SelectTrigger className="w-full bg-[#1E1E1E] border-airbnb-gold/20">
+            <SelectValue placeholder="Select table preference" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ground">Ground Floor</SelectItem>
+            <SelectItem value="first">First Floor</SelectItem>
+            <SelectItem value="terrace">Terrace</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
@@ -349,7 +397,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         <Button 
           type="submit"
           className="w-1/2 bg-airbnb-red hover:bg-airbnb-red/90"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !!genderError || genderCounts.male + genderCounts.female !== guests}
         >
           {isSubmitting ? (
             <>
@@ -380,19 +428,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       </div>
       
       <div className="flex-1 p-6 overflow-y-auto">
-        <div className="pb-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-airbnb-gold' : 'bg-airbnb-gold/40'}`}>
-              <Calendar className="h-4 w-4 text-black" />
-            </div>
-            <div className="h-0.5 flex-1 bg-airbnb-gold/40" />
-            <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-airbnb-gold' : 'bg-airbnb-gold/40'}`}>
-              <Users className="h-4 w-4 text-black" />
-            </div>
-          </div>
+        <div className="pb-8">
+          <BookingSteps currentStep={step} />
         </div>
         
-        {step === 1 ? renderStep1() : renderStep2()}
+        {step === 1 ? renderStep1() : step === 2 ? renderStep2() : renderStep3()}
       </div>
     </div>
   );
