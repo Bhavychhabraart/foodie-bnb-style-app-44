@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { ChevronRight, ChefHat, Star, Sparkles } from 'lucide-react';
@@ -20,7 +21,7 @@ interface ChefSpecial {
 }
 
 interface ChefsSpecialsProps {
-  tableName?: 'chefs_specials' | 'makhna_chefs_specials' | 'slique_chefs_specials';
+  tableName?: string;
   setActiveCategory?: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -44,7 +45,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({
           throw error;
         }
         if (data) {
-          setChefsSpecials(data);
+          setChefsSpecials(data as ChefSpecial[]);
         }
       } catch (error) {
         console.error('Error fetching chef specials:', error);
@@ -69,7 +70,7 @@ const ChefsSpecials: React.FC<ChefsSpecialsProps> = ({
           </div>
           <button 
             className="flex items-center text-airbnb-gold hover:underline group"
-            onClick={() => setActiveCategory('menu')}
+            onClick={() => setActiveCategory && setActiveCategory('menu')}
           >
             <span className="mr-1 group-hover:mr-2 transition-all">View menu</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
