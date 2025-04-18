@@ -29,7 +29,7 @@ const Support: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar />
       
       <main className="flex-1">
         <div className="section-padding bg-soft-gray">

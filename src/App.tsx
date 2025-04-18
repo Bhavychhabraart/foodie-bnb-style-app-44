@@ -19,6 +19,7 @@ const EditPanel = lazy(() => import("./pages/EditPanel"));
 const AdminSiteEditor = lazy(() => import("./pages/AdminSiteEditor"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CloneInstructions = lazy(() => import("./pages/CloneInstructions"));
+const Support = lazy(() => import("./pages/Support"));
 
 // Configure QueryClient with better defaults
 const queryClient = new QueryClient({
@@ -53,6 +54,7 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<Hacha />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/support" element={<Support />} />
                     <Route path="/admin" element={
                       <AdminRoute>
                         <AdminDashboard />
