@@ -1,9 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
 import BottomNav from '@/components/BottomNav';
+import ChefsSpecials from '@/components/ChefsSpecials';
+import OngoingOffers from '@/components/OngoingOffers';
+import PhotoGallery from '@/components/PhotoGallery';
+import Testimonials from '@/components/Testimonials';
+import Highlights from '@/components/Highlights';
+import FlipBook from '@/components/FlipBook';
 import MarqueeAnnouncement from '@/components/MarqueeAnnouncement';
+import About from '@/components/About';
+import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
 import MakhnaHero from '@/components/makhna/MakhnaHero';
@@ -17,6 +25,27 @@ const MakhnaIndex = () => {
     "Weekend Special Buffet",
     "Cultural Dance Evening - Saturdays"
   ];
+  
+  useEffect(() => {
+    // Listen for custom category change events
+    const handleCategoryChange = (event: CustomEvent) => {
+      setActiveCategory(event.detail);
+    };
+
+    // Add event listener
+    window.document.addEventListener(
+      "category-change",
+      handleCategoryChange as EventListener
+    );
+
+    // Cleanup
+    return () => {
+      window.document.removeEventListener(
+        "category-change",
+        handleCategoryChange as EventListener
+      );
+    };
+  }, []);
   
   return (
     <div className="pb-16 bg-[#1A1F2C]">
@@ -33,8 +62,27 @@ const MakhnaIndex = () => {
       <MakhnaHero />
       
       {activeCategory === 'home' ? (
-        <div className="space-y-2">
+        <div className="space-y-2 bg-[#1A1F2C]">
+          <Spotlight />
           <Events category="makhna" />
+          <ChefsSpecials setActiveCategory={setActiveCategory} />
+          <OngoingOffers />
+          <PhotoGallery />
+          <About />
+          <Highlights />
+          <Testimonials />
+        </div>
+      ) : activeCategory === 'experiences' ? (
+        <div className="space-y-2 bg-[#1A1F2C]">
+          <Events category="experiences" />
+        </div>
+      ) : activeCategory === 'menu' ? (
+        <div>
+          <FlipBook />
+        </div>
+      ) : activeCategory === 'offers' ? (
+        <div>
+          <OngoingOffers />
         </div>
       ) : null}
       
