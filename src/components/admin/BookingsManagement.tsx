@@ -4,13 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Search, Edit, Eye, Trash2, UserCog, Calendar, Clock, Phone, Mail, Users, FileText, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Search, Edit, Eye, Trash2, UserCog, Calendar, Clock, Phone, Mail, Users, FileText, CheckCircle2, XCircle, Loader2, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 type Booking = {
   id: string;
@@ -314,6 +313,20 @@ const BookingsManagement: React.FC = () => {
     }
   };
 
+  const handleWhatsAppMessage = (booking: Booking) => {
+    const confirmationMessage = `Hello ${booking.name},\n\nYour booking at The Urban Dhaba has been confirmed!\n\n` +
+      `Details:\n` +
+      `Date: ${formatDate(booking.date)}\n` +
+      `Time: ${booking.time}\n` +
+      `Booking Type: ${booking.booking_type}\n` +
+      `Amount: ₹${booking.total_amount.toLocaleString()}\n\n` +
+      `We look forward to serving you!\n\n` +
+      `Best regards,\nThe Urban Dhaba Team`;
+
+    const whatsappUrl = `https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(confirmationMessage)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const renderBookingStatusBadge = (status: string) => {
     const color = statusColors[status] || 'bg-gray-500';
     return (
@@ -418,6 +431,9 @@ const BookingsManagement: React.FC = () => {
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleEdit(booking)}>
                         <Edit className="h-4 w-4 text-airbnb-gold" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleWhatsAppMessage(booking)}>
+                        <MessageSquare className="h-4 w-4 text-green-500" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleDelete(booking)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
