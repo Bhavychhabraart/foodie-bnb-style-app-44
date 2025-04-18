@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, PartyPopper, Send, Download, User, Calendar, Clock, Phone, Users, MessageCircle, WhatsappIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,47 @@ interface BookingConfirmationProps {
   phone?: string;
   onClose: () => void;
 }
+
+const MessageAnimation = ({ onComplete }: { onComplete: () => void }) => {
+  const [currentMessage, setCurrentMessage] = useState(0);
+  const messages = [
+    "Taking your reservation to WhatsApp...",
+    "To provide you support with bookings...",
+    "Opening WhatsApp now..."
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (currentMessage < messages.length - 1) {
+        setCurrentMessage(prev => prev + 1);
+      } else {
+        onComplete();
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [currentMessage, onComplete]);
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentMessage}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+          className="bg-airbnb-dark p-6 rounded-lg shadow-xl border border-airbnb-gold/20 max-w-sm w-full mx-4"
+        >
+          <div className="flex items-center space-x-3 text-white">
+            <MessageCircle className="w-6 h-6 text-airbnb-gold animate-pulse" />
+            <p className="text-lg">{messages[currentMessage]}</p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const BookingQRCode = ({ bookingData, size = 200 }: { bookingData: string, size?: number }) => {
   return (
@@ -45,6 +86,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const [showQrCode, setShowQrCode] = useState(false);
   const [qrCodeLoaded, setQrCodeLoaded] = useState(false);
   const [showThankYou, setShowThankYou] = useState(true);
+  const [showMessageAnimation, setShowMessageAnimation] = useState(false);
   const { toast } = useToast();
   const qrCanvasRef = useRef<HTMLDivElement>(null);
   const { userProfile } = useAuth();
@@ -74,6 +116,11 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   }, [showQrCode]);
   
   const handleWhatsAppShare = () => {
+    setShowMessageAnimation(true);
+  };
+
+  const handleAnimationComplete = () => {
+    setShowMessageAnimation(false);
     const message = `Booking Confirmed!\n\n${experienceTitle}\nName: ${customerName}\nPhone: ${contactPhone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
     
     const phoneNumber = "919220829369";
@@ -183,6 +230,10 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center bg-airbnb-dark min-h-screen">
+      {showMessageAnimation && (
+        <MessageAnimation onComplete={handleAnimationComplete} />
+      )}
+      
       {showThankYou ? renderThankYouMessage() : (
         <>
           <motion.div
