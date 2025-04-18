@@ -17,6 +17,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const EditPanel = lazy(() => import("./pages/EditPanel"));
 const AdminSiteEditor = lazy(() => import("./pages/AdminSiteEditor"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Template = lazy(() => import("./pages/Template"));
 
 // Configure QueryClient with better defaults
 const queryClient = new QueryClient({
@@ -54,6 +55,7 @@ const App = () => {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/edit-panel" element={<EditPanel />} />
                     <Route path="/admin/site-editor" element={<AdminSiteEditor />} />
+                    <Route path="/template" element={<Template />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>

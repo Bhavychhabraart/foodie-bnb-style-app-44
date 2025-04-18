@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -13,6 +14,7 @@ import About from '@/components/About';
 import Spotlight from '@/components/Spotlight';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import BookingDrawer from '@/components/BookingDrawer';
+import TemplateLink from '@/components/TemplateLink';
 import { Button } from '@/components/ui/button';
 import { Calendar, Menu } from 'lucide-react';
 
@@ -74,7 +76,7 @@ const Index = () => {
         </div> : null}
       
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      
+      <TemplateLink />
       <BookingDrawer open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>;
 };
