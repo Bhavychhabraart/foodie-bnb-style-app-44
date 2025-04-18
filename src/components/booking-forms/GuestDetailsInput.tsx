@@ -2,12 +2,12 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormControl, FormItem } from '@/components/ui/form';
+import { FormItem } from '@/components/ui/form';
 
 interface GuestDetailsInputProps {
   guestCount: number;
   genderCounts: { male: number; female: number };
-  onGenderCountChange: (male: number, female: number) => void;
+  onGenderCountChange: (gender: 'male' | 'female', value: number) => void;
   error?: string;
 }
 
@@ -17,18 +17,6 @@ const GuestDetailsInput: React.FC<GuestDetailsInputProps> = ({
   onGenderCountChange,
   error
 }) => {
-  const handleMaleCountChange = (value: string) => {
-    const maleCount = parseInt(value);
-    const femaleCount = guestCount - maleCount;
-    onGenderCountChange(maleCount, femaleCount);
-  };
-
-  const handleFemaleCountChange = (value: string) => {
-    const femaleCount = parseInt(value);
-    const maleCount = guestCount - femaleCount;
-    onGenderCountChange(maleCount, femaleCount);
-  };
-
   return (
     <div className="space-y-4">
       <div>
@@ -36,7 +24,7 @@ const GuestDetailsInput: React.FC<GuestDetailsInputProps> = ({
           <Label>Male Guests</Label>
           <Select 
             value={genderCounts.male.toString()} 
-            onValueChange={handleMaleCountChange}
+            onValueChange={(value) => onGenderCountChange('male', parseInt(value))}
           >
             <SelectTrigger className="w-full bg-[#1E1E1E] border-airbnb-gold/20">
               <SelectValue placeholder="Select number of male guests" />
@@ -55,7 +43,7 @@ const GuestDetailsInput: React.FC<GuestDetailsInputProps> = ({
           <Label>Female Guests</Label>
           <Select 
             value={genderCounts.female.toString()} 
-            onValueChange={handleFemaleCountChange}
+            onValueChange={(value) => onGenderCountChange('female', parseInt(value))}
           >
             <SelectTrigger className="w-full bg-[#1E1E1E] border-airbnb-gold/20">
               <SelectValue placeholder="Select number of female guests" />
