@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';
@@ -21,7 +20,7 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState('home');
   const [activeTab, setActiveTab] = useState('explore');
   const [bookingOpen, setBookingOpen] = useState(false);
-  const upcomingEvents = ["Soulful Sufi Night - 16th April", "Our World with Raja Kikkat - 17th April", "Thursday Gin & Groove - 17th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
+  const upcomingEvents = ["Soulful Sufi Night - 16th April", "Back to 90s - 18th April", "Bollywood Night - 20th April"];
   
   useEffect(() => {
     // Listen for custom category change events
