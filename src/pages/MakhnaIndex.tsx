@@ -48,24 +48,35 @@ const MakhnaIndex = () => {
   }, []);
   
   return (
-    <div className="pb-16 bg-airbnb-dark">
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+    <div className="min-h-screen bg-gradient-to-b from-airbnb-dark via-airbnb-dark/95 to-airbnb-dark">
+      <div className="fixed top-4 right-4 z-20 flex items-center gap-2 backdrop-blur-sm bg-black/20 p-2 rounded-full">
         <ThemeToggle />
       </div>
       
-      <MarqueeAnnouncement title="Upcoming at Makhna!" items={upcomingEvents} />
+      <MarqueeAnnouncement 
+        title="Upcoming at Makhna!" 
+        items={upcomingEvents} 
+      />
       
-      <div className="sticky top-0 z-10 shadow-md shadow-black/30">
-        <CategorySelector activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      <div className="sticky top-0 z-10">
+        <div className="bg-gradient-to-b from-airbnb-dark to-transparent pb-4">
+          <CategorySelector 
+            activeCategory={activeCategory} 
+            setActiveCategory={setActiveCategory} 
+          />
+        </div>
       </div>
       
       <MakhnaHero />
       
       {activeCategory === 'home' ? (
-        <div className="space-y-2 bg-airbnb-dark">
+        <div className="space-y-8 animate-fade-in">
           <Spotlight tableName="makhna_spotlight" />
           <Events tableName="makhna_events" />
-          <ChefsSpecials tableName="makhna_chefs_specials" setActiveCategory={setActiveCategory} />
+          <ChefsSpecials 
+            tableName="makhna_chefs_specials" 
+            setActiveCategory={setActiveCategory} 
+          />
           <OngoingOffers tableName="makhna_offers" />
           <PhotoGallery bucketName="makhna" />
           <About />
@@ -73,15 +84,18 @@ const MakhnaIndex = () => {
           <Testimonials />
         </div>
       ) : activeCategory === 'experiences' ? (
-        <div className="space-y-2 bg-airbnb-dark">
-          <Events tableName="makhna_events" category="experiences" />
+        <div className="space-y-8 animate-fade-in">
+          <Events 
+            tableName="makhna_events" 
+            category="experiences" 
+          />
         </div>
       ) : activeCategory === 'menu' ? (
-        <div>
+        <div className="animate-fade-in">
           <FlipBook />
         </div>
       ) : activeCategory === 'offers' ? (
-        <div>
+        <div className="animate-fade-in">
           <OngoingOffers tableName="makhna_offers" />
         </div>
       ) : null}
