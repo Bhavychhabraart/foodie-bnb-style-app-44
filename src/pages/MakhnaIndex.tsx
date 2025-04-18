@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import CategorySelector from '@/components/CategorySelector';
 import Events from '@/components/Events';

@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import EventCard from './EventCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -8,7 +9,7 @@ import LoadingWrapper from './LoadingWrapper';
 import ErrorBoundary from './ErrorBoundary';
 
 interface EventsProps {
-  tableName?: string;
+  tableName?: 'events' | 'makhna_events';
   category?: string;
 }
 

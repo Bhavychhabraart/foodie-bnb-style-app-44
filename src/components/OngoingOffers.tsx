@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Tag, Sparkles, Clock } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -17,7 +18,7 @@ interface Offer {
 }
 
 interface OngoingOffersProps {
-  tableName?: string;
+  tableName?: 'offers' | 'makhna_offers';
 }
 
 const OngoingOffers: React.FC<OngoingOffersProps> = ({
@@ -47,7 +48,8 @@ const OngoingOffers: React.FC<OngoingOffersProps> = ({
           return;
         }
         
-        setOffers(data || []);
+        // Type assertion to ensure data conforms to Offer interface
+        setOffers(data as Offer[]);
       } catch (error) {
         console.error('Unexpected error:', error);
       } finally {
