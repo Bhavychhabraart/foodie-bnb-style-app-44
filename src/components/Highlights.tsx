@@ -1,8 +1,9 @@
 import React from 'react';
-import { Award, Clock, Utensils, Wine } from 'lucide-react';
+import { Award, Clock, Utensils } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
 import { motion } from 'framer-motion';
+
 const highlights = [{
   id: 1,
   title: "Award-Winning Chefs",
@@ -14,16 +15,12 @@ const highlights = [{
   description: "We source the freshest ingredients from local farms for an authentic dining experience.",
   icon: Utensils
 }, {
-  id: 3,
-  title: "Premium Wine Selection",
-  description: "Our sommelier curates a world-class collection of wines from the finest vineyards.",
-  icon: Wine
-}, {
   id: 4,
   title: "Exclusive Dining Hours",
   description: "We offer special dining hours for intimate gatherings and private celebrations.",
   icon: Clock
 }];
+
 const container = {
   hidden: {
     opacity: 0
@@ -35,6 +32,7 @@ const container = {
     }
   }
 };
+
 const item = {
   hidden: {
     opacity: 0,
@@ -45,6 +43,7 @@ const item = {
     y: 0
   }
 };
+
 const Highlights: React.FC = () => {
   return <div className="py-16 bg-gradient-to-b from-airbnb-cream/10 to-airbnb-cream/5 dark:from-airbnb-darkbrown dark:to-airbnb-darkbrown/80">
       <div className="container-padding mx-auto">
@@ -111,4 +110,5 @@ const Highlights: React.FC = () => {
       </div>
     </div>;
 };
+
 export default Highlights;
