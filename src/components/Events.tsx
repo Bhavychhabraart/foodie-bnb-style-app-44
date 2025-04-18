@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import EventCard from './EventCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "@/components/ui/carousel";
@@ -8,10 +9,10 @@ import LoadingWrapper from './LoadingWrapper';
 import ErrorBoundary from './ErrorBoundary';
 
 interface EventsProps {
+  tableName?: 'events' | 'makhna_events';
   category?: string;
 }
 
-// Define a consistent interface for all event objects
 interface Event {
   id: string;
   title: string;
@@ -31,68 +32,27 @@ interface Event {
 }
 
 const Events: React.FC<EventsProps> = ({
+  tableName = 'events',
   category = 'home'
 }) => {
   const { data: events = [], isLoading, error } = useQuery({
-    queryKey: ['events', category],
+    queryKey: ['events', tableName, category],
     queryFn: async () => {
-      console.log(`Fetching events for category: ${category}`);
+      console.log(`Fetching events for category: ${category} from table: ${tableName}`);
       
       const today = new Date();
       console.log("Today's date:", today.toISOString());
       
       let query = supabase
-        .from('events')
+        .from(tableName)
         .select('*');
         
-      if (category === 'home') {
-        query = query.eq('category', 'home');
-        
-        const { data, error } = await query.order('created_at', { ascending: false });
-        
-        if (error) {
-          console.error('Error fetching events:', error);
-          throw new Error(error.message);
-        }
-        
-        return data as Event[];
+      if (category !== 'home') {
+        query = query.eq('category', category);
       }
+        
+      const { data, error } = await query.order('created_at', { ascending: false });
       
-      if (category === 'experiences') {
-        const { data, error } = await query.order('date', { ascending: true });
-        
-        if (error) {
-          console.error('Error fetching upcoming events:', error);
-          throw new Error(error.message);
-        }
-        
-        console.log("Raw events data:", data);
-        
-        const upcomingEvents = (data as Event[]).filter(event => {
-          try {
-            const dateStr = event.date.replace(/(st|nd|rd|th)/, '');
-            const eventDate = new Date(dateStr);
-            
-            if (isNaN(eventDate.getTime())) {
-              console.log(`Could not parse date for event: ${event.title}, date: ${event.date}`);
-              return false;
-            }
-            
-            const isUpcoming = eventDate >= today;
-            console.log(`Event: ${event.title}, Date: ${event.date}, Parsed Date: ${eventDate}, Is Upcoming: ${isUpcoming}`);
-            return isUpcoming;
-          } catch (e) {
-            console.error(`Error parsing date for event ${event.title}:`, e);
-            return false;
-          }
-        });
-        
-        console.log("Filtered upcoming events:", upcomingEvents);
-        return upcomingEvents;
-      }
-      
-      const { data, error } = await query.eq('category', category).order('created_at', { ascending: false });
-        
       if (error) {
         console.error('Error fetching events:', error);
         throw new Error(error.message);
