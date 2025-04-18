@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Calendar, Users, Clock, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { FormControl, FormLabel, FormItem } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
+import GuestDetailsInput from './GuestDetailsInput';
 
 interface StandardBookingFormProps {
   onBack: () => void;
@@ -17,7 +17,6 @@ interface StandardBookingFormProps {
 }
 
 const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClose }) => {
-  // Initialize all state hooks at the top level
   const [step, setStep] = useState(1);
   const [date, setDate] = useState<string>('');
   const [time, setTime] = useState<string>('');
@@ -28,18 +27,17 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const [notes, setNotes] = useState<string>('');
   const [skipQueue, setSkipQueue] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0 });
+  const [genderError, setGenderError] = useState<string>('');
   
-  // Always define toast at the top level
   const { toast } = useToast();
 
-  // Available dates (next 14 days)
   const availableDates = Array.from({ length: 14 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() + i);
     return date.toISOString().split('T')[0];
   });
 
-  // Available time slots
   const availableTimes = [
     '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM',
     '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM', '9:00 PM', '9:30 PM'
@@ -67,6 +65,30 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
     }
   };
 
+  const validateGenderRatio = () => {
+    const { male, female } = genderCounts;
+    const couples = Math.min(male, female);
+    const maleStags = male - couples;
+    
+    if (male + female !== guests) {
+      setGenderError('Total number of male and female guests must equal total guests');
+      return false;
+    }
+    
+    if (maleStags > couples) {
+      setGenderError(`Number of male stags (${maleStags}) cannot exceed number of couples (${couples})`);
+      return false;
+    }
+    
+    setGenderError('');
+    return true;
+  };
+
+  const handleGenderCountChange = (male: number, female: number) => {
+    setGenderCounts({ male, female });
+    setGenderError('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -78,16 +100,14 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       });
       return;
     }
+
+    if (!validateGenderRatio()) {
+      return;
+    }
     
     try {
       setIsSubmitting(true);
       
-      // Calculate total amount (base price per guest + additional fees)
-      const basePrice = 1000; // ₹1000 per guest
-      const skipQueueFee = skipQueue ? 100 : 0;
-      const totalAmount = (basePrice * guests) + skipQueueFee;
-      
-      // Create reservation record
       const { data: reservation, error } = await supabase
         .from('reservations')
         .insert({
@@ -98,7 +118,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
           time,
           special_requests: notes,
           booking_type: 'standard',
-          total_amount: totalAmount,
+          total_amount: (1000 * guests) + (skipQueue ? 100 : 0),
           status: 'pending'
         })
         .select('id')
@@ -107,16 +127,26 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       if (error) {
         throw error;
       }
+
+      const guestEntries = [];
       
-      // Check the available gender values in the database
-      // Based on errors, we need to use one of the enum values expected by the database
-      // The enum likely has specific values: 'male', 'female', or 'other'
-      const guestEntries = Array.from({ length: guests }, () => ({
-        reservation_id: reservation.id,
-        name: 'Guest',
-        gender: 'other', // Using 'other' instead of 'not_specified' to match the DB constraint
-        cover_charge: basePrice
-      }));
+      for (let i = 0; i < genderCounts.male; i++) {
+        guestEntries.push({
+          reservation_id: reservation.id,
+          name: 'Guest',
+          gender: 'male',
+          cover_charge: 1000
+        });
+      }
+      
+      for (let i = 0; i < genderCounts.female; i++) {
+        guestEntries.push({
+          reservation_id: reservation.id,
+          name: 'Guest',
+          gender: 'female',
+          cover_charge: 1000
+        });
+      }
       
       const { error: guestsError } = await supabase
         .from('reservation_guests')
@@ -127,13 +157,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         throw guestsError;
       }
       
-      // Show success message
       toast({
         title: "Reservation Submitted!",
         description: `Your table for ${guests} has been reserved.`,
       });
       
-      // Close the booking drawer
       onClose();
       
     } catch (error) {
@@ -184,7 +212,11 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         <Label>Number of Guests</Label>
         <Select 
           value={guests.toString()} 
-          onValueChange={(value) => setGuests(parseInt(value))}
+          onValueChange={(value) => {
+            const newGuests = parseInt(value);
+            setGuests(newGuests);
+            setGenderCounts({ male: 0, female: 0 });
+          }}
         >
           <SelectTrigger className="w-full bg-[#1E1E1E] border-airbnb-gold/20">
             <SelectValue placeholder="Select number of guests" />
@@ -197,9 +229,19 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         </Select>
       </div>
 
+      {guests > 0 && (
+        <GuestDetailsInput
+          guestCount={guests}
+          genderCounts={genderCounts}
+          onGenderCountChange={handleGenderCountChange}
+          error={genderError}
+        />
+      )}
+
       <Button 
         onClick={handleNext} 
         className="w-full mt-4 bg-airbnb-red hover:bg-airbnb-red/90"
+        disabled={!!genderError || genderCounts.male + genderCounts.female !== guests}
       >
         Next
         <ArrowRight className="ml-2 h-4 w-4" />
@@ -331,7 +373,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h2 className="text-lg font-semibold text-white">Standard Booking</h2>
-        <div className="w-8" /> {/* Empty div for centering */}
+        <div className="w-8" />
       </div>
       
       <div className="flex-1 p-6 overflow-y-auto">
