@@ -314,14 +314,15 @@ const BookingsManagement: React.FC = () => {
   };
 
   const handleWhatsAppMessage = (booking: Booking) => {
-    const confirmationMessage = `Hello ${booking.name},\n\nYour booking at The Urban Dhaba has been confirmed!\n\n` +
-      `Details:\n` +
+    const confirmationMessage = `Hello ${booking.name}! 🎉\n\n` +
+      `Your magical dining experience at Hacha is all set! ✨\n\n` +
+      `Booking Details:\n` +
       `Date: ${formatDate(booking.date)}\n` +
       `Time: ${booking.time}\n` +
       `Booking Type: ${booking.booking_type}\n` +
-      `Amount: ₹${booking.total_amount.toLocaleString()}\n\n` +
-      `We look forward to serving you!\n\n` +
-      `Best regards,\nThe Urban Dhaba Team`;
+      `Total: ₹${booking.total_amount.toLocaleString()}\n\n` +
+      `We can't wait to dazzle you with an unforgettable culinary journey. See you soon! 🍽️💫\n\n` +
+      `Warmly,\nThe Hacha Team`;
 
     const whatsappUrl = `https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(confirmationMessage)}`;
     window.open(whatsappUrl, '_blank');
