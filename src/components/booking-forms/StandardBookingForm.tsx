@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,11 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Calendar, Users, Clock, MapPin, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Clock, MapPin, ArrowRight, Loader2, PartyPopper, Send } from 'lucide-react';
 import { FormControl, FormLabel, FormItem } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
 import GuestDetailsInput from './GuestDetailsInput';
 import { BookingSteps } from './BookingSteps';
+import { motion } from 'framer-motion';
+import BookingConfirmation from '@/components/BookingConfirmation';
 
 interface StandardBookingFormProps {
   onBack: () => void;
@@ -32,6 +33,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
   const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0 });
   const [genderError, setGenderError] = useState<string>('');
   const [tablePreference, setTablePreference] = useState<string>('ground');
+  const [showConfirmation, setShowConfirmation] = useState(false);
   
   const { toast } = useToast();
 
@@ -178,7 +180,7 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
         description: "We have received your reservation and will share confirmation on your email.",
       });
       
-      onClose();
+      setShowConfirmation(true);
       
     } catch (error) {
       console.error('Error creating reservation:', error);
@@ -191,6 +193,20 @@ const StandardBookingForm: React.FC<StandardBookingFormProps> = ({ onBack, onClo
       setIsSubmitting(false);
     }
   };
+
+  if (showConfirmation) {
+    return (
+      <BookingConfirmation
+        experienceTitle="Standard Table Reservation"
+        date={new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+        time={time}
+        guests={guests.toString()}
+        name={name}
+        phone={phone}
+        onClose={onClose}
+      />
+    );
+  }
 
   const renderStep1 = () => (
     <div className="space-y-5">
