@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Palette } from 'lucide-react';
+import { ArrowLeft, Palette, Link as LinkIcon, Check } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -16,7 +15,6 @@ import EditSpecials from '@/components/edit-panel/EditSpecials';
 import EditTestimonials from '@/components/edit-panel/EditTestimonials';
 import EditEvents from '@/components/edit-panel/EditEvents';
 
-// Define predefined color options
 const colorOptions = [
   { name: 'Red', value: '#FF385C' },
   { name: 'Blue', value: '#0EA5E9' },
@@ -31,10 +29,10 @@ const colorOptions = [
 const EditPanel: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("gallery");
-  const [accentColor, setAccentColor] = useState("#FF385C"); // Default color (airbnb red)
+  const [accentColor, setAccentColor] = useState("#FF385C");
   const { toast } = useToast();
+  const [copiedLink, setCopiedLink] = useState(false);
 
-  // Load saved color from localStorage on component mount
   useEffect(() => {
     const savedColor = localStorage.getItem('accentColor');
     if (savedColor) {
@@ -43,31 +41,18 @@ const EditPanel: React.FC = () => {
     }
   }, []);
 
-  // Convert hex color to HSL format for CSS variables
   const convertHexToHSL = (hex: string): string => {
-    // Remove the # if it exists
     hex = hex.replace('#', '');
-    
-    // Convert hex to RGB
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
-    
-    // Find greatest and smallest values
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    
-    // Calculate lightness
     let l = (max + min) / 2;
-    
     let s = 0;
     let h = 0;
-    
     if (max !== min) {
-      // Calculate saturation
       s = l > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min);
-      
-      // Calculate hue
       if (max === r) {
         h = (g - b) / (max - min) + (g < b ? 6 : 0);
       } else if (max === g) {
@@ -77,8 +62,6 @@ const EditPanel: React.FC = () => {
       }
       h = h * 60;
     }
-    
-    // Return HSL in format for CSS variables
     return `${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
   };
 
@@ -86,16 +69,36 @@ const EditPanel: React.FC = () => {
     setAccentColor(color);
     document.documentElement.style.setProperty('--primary', convertHexToHSL(color));
     localStorage.setItem('accentColor', color);
-    
     toast({
       title: "Color updated",
       description: "The accent color has been updated successfully.",
     });
   };
 
+  const handleShareLink = () => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      setCopiedLink(true);
+      toast({
+        title: "Link Copied",
+        description: "Edit panel link copied to clipboard",
+      });
+      
+      setTimeout(() => {
+        setCopiedLink(false);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy link",
+        variant: "destructive"
+      });
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
@@ -111,6 +114,25 @@ const EditPanel: React.FC = () => {
             <h1 className="text-xl font-semibold text-gray-900">Edit Content Panel</h1>
           </div>
           <div className="flex items-center space-x-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={handleShareLink}
+              className="flex items-center"
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Share Link
+                </>
+              )}
+            </Button>
+            
             <Sheet>
               <SheetTrigger asChild>
                 <Button size="sm" variant="outline" className="flex items-center">
@@ -187,7 +209,6 @@ const EditPanel: React.FC = () => {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-6 mb-8">
