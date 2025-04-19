@@ -1,16 +1,15 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
-import { Copy, Check, ExternalLink, ChevronLeft } from "lucide-react";
+import { Copy, Check, ExternalLink, ChevronLeft, PaintBrush } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CloneInstructions = () => {
-  const [copied, setCopied] = React.useState<{[key: string]: boolean}>({});
+  const [copied, setCopied] = useState<{[key: string]: boolean}>({});
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -39,10 +38,11 @@ const CloneInstructions = () => {
       </div>
       
       <Tabs defaultValue="setup" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
           <TabsTrigger value="setup">Initial Setup</TabsTrigger>
           <TabsTrigger value="supabase">Supabase Setup</TabsTrigger>
           <TabsTrigger value="development">Development</TabsTrigger>
+          <TabsTrigger value="customization">Customization</TabsTrigger>
         </TabsList>
         
         <TabsContent value="setup">
@@ -138,7 +138,7 @@ const CloneInstructions = () => {
                       3
                     </div>
                     <div>
-                      <p>Enter a name for your project (e.g., "hacha-restaurant")</p>
+                      <p>Enter a name for your project (e.g., "your-restaurant-name")</p>
                     </div>
                   </div>
                   
@@ -382,42 +382,265 @@ CREATE TRIGGER set_timestamp_highlights
                       
                       <div className="rounded-md bg-muted p-4 mt-4">
                         <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-sm font-medium">Create Events & Offers Tables</h3>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => copyToClipboard(`-- Create events table
+CREATE TABLE public.events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
+    host TEXT NOT NULL,
+    venue TEXT NOT NULL,
+    price TEXT NOT NULL,
+    rating NUMERIC NOT NULL DEFAULT 4.8,
+    reviews INTEGER NOT NULL DEFAULT 0,
+    is_sold_out BOOLEAN NOT NULL DEFAULT false,
+    featured BOOLEAN NOT NULL DEFAULT false,
+    capacity TEXT,
+    category TEXT NOT NULL DEFAULT 'home',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Create offers table
+CREATE TABLE public.offers (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image_url TEXT,
+    valid_until TEXT NOT NULL,
+    coupon_code TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Create chefs_specials table
+CREATE TABLE public.chefs_specials (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image_url TEXT,
+    chef TEXT NOT NULL,
+    price TEXT NOT NULL,
+    rating NUMERIC NOT NULL DEFAULT 4.5,
+    is_popular BOOLEAN NOT NULL DEFAULT false,
+    is_new BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chefs_specials ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for public read access
+CREATE POLICY "Allow public read access for events" ON public.events FOR SELECT USING (true);
+CREATE POLICY "Allow public read access for offers" ON public.offers FOR SELECT USING (true);
+CREATE POLICY "Allow public read access for chefs_specials" ON public.chefs_specials FOR SELECT USING (true);
+
+-- Create policies for admin write access
+CREATE POLICY "Allow admin write access for events" ON public.events
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+CREATE POLICY "Allow admin write access for offers" ON public.offers
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+CREATE POLICY "Allow admin write access for chefs_specials" ON public.chefs_specials
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+-- Add updated_at triggers
+CREATE TRIGGER set_timestamp_events
+    BEFORE UPDATE ON public.events
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();
+
+CREATE TRIGGER set_timestamp_offers
+    BEFORE UPDATE ON public.offers
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();
+
+CREATE TRIGGER set_timestamp_chefs_specials
+    BEFORE UPDATE ON public.chefs_specials
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();`, "events_tables")}
+                            className="h-8"
+                          >
+                            {copied["events_tables"] ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                        <pre className="text-xs bg-secondary/50 p-3 rounded overflow-x-auto max-h-64 overflow-y-auto">
+{`-- Create events table
+CREATE TABLE public.events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
+    host TEXT NOT NULL,
+    venue TEXT NOT NULL,
+    price TEXT NOT NULL,
+    rating NUMERIC NOT NULL DEFAULT 4.8,
+    reviews INTEGER NOT NULL DEFAULT 0,
+    is_sold_out BOOLEAN NOT NULL DEFAULT false,
+    featured BOOLEAN NOT NULL DEFAULT false,
+    capacity TEXT,
+    category TEXT NOT NULL DEFAULT 'home',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Create offers table
+CREATE TABLE public.offers (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image_url TEXT,
+    valid_until TEXT NOT NULL,
+    coupon_code TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Create chefs_specials table
+CREATE TABLE public.chefs_specials (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image_url TEXT,
+    chef TEXT NOT NULL,
+    price TEXT NOT NULL,
+    rating NUMERIC NOT NULL DEFAULT 4.5,
+    is_popular BOOLEAN NOT NULL DEFAULT false,
+    is_new BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chefs_specials ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for public read access
+CREATE POLICY "Allow public read access for events" ON public.events FOR SELECT USING (true);
+CREATE POLICY "Allow public read access for offers" ON public.offers FOR SELECT USING (true);
+CREATE POLICY "Allow public read access for chefs_specials" ON public.chefs_specials FOR SELECT USING (true);
+
+-- Create policies for admin write access
+CREATE POLICY "Allow admin write access for events" ON public.events
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+CREATE POLICY "Allow admin write access for offers" ON public.offers
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+CREATE POLICY "Allow admin write access for chefs_specials" ON public.chefs_specials
+    FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+-- Add updated_at triggers
+CREATE TRIGGER set_timestamp_events
+    BEFORE UPDATE ON public.events
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();
+
+CREATE TRIGGER set_timestamp_offers
+    BEFORE UPDATE ON public.offers
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();
+
+CREATE TRIGGER set_timestamp_chefs_specials
+    BEFORE UPDATE ON public.chefs_specials
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_modified_column();`}
+                        </pre>
+                      </div>
+                      
+                      <div className="rounded-md bg-muted p-4 mt-4">
+                        <div className="flex justify-between items-center mb-2">
                           <h3 className="text-sm font-medium">Sample Data</h3>
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            onClick={() => copyToClipboard(`-- Insert initial data
+                            onClick={() => copyToClipboard(`-- Insert sample data for your restaurant
+-- Change these values to match your restaurant!
+
+-- Insert sample highlights
 INSERT INTO public.highlights (title, description, icon) VALUES
-    ('Award-Winning Chefs', 'Our culinary team has been recognized with prestigious awards for their innovative approach.', 'Award'),
-    ('Farm to Table', 'We source the freshest ingredients from local farms for an authentic dining experience.', 'Utensils'),
-    ('Exclusive Dining Hours', 'We offer special dining hours for intimate gatherings and private celebrations.', 'Clock');
+    ('Award-Winning Food', 'Our culinary team has been recognized with prestigious awards for their innovative approach.', 'Award'),
+    ('Fresh Ingredients', 'We source the freshest ingredients from local farms for an authentic dining experience.', 'Utensils'),
+    ('Unique Atmosphere', 'Experience our one-of-a-kind ambiance that combines comfort and style.', 'Clock');
 
+-- Insert about section
 INSERT INTO public.about_section (title, description) VALUES
-    ('About Hacha', 'HACHA, the ultimate BYOB destination where aesthetics meet wild parties and culinary excellence!');
+    ('About Your Restaurant', 'Your restaurant description goes here. Tell your story and what makes your restaurant special!');
 
+-- Insert sample testimonials
 INSERT INTO public.testimonials (name, date, rating, text) VALUES
-    ('Priya Sharma', 'March 2025', 5, 'Absolutely incredible dining experience! The truffle risotto was divine, and the service was impeccable. The ambiance makes it perfect for special occasions.'),
-    ('Rahul Patel', 'February 2025', 4, 'Great food and atmosphere. The beef tenderloin was cooked to perfection. Only giving 4 stars because we had to wait a bit for our table despite having a reservation.'),
-    ('Aisha Khan', 'January 2025', 5, 'Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny. The staff made us feel so special.');`, "sample-data")}
+    ('John Smith', 'March 2025', 5, 'Absolutely incredible dining experience! The food was divine, and the service was impeccable.'),
+    ('Jane Doe', 'February 2025', 4, 'Great food and atmosphere. Everything was cooked to perfection.'),
+    ('Alex Johnson', 'January 2025', 5, 'Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny.');
+    
+-- Insert sample events
+INSERT INTO public.events (title, description, date, time, host, venue, price, category) VALUES
+    ('Weekend Brunch Special', 'Join us for a delightful weekend brunch with exclusive menu items', 'Every Weekend', '10:00 AM - 2:00 PM', 'Restaurant Staff', 'Main Dining Area', '$25 per person', 'home'),
+    ('Wine Tasting Event', 'Explore our curated selection of fine wines paired with appetizers', 'Last Friday of Month', '7:00 PM - 9:00 PM', 'Sommelier Sarah', 'Wine Cellar', '$40 per person', 'experiences'),
+    ('Chef''s Table Experience', 'Exclusive dining experience with our head chef preparing a custom menu', 'By Reservation', '6:30 PM', 'Head Chef Michael', 'Private Dining Room', '$95 per person', 'experiences');
+
+-- Insert sample offers
+INSERT INTO public.offers (title, description, valid_until, coupon_code) VALUES
+    ('Happy Hour Special', '50% off all appetizers and $5 house drinks', 'Monday-Friday, 4-6 PM', 'HAPPY50'),
+    ('Birthday Promotion', 'Free dessert on your birthday when you dine with us', 'Valid with ID on birthday', 'BDAYDESSERT'),
+    ('Weekday Lunch Deal', '15% off all lunch entrees', 'Monday-Thursday, 11 AM - 2 PM', 'LUNCH15');
+
+-- Insert sample chef's specials
+INSERT INTO public.chefs_specials (title, description, chef, price, is_popular, is_new) VALUES
+    ('Signature Dish', 'Our famous signature dish with a special twist', 'Executive Chef', '$28', true, false),
+    ('Seasonal Creation', 'Made with the freshest seasonal ingredients', 'Sous Chef', '$24', false, true),
+    ('Chef''s Recommendation', 'The chef''s personal favorite creation', 'Head Chef', '$32', true, false);`, "sample-data")}
                             className="h-8"
                           >
                             {copied["sample-data"] ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                           </Button>
                         </div>
                         <pre className="text-xs bg-secondary/50 p-3 rounded overflow-x-auto max-h-64 overflow-y-auto">
-{`-- Insert initial data
+{`-- Insert sample data for your restaurant
+-- Change these values to match your restaurant!
+
+-- Insert sample highlights
 INSERT INTO public.highlights (title, description, icon) VALUES
-    ('Award-Winning Chefs', 'Our culinary team has been recognized with prestigious awards for their innovative approach.', 'Award'),
-    ('Farm to Table', 'We source the freshest ingredients from local farms for an authentic dining experience.', 'Utensils'),
-    ('Exclusive Dining Hours', 'We offer special dining hours for intimate gatherings and private celebrations.', 'Clock');
+    ('Award-Winning Food', 'Our culinary team has been recognized with prestigious awards for their innovative approach.', 'Award'),
+    ('Fresh Ingredients', 'We source the freshest ingredients from local farms for an authentic dining experience.', 'Utensils'),
+    ('Unique Atmosphere', 'Experience our one-of-a-kind ambiance that combines comfort and style.', 'Clock');
 
+-- Insert about section
 INSERT INTO public.about_section (title, description) VALUES
-    ('About Hacha', 'HACHA, the ultimate BYOB destination where aesthetics meet wild parties and culinary excellence!');
+    ('About Your Restaurant', 'Your restaurant description goes here. Tell your story and what makes your restaurant special!');
 
+-- Insert sample testimonials
 INSERT INTO public.testimonials (name, date, rating, text) VALUES
-    ('Priya Sharma', 'March 2025', 5, 'Absolutely incredible dining experience! The truffle risotto was divine, and the service was impeccable. The ambiance makes it perfect for special occasions.'),
-    ('Rahul Patel', 'February 2025', 4, 'Great food and atmosphere. The beef tenderloin was cooked to perfection. Only giving 4 stars because we had to wait a bit for our table despite having a reservation.'),
-    ('Aisha Khan', 'January 2025', 5, 'Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny. The staff made us feel so special.');`}
+    ('John Smith', 'March 2025', 5, 'Absolutely incredible dining experience! The food was divine, and the service was impeccable.'),
+    ('Jane Doe', 'February 2025', 4, 'Great food and atmosphere. Everything was cooked to perfection.'),
+    ('Alex Johnson', 'January 2025', 5, 'Our anniversary dinner was spectacular! The tasting menu with wine pairings was worth every penny.');
+    
+-- Insert sample events
+INSERT INTO public.events (title, description, date, time, host, venue, price, category) VALUES
+    ('Weekend Brunch Special', 'Join us for a delightful weekend brunch with exclusive menu items', 'Every Weekend', '10:00 AM - 2:00 PM', 'Restaurant Staff', 'Main Dining Area', '$25 per person', 'home'),
+    ('Wine Tasting Event', 'Explore our curated selection of fine wines paired with appetizers', 'Last Friday of Month', '7:00 PM - 9:00 PM', 'Sommelier Sarah', 'Wine Cellar', '$40 per person', 'experiences'),
+    ('Chef''s Table Experience', 'Exclusive dining experience with our head chef preparing a custom menu', 'By Reservation', '6:30 PM', 'Head Chef Michael', 'Private Dining Room', '$95 per person', 'experiences');
+
+-- Insert sample offers
+INSERT INTO public.offers (title, description, valid_until, coupon_code) VALUES
+    ('Happy Hour Special', '50% off all appetizers and $5 house drinks', 'Monday-Friday, 4-6 PM', 'HAPPY50'),
+    ('Birthday Promotion', 'Free dessert on your birthday when you dine with us', 'Valid with ID on birthday', 'BDAYDESSERT'),
+    ('Weekday Lunch Deal', '15% off all lunch entrees', 'Monday-Thursday, 11 AM - 2 PM', 'LUNCH15');
+
+-- Insert sample chef's specials
+INSERT INTO public.chefs_specials (title, description, chef, price, is_popular, is_new) VALUES
+    ('Signature Dish', 'Our famous signature dish with a special twist', 'Executive Chef', '$28', true, false),
+    ('Seasonal Creation', 'Made with the freshest seasonal ingredients', 'Sous Chef', '$24', false, true),
+    ('Chef''s Recommendation', 'The chef''s personal favorite creation', 'Head Chef', '$32', true, false);`}
                         </pre>
                       </div>
                     </div>
@@ -528,187 +751,4 @@ CREATE TRIGGER on_auth_user_created
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="development">
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-2xl font-bold mb-4">5. Connect Your App to Supabase</h2>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                    1
-                  </div>
-                  <div className="flex-grow">
-                    <p className="mb-2">In your Supabase project, go to Project Settings → API</p>
-                    <p className="text-sm text-muted-foreground">Copy the URL and the anon/public key</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                    2
-                  </div>
-                  <div className="flex-grow">
-                    <p className="mb-2">Update the client file with your Supabase credentials:</p>
-                    <div className="rounded-md bg-muted p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-sm font-medium">src/integrations/supabase/client.ts</h3>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => copyToClipboard(`// This file is automatically generated. Do not edit it directly.
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);`, "client")}
-                          className="h-8"
-                        >
-                          {copied["client"] ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      <pre className="text-sm bg-secondary/50 p-3 rounded overflow-x-auto">
-{`// This file is automatically generated. Do not edit it directly.
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);`}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                    3
-                  </div>
-                  <div>
-                    <p className="mb-2">Start the development server:</p>
-                    <div className="rounded-md bg-muted p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-sm font-medium">Start development server</h3>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => copyToClipboard("npm run dev", "dev")}
-                          className="h-8"
-                        >
-                          {copied["dev"] ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      <pre className="text-sm bg-secondary/50 p-3 rounded overflow-x-auto">
-                        npm run dev
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                    4
-                  </div>
-                  <div>
-                    <p className="mb-2">Access the admin panel using pin code: <span className="font-mono bg-secondary/50 px-2 py-1 rounded">767676</span></p>
-                  </div>
-                </div>
-                
-                <div className="mt-8 p-6 bg-muted rounded-lg">
-                  <h3 className="text-xl font-bold mb-2">Important Notes</h3>
-                  <ul className="space-y-2 list-disc pl-5">
-                    <li>The admin PIN code is set to <span className="font-mono">767676</span> in the <code>AdminRoute.tsx</code> file</li>
-                    <li>You can modify table structures by running additional SQL commands in the Supabase SQL Editor</li>
-                    <li>Make sure to create at least one admin user by setting <code>is_admin</code> to <code>true</code> in the profiles table</li>
-                    <li>To deploy, follow the instructions in your hosting provider (Vercel, Netlify, etc.)</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      <div className="mt-12 border rounded-lg p-6 bg-secondary/10">
-        <h2 className="text-2xl font-bold mb-4">Need Help?</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-center mb-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="Shadcn" />
-                  <AvatarFallback>SC</AvatarFallback>
-                </Avatar>
-              </div>
-              <h3 className="font-semibold text-center mb-2">Supabase Docs</h3>
-              <p className="text-sm text-center text-muted-foreground">Official documentation for all Supabase features</p>
-              <div className="mt-4 flex justify-center">
-                <Button asChild variant="outline" size="sm">
-                  <a href="https://supabase.io/docs" target="_blank" rel="noopener noreferrer">
-                    Visit Docs
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-center mb-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="Shadcn" />
-                  <AvatarFallback>SC</AvatarFallback>
-                </Avatar>
-              </div>
-              <h3 className="font-semibold text-center mb-2">React Docs</h3>
-              <p className="text-sm text-center text-muted-foreground">Learn more about React and how to use it</p>
-              <div className="mt-4 flex justify-center">
-                <Button asChild variant="outline" size="sm">
-                  <a href="https://reactjs.org/docs/getting-started.html" target="_blank" rel="noopener noreferrer">
-                    Visit Docs
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-center mb-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="Shadcn" />
-                  <AvatarFallback>SC</AvatarFallback>
-                </Avatar>
-              </div>
-              <h3 className="font-semibold text-center mb-2">GitHub Repository</h3>
-              <p className="text-sm text-center text-muted-foreground">View source code and report issues</p>
-              <div className="mt-4 flex justify-center">
-                <Button asChild variant="outline" size="sm">
-                  <a href="#" target="_blank" rel="noopener noreferrer">
-                    Visit Repo
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CloneInstructions;
+        </Tabs

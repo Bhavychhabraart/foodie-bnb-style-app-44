@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, X, ChevronDown, Book } from 'lucide-react';
+import { Menu, X, ChevronDown, Book, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -25,9 +25,13 @@ const Navbar: React.FC = () => {
             <NavLink href="/#menu" isActive={location.hash === '#menu'}>Menu</NavLink>
             <NavLink href="/#events" isActive={location.hash === '#events'}>Events</NavLink>
             <NavLink href="/#location" isActive={location.hash === '#location'}>Location</NavLink>
+            <NavLink href="/support" isActive={location.pathname === '/support'}>
+              <FileText className="w-4 h-4 mr-1" />
+              Support
+            </NavLink>
             <NavLink href="/clone-instructions" isActive={location.pathname === '/clone-instructions'}>
               <Book className="w-4 h-4 mr-1" />
-              Clone Guide
+              Template Guide
             </NavLink>
           </div>
         </div>
@@ -86,11 +90,18 @@ const Navbar: React.FC = () => {
                     Location
                   </MobileNavLink>
                   <MobileNavLink 
+                    href="/support" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Support
+                  </MobileNavLink>
+                  <MobileNavLink 
                     href="/clone-instructions" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Book className="w-4 h-4 mr-2" />
-                    Clone Guide
+                    Template Guide
                   </MobileNavLink>
                   
                   <Separator className="my-2" />
