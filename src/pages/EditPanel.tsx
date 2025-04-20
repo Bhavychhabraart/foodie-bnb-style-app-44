@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,7 +15,7 @@ import EditOffers from '@/components/edit-panel/EditOffers';
 import EditSpecials from '@/components/edit-panel/EditSpecials';
 import EditTestimonials from '@/components/edit-panel/EditTestimonials';
 import EditEvents from '@/components/edit-panel/EditEvents';
-import EditAboutContent from '@/components/edit-panel/EditAboutContent';
+// import EditAboutContent from '@/components/edit-panel/EditAboutContent';
 import EditHighlights from '@/components/edit-panel/EditHighlights';
 
 const colorOptions = [
@@ -224,7 +225,7 @@ const EditPanel: React.FC = () => {
             <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="about"><EditAboutContent /></TabsContent>
+          <TabsContent value="about"><div className="bg-gray-100 border p-12 rounded text-gray-400 text-center">About editor temporarily removed for development</div></TabsContent>
           <TabsContent value="highlights"><EditHighlights /></TabsContent>
           <TabsContent value="gallery"><EditGallery /></TabsContent>
           <TabsContent value="events"><EditEvents /></TabsContent>

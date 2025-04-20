@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SplashScreen from "./components/SplashScreen";
 import LoadingWrapper from "./components/LoadingWrapper";
-import AdminRoute from "./components/AdminRoute";
+// import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "@/providers/AuthProvider";
 
 // Lazy load pages for better performance
@@ -66,50 +66,18 @@ const App = () => {
                       <Route path="/" element={<Hacha />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/support" element={<Support />} />
-                      <Route path="/admin" element={
-                        <AdminRoute>
-                          <AdminDashboard />
-                        </AdminRoute>
-                      } />
-                      <Route path="/edit-panel" element={
-                        <AdminRoute>
-                          <EditPanel />
-                        </AdminRoute>
-                      } />
-                      <Route path="/admin/site-editor" element={
-                        <AdminRoute>
-                          <AdminSiteEditor />
-                        </AdminRoute>
-                      } />
+                      <Route path="/admin" element={<AdminDashboard />} />
+                      <Route path="/edit-panel" element={<EditPanel />} />
+                      <Route path="/admin/site-editor" element={<AdminSiteEditor />} />
                       <Route path="/clone-instructions" element={<CloneInstructions />} />
                       
                       {/* Multi-tenant Routes */}
-                      <Route path="/tenant-setup" element={
-                        <AdminRoute>
-                          <TenantSetup />
-                        </AdminRoute>
-                      } />
-                      <Route path="/venues/:slug/setup" element={
-                        <AdminRoute>
-                          <VenueSetupWizard />
-                        </AdminRoute>
-                      } />
-                      <Route path="/venues/:slug/admin" element={
-                        <AdminRoute>
-                          <VenueAdminDashboard />
-                        </AdminRoute>
-                      } />
-                      <Route path="/venues/:slug/edit/:section" element={
-                        <AdminRoute>
-                          <VenueEditPanel />
-                        </AdminRoute>
-                      } />
+                      <Route path="/tenant-setup" element={<TenantSetup />} />
+                      <Route path="/venues/:slug/setup" element={<VenueSetupWizard />} />
+                      <Route path="/venues/:slug/admin" element={<VenueAdminDashboard />} />
+                      <Route path="/venues/:slug/edit/:section" element={<VenueEditPanel />} />
                       <Route path="/venues/:slug" element={<VenueFrontend />} />
-                      <Route path="/super-admin" element={
-                        <AdminRoute>
-                          <SuperAdminDashboard />
-                        </AdminRoute>
-                      } />
+                      <Route path="/super-admin" element={<SuperAdminDashboard />} />
                       
                       {/* Fallback Route */}
                       <Route path="*" element={<NotFound />} />
