@@ -32,18 +32,13 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
     const fetchAboutContent = async () => {
       setLoading(true);
       try {
-        let query = supabase
+        // Create a base query
+        const { data, error } = await supabase
           .from("about_content")
           .select("*")
           .order("created_at", { ascending: true })
+          .eq(venueSlug ? "venue_slug" : "id", venueSlug || "")
           .limit(1);
-
-        if (venueSlug) {
-          query = query.eq("venue_slug", venueSlug);
-        }
-
-        // Avoid using .maybeSingle() with dynamic chained queries, use `.then()` for correct type narrowing
-        const { data, error } = await query;
 
         if (error) {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
