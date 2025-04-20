@@ -32,6 +32,8 @@ const BookingQRCode = ({ bookingData, size = 200 }: { bookingData: string, size?
   );
 };
 
+const WHATSAPP_NUMBER = "919220829369";
+
 const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   experienceTitle,
   date,
@@ -45,6 +47,8 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const [showQrCode, setShowQrCode] = useState(false);
   const [qrCodeLoaded, setQrCodeLoaded] = useState(false);
   const [showThankYou, setShowThankYou] = useState(true);
+  const [showCaretakerAssign, setShowCaretakerAssign] = useState(true);
+  const [showConnectWhatsapp, setShowConnectWhatsapp] = useState(false);
   const { toast } = useToast();
   const qrCanvasRef = useRef<HTMLDivElement>(null);
   const { userProfile } = useAuth();
@@ -73,6 +77,17 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     return undefined;
   }, [showQrCode]);
   
+  useEffect(() => {
+    if (showCaretakerAssign) {
+      setShowConnectWhatsapp(false);
+      const timeout = setTimeout(() => {
+        setShowCaretakerAssign(false);
+        setShowConnectWhatsapp(true);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [showCaretakerAssign]);
+  
   const handleWhatsAppShare = () => {
     const message = `Booking Confirmed!\n\n${experienceTitle}\nName: ${customerName}\nPhone: ${contactPhone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} ${parseInt(guests) === 1 ? 'person' : 'people'}`;
     
@@ -84,6 +99,16 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     toast({
       description: "Opening WhatsApp..."
     });
+  };
+
+  const handleCaretakerWhatsapp = () => {
+    const caretakerName = "Rohit (Your Caretaker)";
+    const caretakerNumber = WHATSAPP_NUMBER;
+    const message =
+      `Hi ${caretakerName},\nMy table reservation is confirmed!\n\nName: ${customerName}\nDate: ${date}\nTime: ${time}\nGuests: ${guests}\nLooking forward to your assistance!`;
+    const whatsappUrl = `https://wa.me/${caretakerNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    toast({ description: "Opening WhatsApp to connect you with your caretaker..." });
   };
 
   const openWhatsAppCard = () => {
@@ -137,6 +162,63 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     }
   };
 
+  const CaretakerAssignAnimation = () => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center h-[260px] mb-6"
+    >
+      <div className="w-20 h-20 mb-6 flex items-center justify-center rounded-full bg-green-100 shadow-lg">
+        <svg className="animate-spin h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24">
+          <circle
+            className="opacity-20"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-80"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          />
+        </svg>
+      </div>
+      <h2 className="text-xl font-bold text-green-700 mb-1">Allotting your reservation caretaker...</h2>
+      <p className="text-airbnb-gold text-base">Please wait a moment</p>
+    </motion.div>
+  );
+
+  const CaretakerWhatsappButton = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center my-6"
+    >
+      <div className="mb-4 flex items-center justify-center">
+        <span className="font-medium text-lg text-green-600">Your caretaker is assigned: <span className="font-bold">Rohit</span></span>
+      </div>
+      <Button
+        onClick={handleCaretakerWhatsapp}
+        className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 text-base font-bold rounded-lg shadow-lg flex items-center gap-2 animate-pulse"
+        style={{ minWidth: 220 }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 32 32" className="mr-2" aria-hidden="true">
+          <rect width="32" height="32" rx="16" fill="#fff"/>
+          <path fill="#25D366" d="M16 7A9 9 0 007 16c0 1.484.408 2.938 1.18 4.203l-1.25 4.45a1 1 0 001.227 1.227l4.45-1.25A9.002 9.002 0 1022 7a8.96 8.96 0 00-6-.001zm.003 2.001A6.998 6.998 0 1123 16.002h-.005A6.999 6.999 0 0116.003 9zm-.13 2.037a1 1 0 00-.86.509l-.535.931a1 1 0 00.206 1.236l1.03.846a6.144 6.144 0 002.62 2.027c.063.023.13.034.197.034.067 0 .134-.01.197-.034a6.143 6.143 0 002.62-2.027l1.03-.846a1 1 0 00.206-1.236l-.535-.93a1 1 0 00-.86-.509l-1.234-.004c-.205 0-.4.079-.546.22l-.586.581a1.003 1.003 0 01-1.422 0l-.586-.581a.77.77 0 00-.545-.22l-1.235.003zm.721 2.426c.064.057.14.086.221.086.08 0 .157-.03.22-.086l.586-.58a.754.754 0 01.545-.221l1.234-.003c.082-.001.158.028.221.085l.535.931-.999.82a5.139 5.139 0 01-2.114 1.637 5.137 5.137 0 01-2.114-1.636l-.999-.821.535-.931zm-.595 3.12c.554.478 1.219.835 1.92 1.076a7.244 7.244 0 001.92-1.076l.999.821a3.376 3.376 0 01-1.828 1.603 3.375 3.375 0 01-1.828-1.604zm-.597.125a1 1 0 00-.466 1.022l.088.606c.094.649.573 1.08 1.19 1.08.596 0 1.058-.423 1.19-1.081l.087-.605a1 1 0 00-.466-1.022 5.321 5.321 0 01-.529-.486zm4.072 0a5.2 5.2 0 01-.53.486 1 1 0 00-.466 1.021l.088.605c.133.658.595 1.081 1.191 1.081.617 0 1.095-.43 1.19-1.08l.089-.606a1 1 0 00-.466-1.022z"/>
+        </svg>
+        Connect on WhatsApp
+      </Button>
+      <p className="mt-2 text-sm text-green-700 font-medium">
+        Chat directly with your caretaker about your reservation!
+      </p>
+    </motion.div>
+  );
+
   const renderThankYouMessage = () => (
     <div className="text-center p-6">
       <motion.div
@@ -183,7 +265,11 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center bg-airbnb-dark min-h-screen">
-      {showThankYou ? renderThankYouMessage() : (
+      {showCaretakerAssign ? (
+        <CaretakerAssignAnimation />
+      ) : showConnectWhatsapp ? (
+        <CaretakerWhatsappButton />
+      ) : showThankYou ? renderThankYouMessage() : (
         <>
           <motion.div
             initial={{ scale: 0 }}
