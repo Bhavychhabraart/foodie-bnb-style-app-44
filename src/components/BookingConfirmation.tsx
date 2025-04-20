@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { QRCodeSVG } from 'qrcode.react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/providers/AuthProvider';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface BookingConfirmationProps {
   experienceTitle: string;
@@ -33,6 +34,14 @@ const BookingQRCode = ({ bookingData, size = 200 }: { bookingData: string, size?
 };
 
 const WHATSAPP_NUMBER = "919220829369";
+
+const Branding = () => (
+  <div className="flex flex-col items-center pb-3">
+    <span className="text-2xl font-bold text-airbnb-gold tracking-wide select-none">
+      Get<span className="text-white">Reserve</span>
+    </span>
+  </div>
+);
 
 const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   experienceTitle,
@@ -170,6 +179,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center justify-center h-[260px] mb-6"
     >
+      <Branding />
       <div className="w-20 h-20 mb-6 flex items-center justify-center rounded-full bg-green-100 shadow-lg">
         <svg className="animate-spin h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24">
           <circle
@@ -199,6 +209,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center justify-center my-6"
     >
+      <Branding />
       <div className="mb-4 flex items-center justify-center">
         <span className="font-medium text-lg text-green-600">Your caretaker is assigned: <span className="font-bold">Rohit</span></span>
       </div>
@@ -373,50 +384,52 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           </div>
 
           <Dialog open={showQrCode} onOpenChange={setShowQrCode}>
-            <DialogContent className="sm:max-w-md">
-              <Card className="bg-airbnb-dark border-airbnb-gold/20">
+            <DialogContent className="sm:max-w-md p-0">
+              <Card className="bg-airbnb-dark border-airbnb-gold/20 h-[500px] flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-center text-white">Your Booking QR Ticket</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center">
-                  <div className="p-4 bg-white rounded-lg shadow-xl" ref={qrCanvasRef}>
-                    {showQrCode && <BookingQRCode bookingData={bookingDetailsQR} />}
-                  </div>
-                  <div className="mt-4 text-center space-y-3">
-                    <p className="text-sm text-white/60 mb-1">Scan this code at the restaurant</p>
-                    <p className="font-medium text-white">{experienceTitle}</p>
-                    
-                    <div className="bg-airbnb-dark/70 rounded-lg p-3 border border-airbnb-gold/20">
-                      <div className="flex items-center justify-center mb-2">
-                        <User className="h-4 w-4 text-airbnb-gold mr-1" />
-                        <p className="text-sm text-white">{customerName}</p>
-                      </div>
+                <ScrollArea className="flex-1 min-h-0">
+                  <CardContent className="flex flex-col items-center pb-0">
+                    <div className="p-4 bg-white rounded-lg shadow-xl" ref={qrCanvasRef}>
+                      {showQrCode && <BookingQRCode bookingData={bookingDetailsQR} />}
+                    </div>
+                    <div className="mt-4 text-center space-y-3">
+                      <p className="text-sm text-white/60 mb-1">Scan this code at the restaurant</p>
+                      <p className="font-medium text-white">{experienceTitle}</p>
                       
-                      {contactPhone && (
+                      <div className="bg-airbnb-dark/70 rounded-lg p-3 border border-airbnb-gold/20">
                         <div className="flex items-center justify-center mb-2">
-                          <Phone className="h-4 w-4 text-airbnb-gold mr-1" />
-                          <p className="text-sm text-white">{contactPhone}</p>
+                          <User className="h-4 w-4 text-airbnb-gold mr-1" />
+                          <p className="text-sm text-white">{customerName}</p>
                         </div>
-                      )}
-                      
-                      <div className="flex items-center justify-center mb-2">
-                        <Calendar className="h-4 w-4 text-airbnb-gold mr-1" />
-                        <p className="text-sm text-white">{date}</p>
-                      </div>
-                      
-                      <div className="flex items-center justify-center mb-2">
-                        <Clock className="h-4 w-4 text-airbnb-gold mr-1" />
-                        <p className="text-sm text-white">{time}</p>
-                      </div>
-                      
-                      <div className="flex items-center justify-center">
-                        <Users className="h-4 w-4 text-airbnb-gold mr-1" />
-                        <p className="text-sm text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</p>
+                        
+                        {contactPhone && (
+                          <div className="flex items-center justify-center mb-2">
+                            <Phone className="h-4 w-4 text-airbnb-gold mr-1" />
+                            <p className="text-sm text-white">{contactPhone}</p>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-center mb-2">
+                          <Calendar className="h-4 w-4 text-airbnb-gold mr-1" />
+                          <p className="text-sm text-white">{date}</p>
+                        </div>
+                        
+                        <div className="flex items-center justify-center mb-2">
+                          <Clock className="h-4 w-4 text-airbnb-gold mr-1" />
+                          <p className="text-sm text-white">{time}</p>
+                        </div>
+                        
+                        <div className="flex items-center justify-center">
+                          <Users className="h-4 w-4 text-airbnb-gold mr-1" />
+                          <p className="text-sm text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
+                  </CardContent>
+                </ScrollArea>
+                <CardFooter className="flex justify-between mt-auto">
                   <Button variant="outline" onClick={() => setShowQrCode(false)} className="text-white border-airbnb-gold/50">
                     Close
                   </Button>
@@ -430,36 +443,38 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           </Dialog>
 
           <Dialog open={showWhatsAppCard} onOpenChange={setShowWhatsAppCard}>
-            <DialogContent className="sm:max-w-md">
-              <Card className="bg-airbnb-dark border-airbnb-gold/20">
+            <DialogContent className="sm:max-w-md p-0">
+              <Card className="bg-airbnb-dark border-airbnb-gold/20 h-[500px] flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-center text-white">Share on WhatsApp</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <p className="text-white">Send your booking details to WhatsApp</p>
-                    <div className="bg-airbnb-dark/50 p-3 rounded-md border border-airbnb-gold/20">
-                      <p className="font-medium text-white">{experienceTitle}</p>
-                      <div className="grid grid-cols-2 gap-1 text-sm mt-2">
-                        <div className="text-airbnb-gold/80">Name:</div>
-                        <div className="text-white">{customerName}</div>
-                        {contactPhone && (
-                          <>
-                            <div className="text-airbnb-gold/80">Contact:</div>
-                            <div className="text-white">{contactPhone}</div>
-                          </>
-                        )}
-                        <div className="text-airbnb-gold/80">Date:</div>
-                        <div className="text-white">{date}</div>
-                        <div className="text-airbnb-gold/80">Time:</div>
-                        <div className="text-white">{time}</div>
-                        <div className="text-airbnb-gold/80">Guests:</div>
-                        <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
+                <ScrollArea className="flex-1 min-h-0">
+                  <CardContent>
+                    <div className="space-y-3">
+                      <p className="text-white">Send your booking details to WhatsApp</p>
+                      <div className="bg-airbnb-dark/50 p-3 rounded-md border border-airbnb-gold/20">
+                        <p className="font-medium text-white">{experienceTitle}</p>
+                        <div className="grid grid-cols-2 gap-1 text-sm mt-2">
+                          <div className="text-airbnb-gold/80">Name:</div>
+                          <div className="text-white">{customerName}</div>
+                          {contactPhone && (
+                            <>
+                              <div className="text-airbnb-gold/80">Contact:</div>
+                              <div className="text-white">{contactPhone}</div>
+                            </>
+                          )}
+                          <div className="text-airbnb-gold/80">Date:</div>
+                          <div className="text-white">{date}</div>
+                          <div className="text-airbnb-gold/80">Time:</div>
+                          <div className="text-white">{time}</div>
+                          <div className="text-airbnb-gold/80">Guests:</div>
+                          <div className="text-white">{guests} {parseInt(guests) === 1 ? 'person' : 'people'}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
+                  </CardContent>
+                </ScrollArea>
+                <CardFooter className="flex justify-between mt-auto">
                   <Button variant="outline" onClick={closeWhatsAppCard} className="text-white border-airbnb-gold/50">
                     Cancel
                   </Button>
