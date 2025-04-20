@@ -13,6 +13,12 @@ const AdminSiteEditor: React.FC = () => {
       <header className="bg-white dark:bg-slate-800 shadow-sm">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
+            <img
+              alt="GetReserve"
+              src="https://getreserve.com/assets/logo.png"
+              className="w-10 h-10 mr-4 rounded-full shadow"
+              style={{ background: "#fff", border: "2px solid #FFD700" }}
+            />
             <Button 
               variant="ghost" 
               size="sm" 
@@ -31,7 +37,7 @@ const AdminSiteEditor: React.FC = () => {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto" style={{ height: "calc(100vh - 80px)" }}>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <SiteEditorCard 
             title="Content Management"

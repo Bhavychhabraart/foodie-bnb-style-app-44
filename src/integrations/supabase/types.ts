@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      about_content: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       chefs_specials: {
         Row: {
           chef: string
@@ -108,6 +135,33 @@ export type Database = {
           title?: string
           updated_at?: string
           venue?: string
+        }
+        Relationships: []
+      }
+      highlights: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon_name: string
+          id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon_name: string
+          id?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon_name?: string
+          id?: string
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

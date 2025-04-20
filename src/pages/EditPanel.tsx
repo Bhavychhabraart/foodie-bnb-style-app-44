@@ -14,6 +14,8 @@ import EditOffers from '@/components/edit-panel/EditOffers';
 import EditSpecials from '@/components/edit-panel/EditSpecials';
 import EditTestimonials from '@/components/edit-panel/EditTestimonials';
 import EditEvents from '@/components/edit-panel/EditEvents';
+import EditAboutContent from '@/components/edit-panel/EditAboutContent';
+import EditHighlights from '@/components/edit-panel/EditHighlights';
 
 const colorOptions = [
   { name: 'Red', value: '#FF385C' },
@@ -211,7 +213,9 @@ const EditPanel: React.FC = () => {
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-6 mb-8">
+          <TabsList className="grid grid-cols-8 mb-8">
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="highlights">Highlights</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="experiences">Experiences</TabsTrigger>
@@ -220,29 +224,14 @@ const EditPanel: React.FC = () => {
             <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="gallery">
-            <EditGallery />
-          </TabsContent>
-          
-          <TabsContent value="events">
-            <EditEvents />
-          </TabsContent>
-          
-          <TabsContent value="experiences">
-            <EditExperiences />
-          </TabsContent>
-          
-          <TabsContent value="offers">
-            <EditOffers />
-          </TabsContent>
-          
-          <TabsContent value="specials">
-            <EditSpecials />
-          </TabsContent>
-          
-          <TabsContent value="testimonials">
-            <EditTestimonials />
-          </TabsContent>
+          <TabsContent value="about"><EditAboutContent /></TabsContent>
+          <TabsContent value="highlights"><EditHighlights /></TabsContent>
+          <TabsContent value="gallery"><EditGallery /></TabsContent>
+          <TabsContent value="events"><EditEvents /></TabsContent>
+          <TabsContent value="experiences"><EditExperiences /></TabsContent>
+          <TabsContent value="offers"><EditOffers /></TabsContent>
+          <TabsContent value="specials"><EditSpecials /></TabsContent>
+          <TabsContent value="testimonials"><EditTestimonials /></TabsContent>
         </Tabs>
       </main>
     </div>
