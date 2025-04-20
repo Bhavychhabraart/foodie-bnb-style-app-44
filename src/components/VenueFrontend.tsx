@@ -26,12 +26,14 @@ interface VenueData {
   status: string;
   created_at: string;
   updated_at: string;
+  setup_completed: boolean;
 }
 
 const VenueFrontend: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [venue, setVenue] = useState<VenueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("all");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -69,6 +71,14 @@ const VenueFrontend: React.FC = () => {
     fetchVenue();
   }, [slug, toast, navigate]);
 
+  // Function to scroll to booking section
+  const scrollToBooking = () => {
+    const bookingSection = document.getElementById('booking');
+    if (bookingSection) {
+      bookingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -89,16 +99,14 @@ const VenueFrontend: React.FC = () => {
     );
   }
 
-  // Here we would normally pass the venue ID to all the components
-  // to fetch venue-specific data, but for now we'll just render
-  // the existing components
+  // Here we pass venue data and the required props to all components
   return (
     <div className="min-h-screen">
       <Navbar />
-      <Hero />
+      <Hero scrollToBooking={scrollToBooking} />
       <About />
       <Highlights />
-      <ChefsSpecials />
+      <ChefsSpecials setActiveCategory={setActiveCategory} />
       <Events />
       <Footer />
     </div>
@@ -106,4 +114,3 @@ const VenueFrontend: React.FC = () => {
 };
 
 export default VenueFrontend;
-

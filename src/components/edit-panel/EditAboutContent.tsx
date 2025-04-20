@@ -11,8 +11,16 @@ interface EditAboutContentProps {
   venueSlug?: string;
 }
 
+interface AboutContent {
+  id?: string;
+  title: string;
+  description: string;
+  image_url: string;
+  venue_slug?: string;
+}
+
 const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
-  const [about, setAbout] = useState<{ id?: string, title: string, description: string, image_url: string }>({
+  const [about, setAbout] = useState<AboutContent>({
     title: "",
     description: "",
     image_url: "",
@@ -41,7 +49,7 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
         }
         if (data) {
-          setAbout(data);
+          setAbout(data as AboutContent);
         }
       } catch (error) {
         console.error("Error fetching about content:", error);
@@ -60,16 +68,15 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
     
     try {
       let resp;
-      const updateData = {
+      const updateData: AboutContent = {
         title: about.title,
         description: about.description,
         image_url: about.image_url,
-        updated_at: new Date().toISOString(),
       };
       
       // Add venue_slug if provided
       if (venueSlug) {
-        Object.assign(updateData, { venue_slug: venueSlug });
+        updateData.venue_slug = venueSlug;
       }
       
       if (about.id) {

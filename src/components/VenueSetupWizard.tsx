@@ -9,6 +9,23 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditAboutContent from "@/components/edit-panel/EditAboutContent";
 
+// Add interface for venue
+interface Venue {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  address: string;
+  website?: string;
+  contact_email: string;
+  contact_phone: string;
+  owner_id: string;
+  status: string;
+  setup_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 const VenueSetupWizard: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [activeStep, setActiveStep] = useState("about");
