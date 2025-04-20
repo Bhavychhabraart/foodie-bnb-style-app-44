@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
+// Venue type is now correct
 interface VenueData {
   id: string;
   name: string;
@@ -37,21 +38,21 @@ const VenueFrontend: React.FC = () => {
   useEffect(() => {
     const fetchVenue = async () => {
       if (!slug) return;
-      
+
       try {
         const { data: venueData, error } = await supabase
           .from("venues")
           .select("*")
           .eq("slug", slug)
           .eq("status", "active")
-          .single();
-          
+          .maybeSingle();
+
         if (error) throw error;
         if (!venueData) {
           throw new Error("Venue not found");
         }
-        
-        setVenue(venueData);
+
+        setVenue(venueData as VenueData);
       } catch (error: any) {
         console.error("Error fetching venue:", error);
         toast({
@@ -64,10 +65,10 @@ const VenueFrontend: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchVenue();
   }, [slug, toast, navigate]);
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,7 +76,7 @@ const VenueFrontend: React.FC = () => {
       </div>
     );
   }
-  
+
   if (!venue) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -87,7 +88,7 @@ const VenueFrontend: React.FC = () => {
       </div>
     );
   }
-  
+
   // Here we would normally pass the venue ID to all the components
   // to fetch venue-specific data, but for now we'll just render
   // the existing components
@@ -105,3 +106,4 @@ const VenueFrontend: React.FC = () => {
 };
 
 export default VenueFrontend;
+

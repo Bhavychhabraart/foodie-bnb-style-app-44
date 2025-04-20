@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,9 +24,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 
+interface Venue {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  address: string;
+  website: string | null;
+  contact_email: string;
+  contact_phone: string;
+  owner_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const VenueAdminDashboard: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [venue, setVenue] = useState<any>(null);
+  const [venue, setVenue] = useState<Venue | null>(null);
   const [stats, setStats] = useState({
     totalReservations: 0,
     todayReservations: 0,
@@ -40,18 +54,25 @@ const VenueAdminDashboard: React.FC = () => {
   useEffect(() => {
     const fetchVenueData = async () => {
       if (!slug) return;
-      
+
       try {
-        // Fetch venue data
         const { data: venueData, error: venueError } = await supabase
           .from("venues")
           .select("*")
           .eq("slug", slug)
-          .single();
-        
+          .maybeSingle();
+
         if (venueError) throw venueError;
-        
-        // Check if user has access to this venue
+        if (!venueData) {
+          toast({
+            title: "Not found",
+            description: "Venue not found",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
         if (venueData.owner_id !== user?.id) {
           toast({
             title: "Access denied",
@@ -61,28 +82,26 @@ const VenueAdminDashboard: React.FC = () => {
           navigate("/");
           return;
         }
-        
+
         setVenue(venueData);
-        
-        // Fetch venue statistics
-        // In a real application, you would filter these by venue_id
+
         const today = new Date().toISOString().split('T')[0];
-        
+
         const { count: totalReservations } = await supabase
           .from("reservations")
           .select("*", { count: 'exact', head: true });
-        
+
         const { count: todayReservations } = await supabase
           .from("reservations")
           .select("*", { count: 'exact', head: true })
           .eq("date", today);
-        
+
         const { data: revenueData } = await supabase
           .from("reservations")
           .select("total_amount");
-        
-        const totalRevenue = revenueData?.reduce((sum, reservation) => sum + Number(reservation.total_amount), 0) || 0;
-        
+
+        const totalRevenue = revenueData?.reduce((sum: number, reservation: { total_amount: number }) => sum + Number(reservation.total_amount), 0) || 0;
+
         setStats({
           totalReservations: totalReservations || 0,
           todayReservations: todayReservations || 0,
@@ -99,7 +118,7 @@ const VenueAdminDashboard: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchVenueData();
   }, [slug, user?.id, navigate]);
 
@@ -131,7 +150,6 @@ const VenueAdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      {/* Header */}
       <header className="bg-white dark:bg-slate-800 shadow-sm">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
@@ -166,9 +184,7 @@ const VenueAdminDashboard: React.FC = () => {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 gap-6 mb-6 sm:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardContent className="pt-6">
@@ -221,7 +237,6 @@ const VenueAdminDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Main Dashboard */}
         <Card>
           <CardHeader>
             <CardTitle>Venue Management</CardTitle>

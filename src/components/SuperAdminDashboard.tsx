@@ -9,8 +9,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+// Venue type is now correct
+interface Venue {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  address: string;
+  website: string | null;
+  contact_email: string;
+  contact_phone: string;
+  owner_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  owner_email?: string;
+}
+
 const SuperAdminDashboard: React.FC = () => {
-  const [venues, setVenues] = useState<any[]>([]);
+  const [venues, setVenues] = useState<Venue[]>([]);
   const [stats, setStats] = useState({
     totalVenues: 0,
     activeVenues: 0,
@@ -29,27 +46,27 @@ const SuperAdminDashboard: React.FC = () => {
           .from("venues")
           .select("*")
           .order("created_at", { ascending: false });
-        
+
         if (venuesError) throw venuesError;
-        
+
         // Get count of active venues
-        const activeVenues = venuesData?.filter(v => v.status === "active").length || 0;
-        
+        const activeVenues = venuesData?.filter((v: Venue) => v.status === "active").length || 0;
+
         // Fetch user count
         const { count: usersCount, error: usersError } = await supabase
           .from("profiles")
           .select("*", { count: 'exact', head: true });
-        
+
         if (usersError) throw usersError;
-        
+
         // Fetch reservation count
         const { count: reservationsCount, error: reservationsError } = await supabase
           .from("reservations")
           .select("*", { count: 'exact', head: true });
-        
+
         if (reservationsError) throw reservationsError;
-        
-        setVenues(venuesData || []);
+
+        setVenues(venuesData as Venue[] || []);
         setStats({
           totalVenues: venuesData?.length || 0,
           activeVenues,
@@ -58,21 +75,21 @@ const SuperAdminDashboard: React.FC = () => {
         });
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast({ 
-          title: "Data fetch failed", 
-          description: "Could not load dashboard data", 
-          variant: "destructive" 
+        toast({
+          title: "Data fetch failed",
+          description: "Could not load dashboard data",
+          variant: "destructive"
         });
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     fetchData();
   }, []);
 
-  const filteredVenues = venues.filter(venue => 
-    venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredVenues = venues.filter(venue =>
+    venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     venue.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -113,7 +130,7 @@ const SuperAdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
@@ -127,7 +144,7 @@ const SuperAdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
@@ -141,7 +158,7 @@ const SuperAdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
@@ -163,9 +180,9 @@ const SuperAdminDashboard: React.FC = () => {
               <CardTitle>Venue Management</CardTitle>
               <div className="relative w-64">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <Input 
-                  placeholder="Search venues..." 
-                  className="pl-8" 
+                <Input
+                  placeholder="Search venues..."
+                  className="pl-8"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -214,14 +231,14 @@ const SuperAdminDashboard: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex space-x-2">
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={() => navigate(`/venues/${venue.slug}`)}
                             >
                               View Site
                             </Button>
-                            <Button 
+                            <Button
                               size="sm"
                               onClick={() => navigate(`/super-admin/venues/${venue.id}`)}
                             >
@@ -243,3 +260,4 @@ const SuperAdminDashboard: React.FC = () => {
 };
 
 export default SuperAdminDashboard;
+

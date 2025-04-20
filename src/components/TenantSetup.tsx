@@ -20,6 +20,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+// Match Database type for venues
+interface Venue {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  address: string;
+  website: string | null;
+  contact_email: string;
+  contact_phone: string;
+  owner_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const tenantSchema = z.object({
   name: z.string().min(2, "Venue name must be at least 2 characters"),
   slug: z.string()
@@ -39,7 +55,7 @@ const TenantSetup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const form = useForm<TenantFormValues>({
     resolver: zodResolver(tenantSchema),
     defaultValues: {
@@ -55,31 +71,32 @@ const TenantSetup: React.FC = () => {
 
   const onSubmit = async (values: TenantFormValues) => {
     if (!user) {
-      toast({ 
-        title: "Authentication error", 
+      toast({
+        title: "Authentication error",
         description: "You must be logged in to create a venue",
-        variant: "destructive" 
+        variant: "destructive"
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       // First check if slug is available
       const { data: existingVenue } = await supabase
         .from("venues")
         .select("slug")
         .eq("slug", values.slug)
-        .single();
-      
+        .maybeSingle();
+
       if (existingVenue) {
-        form.setError("slug", { 
-          message: "This slug is already taken. Please choose another one." 
+        form.setError("slug", {
+          message: "This slug is already taken. Please choose another one."
         });
+        setIsLoading(false);
         return;
       }
-      
+
       // Insert new venue
       const { data: venue, error } = await supabase
         .from("venues")
@@ -96,41 +113,42 @@ const TenantSetup: React.FC = () => {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       // Update user's profile to set current_venue_id
       await supabase
         .from("profiles")
         .update({ current_venue_id: venue.id })
         .eq("id", user.id);
-      
-      toast({ 
-        title: "Venue created", 
+
+      toast({
+        title: "Venue created",
         description: `Your venue "${values.name}" has been created successfully!`
       });
-      
+
       // Navigate to venue setup wizard
       navigate(`/venues/${values.slug}/setup`);
     } catch (error: any) {
       console.error("Error creating venue:", error);
-      toast({ 
-        title: "Error", 
+      toast({
+        title: "Error",
         description: error.message || "Failed to create venue",
-        variant: "destructive" 
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nameValue = e.target.value;
     form.setValue("name", nameValue);
-    
-    // Only auto-generate slug if user hasn't manually edited it
-    if (!form.getValues("slug") || form.getValues("slug") === form.getFieldState("slug").isDirty) {
+    const currentSlug = form.getValues("slug");
+
+    // Only auto-generate slug if user hasn't manually changed slug field
+    if (!form.formState.dirtyFields.slug) {
       const slugValue = nameValue
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
@@ -158,17 +176,17 @@ const TenantSetup: React.FC = () => {
                   <FormItem>
                     <FormLabel>Venue Name</FormLabel>
                     <FormControl>
-                      <Input 
-                        {...field} 
+                      <Input
+                        {...field}
                         onChange={(e) => handleNameChange(e)}
-                        placeholder="e.g. Fine Dine Restaurant" 
+                        placeholder="e.g. Fine Dine Restaurant"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="slug"
@@ -178,10 +196,10 @@ const TenantSetup: React.FC = () => {
                     <FormControl>
                       <div className="flex items-center space-x-2">
                         <div className="text-sm text-gray-500">getreserve.com/</div>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           className="flex-1"
-                          placeholder="your-venue-name" 
+                          placeholder="your-venue-name"
                         />
                       </div>
                     </FormControl>
@@ -189,7 +207,7 @@ const TenantSetup: React.FC = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -197,9 +215,9 @@ const TenantSetup: React.FC = () => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        {...field} 
-                        placeholder="Tell us about your venue..." 
+                      <Textarea
+                        {...field}
+                        placeholder="Tell us about your venue..."
                         rows={3}
                       />
                     </FormControl>
@@ -207,7 +225,7 @@ const TenantSetup: React.FC = () => {
                   </FormItem>
                 )}
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -222,7 +240,7 @@ const TenantSetup: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="website"
@@ -237,7 +255,7 @@ const TenantSetup: React.FC = () => {
                   )}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -252,7 +270,7 @@ const TenantSetup: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="contact_phone"
@@ -267,7 +285,7 @@ const TenantSetup: React.FC = () => {
                   )}
                 />
               </div>
-              
+
               <div className="flex justify-end">
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Creating..." : "Create Venue"}
@@ -282,3 +300,4 @@ const TenantSetup: React.FC = () => {
 };
 
 export default TenantSetup;
+

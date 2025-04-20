@@ -385,34 +385,48 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          current_venue_id: string | null
           email: string | null
           full_name: string | null
           id: string
           is_admin: boolean
+          is_super_admin: boolean
           phone: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          current_venue_id?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           is_admin?: boolean
+          is_super_admin?: boolean
           phone?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          current_venue_id?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
           is_admin?: boolean
+          is_super_admin?: boolean
           phone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_current_venue_id_fkey"
+            columns: ["current_venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservation_guests: {
         Row: {
@@ -611,6 +625,51 @@ export type Database = {
           time?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          address: string
+          contact_email: string
+          contact_phone: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          slug: string
+          status: string
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          address: string
+          contact_email: string
+          contact_phone: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          slug: string
+          status?: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          slug?: string
+          status?: string
+          updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
       }
