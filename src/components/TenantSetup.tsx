@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import {
   Form,
@@ -19,6 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { Loader2 } from "lucide-react";
 
 // Match Database type for venues
 interface Venue {
@@ -55,6 +56,7 @@ const TenantSetup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const form = useForm<TenantFormValues>({
     resolver: zodResolver(tenantSchema),
@@ -83,11 +85,16 @@ const TenantSetup: React.FC = () => {
 
     try {
       // First check if slug is available
-      const { data: existingVenue } = await supabase
+      const { data: existingVenue, error: slugError } = await supabase
         .from("venues")
         .select("slug")
         .eq("slug", values.slug)
         .maybeSingle();
+
+      if (slugError) {
+        console.error("Error checking slug:", slugError);
+        throw new Error("Failed to check if slug is available");
+      }
 
       if (existingVenue) {
         form.setError("slug", {
@@ -97,8 +104,11 @@ const TenantSetup: React.FC = () => {
         return;
       }
 
+      console.log("Creating venue with values:", values);
+      console.log("User ID:", user.id);
+
       // Insert new venue
-      const { data: venue, error } = await supabase
+      const { data: venue, error: insertError } = await supabase
         .from("venues")
         .insert({
           name: values.name,
@@ -114,13 +124,23 @@ const TenantSetup: React.FC = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (insertError) {
+        console.error("Error creating venue:", insertError);
+        throw insertError;
+      }
+
+      console.log("Venue created:", venue);
 
       // Update user's profile to set current_venue_id
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({ current_venue_id: venue.id })
         .eq("id", user.id);
+
+      if (profileError) {
+        console.error("Error updating profile:", profileError);
+        // Not throwing here as venue is already created
+      }
 
       toast({
         title: "Venue created",
@@ -133,7 +153,7 @@ const TenantSetup: React.FC = () => {
       console.error("Error creating venue:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create venue",
+        description: error.message || "Failed to create venue. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -288,7 +308,14 @@ const TenantSetup: React.FC = () => {
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Creating..." : "Create Venue"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Venue"
+                  )}
                 </Button>
               </div>
             </form>
@@ -300,4 +327,3 @@ const TenantSetup: React.FC = () => {
 };
 
 export default TenantSetup;
-
