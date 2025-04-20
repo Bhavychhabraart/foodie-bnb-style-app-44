@@ -26,7 +26,7 @@ interface Venue {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  description: string | null;
   address: string;
   website: string | null;
   contact_email: string;
@@ -85,6 +85,7 @@ const TenantSetup: React.FC = () => {
 
     try {
       // First check if slug is available
+      console.log("Checking slug availability:", values.slug);
       const { data: existingVenue, error: slugError } = await supabase
         .from("venues")
         .select("slug")
@@ -97,6 +98,7 @@ const TenantSetup: React.FC = () => {
       }
 
       if (existingVenue) {
+        console.log("Slug already taken:", existingVenue);
         form.setError("slug", {
           message: "This slug is already taken. Please choose another one."
         });
@@ -107,20 +109,25 @@ const TenantSetup: React.FC = () => {
       console.log("Creating venue with values:", values);
       console.log("User ID:", user.id);
 
+      // Format the data properly for insert
+      const venueData = {
+        name: values.name,
+        slug: values.slug,
+        description: values.description || "",
+        address: values.address,
+        website: values.website || null,
+        contact_email: values.contact_email,
+        contact_phone: values.contact_phone,
+        owner_id: user.id,
+        status: "active"
+      };
+      
+      console.log("Venue data for insert:", venueData);
+
       // Insert new venue
       const { data: venue, error: insertError } = await supabase
         .from("venues")
-        .insert({
-          name: values.name,
-          slug: values.slug,
-          description: values.description || "",
-          address: values.address,
-          website: values.website || null,
-          contact_email: values.contact_email,
-          contact_phone: values.contact_phone,
-          owner_id: user.id,
-          status: "active"
-        })
+        .insert(venueData)
         .select()
         .single();
 
@@ -151,6 +158,15 @@ const TenantSetup: React.FC = () => {
       navigate(`/venues/${values.slug}/setup`);
     } catch (error: any) {
       console.error("Error creating venue:", error);
+      
+      // More detailed error information
+      if (error.details) {
+        console.error("Error details:", error.details);
+      }
+      if (error.hint) {
+        console.error("Error hint:", error.hint);
+      }
+      
       toast({
         title: "Error",
         description: error.message || "Failed to create venue. Please try again.",
