@@ -638,6 +638,7 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          setup_completed: boolean
           slug: string
           status: string
           updated_at: string | null
@@ -652,6 +653,7 @@ export type Database = {
           id?: string
           name: string
           owner_id: string
+          setup_completed?: boolean
           slug: string
           status?: string
           updated_at?: string | null
@@ -666,6 +668,7 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string
+          setup_completed?: boolean
           slug?: string
           status?: string
           updated_at?: string | null
