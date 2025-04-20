@@ -37,19 +37,19 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
           .select("*")
           .order("created_at", { ascending: true })
           .limit(1);
-          
-        // If we have a venue slug, filter by it
+
         if (venueSlug) {
           query = query.eq("venue_slug", venueSlug);
         }
-          
-        const { data, error } = await query.maybeSingle();
+
+        // Avoid using .maybeSingle() with dynamic chained queries, use `.then()` for correct type narrowing
+        const { data, error } = await query;
 
         if (error) {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
         }
-        if (data) {
-          setAbout(data as AboutContent);
+        if (data && Array.isArray(data) && data.length > 0) {
+          setAbout(data[0] as AboutContent);
         }
       } catch (error) {
         console.error("Error fetching about content:", error);
@@ -65,7 +65,7 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       let resp;
       const updateData: AboutContent = {
@@ -73,12 +73,11 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
         description: about.description,
         image_url: about.image_url,
       };
-      
-      // Add venue_slug if provided
+
       if (venueSlug) {
         updateData.venue_slug = venueSlug;
       }
-      
+
       if (about.id) {
         resp = await supabase
           .from("about_content")
@@ -89,7 +88,7 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
           .from("about_content")
           .insert([updateData]);
       }
-      
+
       if (resp.error) {
         toast({ title: "Error", description: "Failed to save about content", variant: "destructive" });
       } else {

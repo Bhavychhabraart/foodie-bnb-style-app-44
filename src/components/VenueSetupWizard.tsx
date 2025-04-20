@@ -36,10 +36,11 @@ const VenueSetupWizard: React.FC = () => {
     setIsLoading(true);
     try {
       // Update venue status to completed
-      const updateData = { setup_completed: true };
+      // Explicitly type updateData to include `setup_completed`
+      const updateData: { setup_completed: boolean } = { setup_completed: true };
       await supabase
         .from("venues")
-        .update(updateData as any) // cast to any to bypass typing error
+        .update(updateData)
         .eq("slug", slug);
       
       toast({ 
