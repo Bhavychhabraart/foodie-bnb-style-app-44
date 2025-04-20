@@ -18,6 +18,8 @@ const EditAboutContent: React.FC = () => {
   // Load about content on mount
   useEffect(() => {
     setLoading(true);
+    
+    // Fetch data and handle the promise chain properly
     supabase
       .from("about_content")
       .select("*")
@@ -31,44 +33,58 @@ const EditAboutContent: React.FC = () => {
         if (data) {
           setAbout(data);
         }
+        // Set loading to false inside the then block
+        setLoading(false);
       })
-      .finally(() => setLoading(false));
+      .catch(error => {
+        console.error("Error fetching about content:", error);
+        toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
+        setLoading(false);
+      });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    let resp;
-    if (about.id) {
-      resp = await supabase
-        .from("about_content")
-        .update({
-          title: about.title,
-          description: about.description,
-          image_url: about.image_url,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", about.id);
-    } else {
-      resp = await supabase
-        .from("about_content")
-        .insert([
-          {
+    
+    try {
+      let resp;
+      if (about.id) {
+        resp = await supabase
+          .from("about_content")
+          .update({
             title: about.title,
             description: about.description,
             image_url: about.image_url,
-          },
-        ]);
-    }
-    if (resp.error) {
-      toast({ title: "Error", description: "Failed to save about content", variant: "destructive" });
-    } else {
-      toast({ title: "Saved", description: "About section updated" });
-      if (!about.id && resp.data && resp.data[0]?.id) {
-        setAbout({ ...about, id: resp.data[0].id });
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", about.id);
+      } else {
+        resp = await supabase
+          .from("about_content")
+          .insert([
+            {
+              title: about.title,
+              description: about.description,
+              image_url: about.image_url,
+            },
+          ]);
       }
+      
+      if (resp.error) {
+        toast({ title: "Error", description: "Failed to save about content", variant: "destructive" });
+      } else {
+        toast({ title: "Saved", description: "About section updated" });
+        if (!about.id && resp.data && resp.data[0]?.id) {
+          setAbout({ ...about, id: resp.data[0].id });
+        }
+      }
+    } catch (error) {
+      console.error("Error saving about content:", error);
+      toast({ title: "Error", description: "Failed to save about content", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
