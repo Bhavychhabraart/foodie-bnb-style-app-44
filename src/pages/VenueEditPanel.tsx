@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-// import EditAboutContent from '@/components/edit-panel/EditAboutContent';
+import EditAboutContent from '@/components/edit-panel/EditAboutContent';
 import EditVenueHighlights from '@/components/edit-panel/EditVenueHighlights';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,7 @@ const VenueEditPanel: React.FC = () => {
   const renderSection = () => {
     switch (section) {
       case 'about':
-        // return <EditAboutContent venueSlug={slug} />;
-        return <div className="bg-gray-100 border p-12 rounded text-gray-400 text-center">About editor temporarily removed for development</div>;
+        return <EditAboutContent venueSlug={slug} />;
       case 'highlights':
         return <EditVenueHighlights venueSlug={slug} />;
       case 'menu':
