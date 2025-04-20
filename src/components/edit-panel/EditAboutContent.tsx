@@ -32,13 +32,17 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
     const fetchAboutContent = async () => {
       setLoading(true);
       try {
-        // Create a base query
-        const { data, error } = await supabase
+        let query = supabase
           .from("about_content")
           .select("*")
           .order("created_at", { ascending: true })
-          .eq(venueSlug ? "venue_slug" : "id", venueSlug || "")
           .limit(1);
+
+        if (venueSlug) {
+          query = query.eq("venue_slug", venueSlug);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
@@ -149,3 +153,4 @@ const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
 };
 
 export default EditAboutContent;
+
