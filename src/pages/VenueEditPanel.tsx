@@ -2,6 +2,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 // import EditAboutContent from '@/components/edit-panel/EditAboutContent';
+import EditVenueHighlights from '@/components/edit-panel/EditVenueHighlights';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
@@ -17,7 +18,7 @@ const VenueEditPanel: React.FC = () => {
         // return <EditAboutContent venueSlug={slug} />;
         return <div className="bg-gray-100 border p-12 rounded text-gray-400 text-center">About editor temporarily removed for development</div>;
       case 'highlights':
-        return <div>Highlights Editor Coming Soon</div>;
+        return <EditVenueHighlights venueSlug={slug} />;
       case 'menu':
         return <div>Menu Editor Coming Soon</div>;
       case 'specials':
