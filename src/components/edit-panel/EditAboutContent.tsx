@@ -7,7 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 
-const EditAboutContent: React.FC = () => {
+interface EditAboutContentProps {
+  venueSlug?: string;
+}
+
+const EditAboutContent: React.FC<EditAboutContentProps> = ({ venueSlug }) => {
   const [about, setAbout] = useState<{ id?: string, title: string, description: string, image_url: string }>({
     title: "",
     description: "",
@@ -20,12 +24,18 @@ const EditAboutContent: React.FC = () => {
     const fetchAboutContent = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("about_content")
           .select("*")
           .order("created_at", { ascending: true })
-          .limit(1)
-          .maybeSingle();
+          .limit(1);
+          
+        // If we have a venue slug, filter by it
+        if (venueSlug) {
+          query = query.eq("venue_slug", venueSlug);
+        }
+          
+        const { data, error } = await query.maybeSingle();
 
         if (error) {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
@@ -42,7 +52,7 @@ const EditAboutContent: React.FC = () => {
     };
 
     fetchAboutContent();
-  }, []);
+  }, [venueSlug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,26 +60,27 @@ const EditAboutContent: React.FC = () => {
     
     try {
       let resp;
+      const updateData = {
+        title: about.title,
+        description: about.description,
+        image_url: about.image_url,
+        updated_at: new Date().toISOString(),
+      };
+      
+      // Add venue_slug if provided
+      if (venueSlug) {
+        Object.assign(updateData, { venue_slug: venueSlug });
+      }
+      
       if (about.id) {
         resp = await supabase
           .from("about_content")
-          .update({
-            title: about.title,
-            description: about.description,
-            image_url: about.image_url,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq("id", about.id);
       } else {
         resp = await supabase
           .from("about_content")
-          .insert([
-            {
-              title: about.title,
-              description: about.description,
-              image_url: about.image_url,
-            },
-          ]);
+          .insert([updateData]);
       }
       
       if (resp.error) {

@@ -1,64 +1,33 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
+import LoadingWrapper from './LoadingWrapper';
 
 interface AdminRouteProps {
   children: React.ReactNode;
+  requireSuperAdmin?: boolean;
 }
 
-const ADMIN_PIN = '767676';
+const AdminRoute: React.FC<AdminRouteProps> = ({ children, requireSuperAdmin = false }) => {
+  const { isAdmin, isSuperAdmin, isLoading, user } = useAuth();
 
-const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const [showPinDialog, setShowPinDialog] = useState(true);
-  const [pin, setPin] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  if (isLoading) {
+    return <LoadingWrapper isLoading={true}>Loading...</LoadingWrapper>;
+  }
 
-  const handlePinSubmit = () => {
-    if (pin === ADMIN_PIN) {
-      setIsAuthenticated(true);
-      setShowPinDialog(false);
-      toast({
-        title: "Access Granted",
-        description: "Welcome to the admin panel",
-      });
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "Incorrect PIN code",
-        variant: "destructive"
-      });
-      setPin('');
-    }
-  };
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
-  if (!isAuthenticated) {
-    return (
-      <Dialog open={showPinDialog} onOpenChange={setShowPinDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Admin Access Required</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Enter PIN"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handlePinSubmit()}
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={handlePinSubmit}>Submit</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+  // If super admin is required and user is not a super admin
+  if (requireSuperAdmin && !isSuperAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  // For regular admin routes
+  if (!isAdmin && !isSuperAdmin) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
