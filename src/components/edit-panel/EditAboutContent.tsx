@@ -17,30 +17,31 @@ const EditAboutContent: React.FC = () => {
 
   // Load about content on mount
   useEffect(() => {
-    setLoading(true);
-    
-    // Fetch data and handle the promise chain properly
-    supabase
-      .from("about_content")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data, error }) => {
+    const fetchAboutContent = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("about_content")
+          .select("*")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
         if (error) {
           toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
         }
         if (data) {
           setAbout(data);
         }
-        // Set loading to false inside the then block
-        setLoading(false);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error("Error fetching about content:", error);
         toast({ title: "Error", description: "Could not fetch about content", variant: "destructive" });
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchAboutContent();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
