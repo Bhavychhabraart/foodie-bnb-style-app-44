@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +14,6 @@ interface Highlight {
   icon_name: string;
 }
 
-// Venue type is now correct
 interface VenueData {
   id: string;
   name: string;
@@ -85,7 +83,6 @@ const VenueFrontend: React.FC = () => {
   const fetchHighlights = async () => {
     try {
       setHighlightsLoading(true);
-      // In a production app, you would filter by venue_id
       const { data, error } = await supabase
         .from("highlights")
         .select("*")
@@ -100,61 +97,44 @@ const VenueFrontend: React.FC = () => {
     }
   };
 
-  // Function to scroll to booking section
-  const scrollToBooking = () => {
-    const bookingSection = document.getElementById('booking');
-    if (bookingSection) {
-      bookingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading venue...</p>
-      </div>
-    );
-  }
-
-  if (!venue) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Venue Not Found</h1>
-          <p className="mb-4">The venue you're looking for doesn't exist or is not available.</p>
-          <Button onClick={() => navigate("/")}>Return Home</Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#1A1F2C]">
+        <p className="text-white">Loading venue...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#1A1F2C]">
       <Navbar />
       <VenueHero 
-        venueName={venue.name}
-        venueDescription={venue.description || "Experience the ultimate dining destination!"}
-        scrollToBooking={scrollToBooking}
+        venueName="Slique"
+        venueDescription="Experience modern luxury dining in the heart of the city. Where contemporary cuisine meets elegant ambiance."
+        scrollToBooking={() => {
+          const bookingSection = document.getElementById('booking');
+          if (bookingSection) {
+            bookingSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
       />
-      <VenueAbout 
-        title={`About ${venue.name}`}
-        description={venue.description || ""}
-      />
+      <VenueAbout />
       <VenueHighlights 
         highlights={highlights}
         loading={highlightsLoading}
       />
-      <div id="booking" className="py-12 bg-primary/5">
+      <div id="booking" className="py-20 bg-[#1A1F2C]">
         <div className="container text-center">
-          <h2 className="text-3xl font-bold mb-4">Book Your Table</h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Ready for an unforgettable experience? Reserve your table now and enjoy exceptional service and delicious cuisine.
+          <h2 className="text-4xl font-bold mb-6 text-white">Reserve Your Experience</h2>
+          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join us for an unforgettable dining experience. Reserve your table now and immerse yourself in the world of contemporary cuisine.
           </p>
-          <div className="flex justify-center">
-            <Button size="lg">
-              Book Now
-            </Button>
-          </div>
+          <Button 
+            size="lg"
+            className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
+          >
+            Book Now
+          </Button>
         </div>
       </div>
       <Footer />
