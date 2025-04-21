@@ -85,7 +85,7 @@ export const VenueAbout: React.FC<VenueAboutProps> = ({
           <div className="aspect-[4/3] overflow-hidden rounded-xl">
             <img 
               src={imageUrl} 
-              alt="Slique interior" 
+              alt="Venue interior" 
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
             />
           </div>
@@ -108,37 +108,13 @@ export const VenueHighlights: React.FC<VenueHighlightsProps> = ({ highlights = [
     );
   }
 
-  // Use these curated highlights for Slique
-  const sliqueHighlights = [
-    {
-      id: '1',
-      title: 'Michelin-Starred Chef',
-      description: 'Experience culinary masterpieces crafted by our internationally acclaimed chef team.',
-      icon_name: 'Award'
-    },
-    {
-      id: '2',
-      title: 'Farm to Table',
-      description: 'We source only the finest seasonal ingredients from local artisanal producers.',
-      icon_name: 'Utensils'
-    },
-    {
-      id: '3',
-      title: 'Private Dining',
-      description: 'Exclusive dining spaces available for intimate gatherings and special occasions.',
-      icon_name: 'Clock'
-    }
-  ];
-
-  const displayHighlights = highlights.length > 0 ? highlights : sliqueHighlights;
-
   return (
     <section id="highlights" className="py-20 bg-gradient-to-b from-[#1A1F2C] to-[#2C1F3D]">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-12 text-white">Why Choose Slique</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-white">Why Choose Us</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {displayHighlights.map((highlight) => (
+          {highlights.map((highlight) => (
             <Card key={highlight.id} className="bg-white/5 backdrop-blur-sm border-0">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
