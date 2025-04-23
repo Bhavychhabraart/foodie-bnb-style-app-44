@@ -9,33 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      about_content: {
-        Row: {
-          created_at: string | null
-          description: string
-          id: string
-          image_url: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          id?: string
-          image_url?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          id?: string
-          image_url?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       chefs_specials: {
         Row: {
           chef: string
@@ -135,33 +108,6 @@ export type Database = {
           title?: string
           updated_at?: string
           venue?: string
-        }
-        Relationships: []
-      }
-      highlights: {
-        Row: {
-          created_at: string | null
-          description: string
-          icon_name: string
-          id: string
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          icon_name: string
-          id?: string
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          icon_name?: string
-          id?: string
-          title?: string
-          updated_at?: string | null
         }
         Relationships: []
       }
@@ -385,48 +331,34 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
-          current_venue_id: string | null
           email: string | null
           full_name: string | null
           id: string
           is_admin: boolean
-          is_super_admin: boolean
           phone: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
-          current_venue_id?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           is_admin?: boolean
-          is_super_admin?: boolean
           phone?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
-          current_venue_id?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
           is_admin?: boolean
-          is_super_admin?: boolean
           phone?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_current_venue_id_fkey"
-            columns: ["current_venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       reservation_guests: {
         Row: {
@@ -625,54 +557,6 @@ export type Database = {
           time?: string
           title?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      venues: {
-        Row: {
-          address: string
-          contact_email: string
-          contact_phone: string
-          created_at: string | null
-          description: string | null
-          id: string
-          name: string
-          owner_id: string
-          setup_completed: boolean
-          slug: string
-          status: string
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          address: string
-          contact_email: string
-          contact_phone: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name: string
-          owner_id: string
-          setup_completed?: boolean
-          slug: string
-          status?: string
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          address?: string
-          contact_email?: string
-          contact_phone?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-          owner_id?: string
-          setup_completed?: boolean
-          slug?: string
-          status?: string
-          updated_at?: string | null
-          website?: string | null
         }
         Relationships: []
       }
